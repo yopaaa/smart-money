@@ -1,32 +1,16 @@
 import Account from '@/app/Account';
 import Home from '@/app/Home';
-import HomeScreen from '@/app/HomeScreen';
+import Settings from '@/app/Settings';
+import StatsScreen from '@/app/StatsScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { CurvedBottomBarExpo } from 'react-native-curved-bottom-bar';
 
-// // Keep the splash screen visible while we fetch resources
-// SplashScreen.preventAutoHideAsync();
-
-// // Set the animation options. This is optional.
-// SplashScreen.setOptions({
-//   duration: 1000,
-//   fade: true,
-// });
-
-
-const Screen1 = () => <View><Text>Home</Text></View>;
-const Screen2 = () => <HomeScreen />;
 
 const renderTabBar = ({ routeName, selectedTab, navigate }) => {
-  let icon = routeName === 'home' ? 'home' : 'person';
-
   return (
     <TouchableOpacity
-      // name={icon}
-      // size={24}
-      // color={routeName === selectedTab ? '#00BFFF' : 'gray'}
       onPress={() => navigate(routeName)}
 
       style={styles.tabbarItem}
@@ -44,52 +28,16 @@ const renderTabBar = ({ routeName, selectedTab, navigate }) => {
 export default function App() {
   const router = useRouter();
 
-
-  // const [appIsReady, setAppIsReady] = useState(false);
-
-  // useEffect(() => {
-  //   async function prepare() {
-  //     try {
-  //       // Pre-load fonts, make any API calls you need to do here
-  //       await Font.loadAsync(Entypo.font);
-  //       // Artificially delay for two seconds to simulate a slow loading
-  //       // experience. Remove this if you copy and paste the code!
-  //       await new Promise(resolve => setTimeout(resolve, 2000));
-  //     } catch (e) {
-  //       console.warn(e);
-  //     } finally {
-  //       // Tell the application to render
-  //       setAppIsReady(true);
-  //     }
-  //   }
-
-  //   prepare();
-  // }, []);
-
-  // const onLayoutRootView = useCallback(() => {
-  //   if (appIsReady) {
-  //     // This tells the splash screen to hide immediately! If we call this after
-  //     // `setAppIsReady`, then we may see a blank screen while the app is
-  //     // loading its initial state and rendering its first pixels. So instead,
-  //     // we hide the splash screen once we know the root view has already
-  //     // performed layout.
-  //     SplashScreen.hide();
-  //   }
-  // }, [appIsReady]);
-
-  // if (!appIsReady) {
-  //   return null;
-  // }
-
   return (
     <CurvedBottomBarExpo.Navigator
+      screenOptions={{headerShown: false}}
       type="DOWN"
       height={100}
       circleWidth={60}
       bgColor="white"
       initialRouteName="home"
       renderCircle={({ selectedTab, navigate }) => (
-        <View
+        <TouchableOpacity
           style={{
             width: 60,
             height: 60,
@@ -99,16 +47,17 @@ export default function App() {
             alignItems: 'center',
             bottom: 15,
           }}
+          onPress={() => router.navigate("page/TransactionForm")}
         >
-          <Ionicons name="add" size={24} color="#FFF" onPress={() => router.navigate("page/TransactionForm")} />
-        </View>
+          <Ionicons name="add" size={24} color="#FFF" />
+        </TouchableOpacity>
       )}
       tabBar={renderTabBar}
     >
       <CurvedBottomBarExpo.Screen name="home" position="LEFT" component={Home} />
-      <CurvedBottomBarExpo.Screen name="analytics" position="LEFT" component={HomeScreen} />
+      <CurvedBottomBarExpo.Screen name="analytics" position="LEFT" component={StatsScreen} />
       <CurvedBottomBarExpo.Screen name="albums" position="RIGHT" component={Account} />
-      <CurvedBottomBarExpo.Screen name="settings" position="RIGHT" component={Screen2} />
+      <CurvedBottomBarExpo.Screen name="settings" position="RIGHT" component={Settings} />
     </CurvedBottomBarExpo.Navigator>
   );
 }

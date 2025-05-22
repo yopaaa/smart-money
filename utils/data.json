@@ -1,0 +1,50 @@
+[
+    {
+        "accountId": "acc-1",
+        "amount": 1000,
+        "category": "Investasi",
+        "createdAt": "1747756572912",
+        "description": null,
+        "fee": 50,
+        "id": "DBeZyJPE",
+        "targetAccountId": null,
+        "title": "transfer",
+        "type": "transfer"
+    },
+    {
+        "accountId": "acc-2",
+        "amount": 1000,
+        "category": "Investasi",
+        "createdAt": "1747756572912",
+        "description": null,
+        "fee": 0,
+        "id": "8QmSBue7",
+        "targetAccountId": null,
+        "title": "Transfer dari Dompet",
+        "type": "income"
+    },
+    {
+        "accountId": "acc-1",
+        "amount": 50,
+        "category": "Biaya Transfer",
+        "createdAt": "1747756572912",
+        "description": "Biaya transfer ke Rekening Bank",
+        "fee": 0,
+        "id": "II4ZJm4w",
+        "targetAccountId": null,
+        "title": "Biaya transfer",
+        "type": "expense"
+    },
+    {
+        "accountId": "acc-1",
+        "amount": 0,
+        "category": "Pendapatan",
+        "createdAt": "1747756527345",
+        "description": "Transaksi awal akun",
+        "fee": 0,
+        "id": "JSO0z7TN",
+        "targetAccountId": null,
+        "title": "Transaksi awal",
+        "type": "income"
+    }
+]

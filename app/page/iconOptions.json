@@ -1,0 +1,91 @@
+[
+    {
+        "icon": "cash",
+        "color": "#000"
+    },
+    {
+        "icon": "credit-card",
+        "color": "#000"
+    },
+    {
+        "icon": "credit-card-outline",
+        "color": "#000"
+    },
+    {
+        "icon": "bank",
+        "color": "#000"
+    },
+    {
+        "icon": "chart-line",
+        "color": "#000"
+    },
+    {
+        "icon": "file-document",
+        "color": "#000"
+    },
+     {
+        "icon": "account-cash",
+        "color": "#000"
+    },
+    {
+        "icon": "account-arrow-left",
+        "color": "#000"
+    },
+    {
+        "icon": "umbrella",
+        "color": "#000"
+    },
+
+    {
+        "icon": "dots-horizontal",
+        "color": "#000"
+    },
+    {
+        "icon": "account-cash",
+        "color": "#000"
+    },
+    {
+        "icon": "wallet",
+        "color": "#000"
+    },
+    {
+        "icon": "piggy-bank",
+        "color": "#000"
+    },
+    {
+        "icon": "briefcase",
+        "color": "#000"
+    },
+    {
+        "icon": "safe",
+        "color": "#000"
+    },
+    {
+        "icon": "hand-coin",
+        "color": "#000"
+    },
+    {
+        "icon": "bank-transfer",
+        "color": "#000"
+    },
+    {
+        "icon": "currency-usd",
+        "color": "#000"
+    },
+    {
+        "icon": "account-circle",
+        "color": "#000"
+    },
+    {
+        "icon": "calendar-month",
+        "color": "#000"
+    },
+    {
+        "icon": "store",
+        "color": "#000"
+    },
+    {
+        "icon": "shopping",
+        "color": "#000"
+    }
+]

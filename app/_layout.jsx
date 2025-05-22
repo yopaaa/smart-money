@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { TransactionProvider } from './TransactionContext';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -18,12 +19,23 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <TransactionProvider>
+
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack screenOptions={{
+          animation: "fade_from_bottom",
+          headerShown: false,
+          headerStyle: { backgroundColor: '#00BFFF' },
+          headerTintColor: '#fff',
+          headerTitleAlign: 'center',
+        }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </TransactionProvider>
+
   );
 }

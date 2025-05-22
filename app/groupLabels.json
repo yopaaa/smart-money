@@ -1,0 +1,72 @@
+[
+    {
+        "key": "cash",
+        "name": "Cash",
+        "icon": "cash",
+        "color": "#81c784",
+        "isLiability": false
+    },
+    {
+        "key": "card",
+        "name": "Credit Card",
+        "icon": "credit-card",
+        "color": "#64b5f6",
+        "isLiability": true
+    },
+    {
+        "key": "debit",
+        "name": "Debit Card",
+        "icon": "credit-card-outline",
+        "color": "#7986cb",
+        "isLiability": false
+    },
+    {
+        "key": "saving",
+        "name": "Saving Account",
+        "icon": "bank",
+        "color": "#4db6ac",
+        "isLiability": false
+    },
+    {
+        "key": "invest",
+        "name": "Investasi",
+        "icon": "chart-line",
+        "color": "#ffb74d",
+        "isLiability": false
+    },
+    {
+        "key": "liability",
+        "name": "Liabilities",
+        "icon": "file-document",
+        "color": "#e57373",
+        "isLiability": true
+    },
+    {
+        "key": "debt",
+        "name": "Hutang",
+        "icon": "account-cash",
+        "color": "#f06292",
+        "isLiability": true
+    },
+    {
+        "key": "receivable",
+        "name": "Piutang",
+        "icon": "account-arrow-left",
+        "color": "#9575cd",
+        "isLiability": false
+    },
+    {
+        "key": "expense-buffer",
+        "name": "Emergency Fund",
+        "icon": "umbrella",
+        "color": "#ba68c8",
+        "isLiability": false
+    },
+    {
+        "key": "other",
+        "name": "Lainnya",
+        "icon": "dots-horizontal",
+        "color": "#90a4ae",
+        "isLiability": false
+    }
+]

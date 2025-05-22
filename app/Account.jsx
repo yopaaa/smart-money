@@ -1,64 +1,29 @@
-import { useEffect, useState } from 'react';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
     SafeAreaView,
-    SectionList, StyleSheet,
+    SectionList,
+    StatusBar,
+    StyleSheet,
     Text,
-    View,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
-// import 'react-native-get-random-values';
-import { getAccounts, initDB } from '../utils/db';
-
-
-// Dummy data akun
-const dummyAccounts = [
-    { id: '1', name: 'Dompet', balance: 150000, type: 'cash', isLiability: false, hidden: false },
-    { id: '2', name: 'BCA', balance: 3200000, type: 'saving', isLiability: false, hidden: false },
-    { id: '3', name: 'BRI', balance: 2200000, type: 'saving', isLiability: false, hidden: false },
-    { id: '4', name: 'Kartu Kredit BCA', balance: 2000000, type: 'card', isLiability: true, hidden: false },
-    { id: '5', name: 'Reksadana', balance: 1500000, type: 'invest', isLiability: false, hidden: false },
-    { id: '6', name: 'Crypto', balance: 1500000, type: 'invest', isLiability: false, hidden: true },
-    { id: '7', name: 'Pinjaman Teman', balance: 500000, type: 'liability', isLiability: true, hidden: false },
-];
-
-const groupLabels = {
-    cash: 'Cash',
-    card: 'Credit Card',
-    debit: 'Debit Card',
-    saving: 'Saving Account',
-    invest: 'Investasi',
-    liability: 'Liabilities',
-    other: 'Lainnya',
-};
+import { useRouter } from 'expo-router';
+import { useTransactions } from './TransactionContext';
+import groupLabels from './groupLabels.json';
 
 export default function AccountsScreen() {
-    const [accounts, setAccounts] = useState([]);
-
- 
-
-    useEffect(() => {
-        initDB();
-        loadAccounts()
-    }, []);
-
-    const loadAccounts = () => {
-        const rows = getAccounts();
-        setAccounts(rows);
-    };
-
-
-    // const loadAccounts = () => {
-    //     // Ganti dengan load dari AsyncStorage jika perlu
-    //     setAccounts(dummyAccounts);
-    // };
+    const { accounts } = useTransactions();
+    const router = useRouter();
 
     const calculateSummary = () => {
         let assets = 0;
         let liabilities = 0;
-        for (let acc of accounts) {
+        for (let acc of accounts) {            
             if (acc.hidden) continue; // skip akun tersembunyi
-            if (acc.isLiability) {
-                liabilities += acc.balance;
+            if (acc.isLiability > 0) {
+                liabilities -= acc.balance;
             } else {
                 assets += acc.balance;
             }
@@ -70,19 +35,23 @@ export default function AccountsScreen() {
         };
     };
 
-
     const groupAccounts = () => {
         const groups = {};
+
         for (let acc of accounts) {
             const key = acc.type || 'other';
             if (!groups[key]) groups[key] = [];
-            groups[key].push(acc); // tampilkan semua, termasuk hidden
+            groups[key].push(acc);
         }
 
-        return Object.keys(groups).map((type) => ({
-            title: groupLabels[type] || type,
-            data: groups[type],
-        }));
+        return groupLabels
+            .filter(group => groups[group.key]) // hanya yang punya data
+            .map(group => ({
+                title: group.name,
+                icon: group.icon,
+                color: group.color,
+                data: groups[group.key],
+            }));
     };
 
 
@@ -90,9 +59,10 @@ export default function AccountsScreen() {
     const grouped = groupAccounts();
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Text style={styles.header}>Akun</Text>
-
+        <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
+            <View style={styles.headercontainer}>
+                <Text style={styles.header}>Riwayat Transaksi</Text>
+            </View>
             <View style={styles.summary}>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Assets</Text>
@@ -108,40 +78,67 @@ export default function AccountsScreen() {
                 </View>
             </View>
 
-            <SectionList
-                sections={grouped}
-                keyExtractor={(item) => item.id}
-                renderSectionHeader={({ section: { title } }) => (
-                    <Text style={styles.groupTitle}>{title}</Text>
-                )}
-                renderItem={({ item }) => (
-                    <View style={styles.item}>
-                        <Text style={styles.accountName}>{item.name}</Text>
-                        <Text style={[
-                            styles.accountBalance,
-                            item.hidden
-                                ? styles.hiddenBalance
-                                : item.isLiability
-                                    ? styles.liabilityBalance
-                                    : styles.assetBalance
-                        ]}>
-                            Rp{item.balance.toLocaleString()}
-                        </Text>
+            {/* <Text>
+                {JSON.stringify(calculateSummary(), " ", " ")}
+            </Text> */}
 
-                    </View>
-                )}
-                contentContainerStyle={{ paddingBottom: 100 }}
-            />
+            <View>
+                <SectionList
+                    sections={grouped}
+                    keyExtractor={(item) => item.id}
+                    renderSectionHeader={({ section: { title } }) => (
+                        <Text style={styles.groupTitle}>{title}</Text>
+                    )}
+                    renderItem={({ item }) => (
+                        <View style={styles.item}>
 
-            {/* <AccountForm onSuccess={(updated) => setAccounts(updated)} /> */}
+                            <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 20 }}>
+                                <MaterialCommunityIcons name={item.icon} size={24} color={item.iconColor} />
+                                <Text style={styles.accountName}>
+                                    {item.name}
+                                </Text>
+                            </View>
+                            <Text style={[
+                                styles.accountBalance,
+                                item.hidden
+                                    ? styles.hiddenBalance
+                                    : item.isLiability
+                                        ? styles.liabilityBalance
+                                        : styles.assetBalance
+                            ]}>
+                                Rp{item.balance.toLocaleString()}
+                            </Text>
+
+                        </View>
+                    )}
+                    contentContainerStyle={{ paddingBottom: 100 }}
+                />
+            </View>
+
+            <TouchableOpacity onPress={() => router.navigate("page/CreateAccountForm")} style={{ position: "relative" }}>
+                <Text>Add account</Text>
+
+            </TouchableOpacity>
 
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
-    header: { fontSize: 24, fontWeight: 'bold', marginBottom: 16 },
+    container: {
+        padding: 16,
+        flex: 1,
+        flexDirection: "column"
+    },
+    headercontainer: {
+        height: 60,
+        justifyContent: 'center',
+    },
+    header: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 16,
+    },
     summary: {
         flexDirection: 'row',
         justifyContent: 'space-between',
