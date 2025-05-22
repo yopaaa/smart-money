@@ -99,15 +99,18 @@ export default function HomeScreen() {
                 <Text style={styles.header}>Riwayat Transaksi</Text>
             </View>
 
-            <FlatList
-                //   style={{marginBottom: 100}}
-                data={groupedTransactions}
-                keyExtractor={(item) => item.date}
-                renderItem={renderGroup}
-                ListEmptyComponent={<Text>Belum ada transaksi</Text>}
-                showsVerticalScrollIndicator={false}  // <--- ini baris penting
-                ListFooterComponent={<View style={{ margin: 100, justifyContent: "center" }} />}
-            />
+            <View>
+
+                <FlatList
+                    //   style={{marginBottom: 100}}
+                    data={groupedTransactions}
+                    keyExtractor={(item) => item.date}
+                    renderItem={renderGroup}
+                    ListEmptyComponent={<Text>Belum ada transaksi</Text>}
+                    showsVerticalScrollIndicator={false} 
+                    ListFooterComponent={<View style={{ margin: 100, justifyContent: "center" }} />}
+                />
+            </View>
 
         </SafeAreaView>
     );

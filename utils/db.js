@@ -17,6 +17,22 @@ export const initDB = () => {
     );`
     );
 
+    db.execSync(`
+    CREATE TABLE IF NOT EXISTS transactions (
+        id TEXT PRIMARY KEY NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        amount INTEGER NOT NULL,
+        type TEXT NOT NULL,
+        accountId TEXT NOT NULL,
+        targetAccountId TEXT,
+        createdAt TEXT NOT NULL,
+        category TEXT,
+        fee INTEGER DEFAULT 0,
+        FOREIGN KEY (accountId) REFERENCES accounts(id),
+        FOREIGN KEY (targetAccountId) REFERENCES accounts(id)
+    );`);
+
     const existing = db.getAllSync('SELECT COUNT(*) as total FROM accounts');
     if (existing[0]?.total === 0) {
         console.log('⏳ Menambahkan akun default...');
@@ -41,38 +57,6 @@ export const initDB = () => {
             icon: "bank",
             iconColor: "#2196f3",
             description: ""
-        })
-    }
-
-    db.execSync(`
-    CREATE TABLE IF NOT EXISTS transactions (
-        id TEXT PRIMARY KEY NOT NULL,
-        title TEXT NOT NULL,
-        description TEXT,
-        amount INTEGER NOT NULL,
-        type TEXT NOT NULL,
-        accountId TEXT NOT NULL,
-        targetAccountId TEXT,
-        createdAt TEXT NOT NULL,
-        category TEXT,
-        fee INTEGER DEFAULT 0,
-        FOREIGN KEY (accountId) REFERENCES accounts(id),
-        FOREIGN KEY (targetAccountId) REFERENCES accounts(id)
-    );`);
-
-    const existingTx = db.getAllSync('SELECT COUNT(*) as total FROM transactions');
-    if (existingTx[0]?.total === 0) {
-        console.log('🧾 Menambahkan transaksi default...');
-        addTransaction({
-            title: 'Transaksi awal',
-            description: 'Transaksi awal akun',
-            amount: 0,
-            type: 'income',
-            accountId: 'acc-1',
-            targetAccountId: undefined,
-            createdAt: Date.now(),
-            category: "Pendapatan",
-            fee: 0
         })
     }
 };
@@ -122,7 +106,7 @@ export const addTransaction = (
                 id,
                 transaction.title,
                 transaction.description || null,
-                0 + transaction.amount,
+                transaction.amount,
                 transaction.type,
                 transaction.accountId,
                 transaction.createdAt,

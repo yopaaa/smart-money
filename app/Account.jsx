@@ -20,7 +20,7 @@ export default function AccountsScreen() {
     const calculateSummary = () => {
         let assets = 0;
         let liabilities = 0;
-        for (let acc of accounts) {            
+        for (let acc of accounts) {
             if (acc.hidden) continue; // skip akun tersembunyi
             if (acc.isLiability > 0) {
                 liabilities -= acc.balance;
@@ -81,11 +81,19 @@ export default function AccountsScreen() {
             {/* <Text>
                 {JSON.stringify(calculateSummary(), " ", " ")}
             </Text> */}
+            <TouchableOpacity onPress={() => router.navigate("page/CreateAccountForm")} style={{ position: "relative" }}>
+                <Text>Add account</Text>
 
-            <View>
+            </TouchableOpacity>
+
+            <View style={{ flex: 1 }}>
                 <SectionList
+                    style={{ flex: 1 }}
+                    scrollEnabled
                     sections={grouped}
                     keyExtractor={(item) => item.id}
+                    contentContainerStyle={{ paddingBottom: 100 }}
+                    showsVerticalScrollIndicator={false}
                     renderSectionHeader={({ section: { title } }) => (
                         <Text style={styles.groupTitle}>{title}</Text>
                     )}
@@ -111,14 +119,11 @@ export default function AccountsScreen() {
 
                         </View>
                     )}
-                    contentContainerStyle={{ paddingBottom: 100 }}
+                    ListFooterComponent={<View style={{ margin: 100, justifyContent: "center" }} />}
                 />
             </View>
 
-            <TouchableOpacity onPress={() => router.navigate("page/CreateAccountForm")} style={{ position: "relative" }}>
-                <Text>Add account</Text>
 
-            </TouchableOpacity>
 
         </SafeAreaView>
     );
@@ -149,6 +154,9 @@ const styles = StyleSheet.create({
     summaryValue: { fontSize: 16, fontWeight: 'bold' },
 
     groupTitle: {
+        borderBottomColor: "black",
+        borderBottomWidth: 1,
+        paddingBottom: 15,
         fontSize: 16,
         fontWeight: 'bold',
         marginTop: 20,

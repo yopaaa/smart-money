@@ -28,7 +28,7 @@ export const TransactionProvider = ({ children }) => {
 
     const loadAccounts = () => {
         const rows = getAccounts();
-        setAccounts(rows);
+        setAccounts(rows);        
     };
 
     useEffect(() => {

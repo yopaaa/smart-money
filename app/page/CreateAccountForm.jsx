@@ -1,3 +1,7 @@
+import CustomIconPickerGrid from '@/components/CustomIconPickerGrid';
+import CustomPicker from '@/components/CustomPicker';
+import SimpleHeader from '@/components/SimpleHeader';
+import SwitchToggle from '@/components/SwitchToggle';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -16,15 +20,11 @@ import {
 import groupLabels from '../groupLabels.json';
 import { useTransactions } from '../TransactionContext';
 import colorOptions from './colorOptions.json';
-import CustomIconPickerGrid from './CustomIconPickerGrid';
-import CustomPicker from './CustomPicker';
 import iconOptions from './iconOptions.json';
-import SimpleHeader from './SimpleHeader';
-import SwitchToggle from './SwitchToggle';
 
 const TransactionForm = () => {
   const router = useRouter();
-  const { refetchTransactions, addAccount } = useTransactions();
+  const { refetchTransactions, addAccount, accounts } = useTransactions();
   const [selectedIcon, setSelectedIcon] = useState(iconOptions[0]);
   const [selectedIconColor, setSelectedIconColor] = useState(colorOptions[0]);
   const [isVisible, setIsVisible] = useState(true);
@@ -39,6 +39,8 @@ const TransactionForm = () => {
 
   useEffect(() => {
     console.log("Create account form")
+    console.log(accounts);
+
   }, []);
 
   const handleChange = (name, value) => {
@@ -53,16 +55,25 @@ const TransactionForm = () => {
       Alert.alert('Error', 'Mohon isi semua data dengan benar');
       return;
     }
+    // Validasi nama unik (case insensitive)
+    const isNameExist = accounts.some(
+      account => account.name.toLowerCase() === formData.name.trim().toLowerCase()
+    );
+
+    if (isNameExist) {
+      Alert.alert('Error', 'Nama akun sudah digunakan, silakan gunakan nama lain');
+      return;
+    }
 
     const accountData = {
-      name: formData.name,
+      name: formData.name.trim(),
       balance: formData.balance,
       type: formData.type.key,
       isLiability: formData.type.isLiability ? 1 : 0,
       hidden: isVisible ? 0 : 1,
       icon: selectedIcon.icon,
       iconColor: selectedIconColor.color,
-      description: formData.description
+      description: formData.description.trim()
     }
 
     try {

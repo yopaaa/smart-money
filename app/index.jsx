@@ -7,7 +7,6 @@ import { useRouter } from 'expo-router';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { CurvedBottomBarExpo } from 'react-native-curved-bottom-bar';
 
-
 const renderTabBar = ({ routeName, selectedTab, navigate }) => {
   return (
     <TouchableOpacity

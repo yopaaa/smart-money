@@ -1,3 +1,5 @@
+import CustomPicker from '@/components/CustomPicker';
+import SimpleHeader from '@/components/SimpleHeader';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
@@ -17,8 +19,6 @@ import {
   View
 } from 'react-native';
 import { useTransactions } from '../TransactionContext';
-import CustomPicker from './CustomPicker';
-import SimpleHeader from './SimpleHeader';
 
 const categories = [
   { name: 'Makanan', icon: 'silverware-fork-knife', color: '#e57373' },
@@ -61,7 +61,7 @@ const TransactionForm = () => {
         targetAccountId: accounts[1]
       }));
     }
-  }, []);
+  }, [accounts]);
 
   const handleChange = (name, value) => {
     setFormData(prev => ({
@@ -94,9 +94,9 @@ const TransactionForm = () => {
 
 
     const transaction = {
-      title: formData.title,
-      description: formData.description,
-      amount: formData.type === 'expense' ? 0 - parseInt(formData.amount) : parseInt(formData.amount),
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      amount: parseInt(formData.amount),
       type: formData.type,
       accountId: formData.accountId.id,
       targetAccountId: formData.type === 'transfer' ? formData.targetAccountId.id : undefined,
