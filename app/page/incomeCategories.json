@@ -1,0 +1,52 @@
+[
+    {
+        "name": "Gaji",
+        "icon": "cash",
+        "color": "#81c784"
+    },
+    {
+        "name": "Bonus",
+        "icon": "gift",
+        "color": "#fbc02d"
+    },
+    {
+        "name": "Penjualan",
+        "icon": "cart",
+        "color": "#4db6ac"
+    },
+    {
+        "name": "Bunga Bank",
+        "icon": "bank",
+        "color": "#64b5f6"
+    },
+    {
+        "name": "Investasi",
+        "icon": "chart-line",
+        "color": "#ffb74d"
+    },
+    {
+        "name": "Hadiah",
+        "icon": "party-popper",
+        "color": "#ba68c8"
+    },
+    {
+        "name": "Uang Saku",
+        "icon": "wallet-giftcard",
+        "color": "#f06292"
+    },
+    {
+        "name": "Transfer Masuk",
+        "icon": "bank-transfer-in",
+        "color": "#a1887f"
+    },
+    {
+        "name": "Penarikan Tunai",
+        "icon": "cash-plus",
+        "color": "#4caf50"
+    },
+    {
+        "name": "Lainnya",
+        "icon": "dots-horizontal",
+        "color": "#90a4ae"
+    }
+]

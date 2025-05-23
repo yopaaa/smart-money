@@ -40,17 +40,31 @@ export default function AccountsScreen() {
 
         for (let acc of accounts) {
             const key = acc.type || 'other';
-            if (!groups[key]) groups[key] = [];
-            groups[key].push(acc);
+
+            if (!groups[key]) {
+                groups[key] = {
+                    balance: 0,
+                    accounts: []
+                };
+            }
+
+            groups[key].accounts.push(acc);
+            if (acc.hidden === 0) {
+
+                groups[key].balance += acc.balance;
+            }
         }
 
+        // console.log(JSON.stringify(groups," ", " "));
+
         return groupLabels
-            .filter(group => groups[group.key]) // hanya yang punya data
+            .filter(group => groups[group.key]) // hanya yang ada datanya
             .map(group => ({
                 title: group.name,
                 icon: group.icon,
                 color: group.color,
-                data: groups[group.key],
+                balance: groups[group.key].balance,
+                data: groups[group.key].accounts
             }));
     };
 
@@ -61,26 +75,27 @@ export default function AccountsScreen() {
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
             <View style={styles.headercontainer}>
-                <Text style={styles.header}>Riwayat Transaksi</Text>
+                <Text style={styles.header}>Accounts</Text>
             </View>
             <View style={styles.summary}>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Assets</Text>
-                    <Text style={styles.summaryValue}>Rp{assets.toLocaleString()}</Text>
+                    <Text style={[styles.summaryValue, styles.assetBalance]}>Rp{assets.toLocaleString()}</Text>
                 </View>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Liabilities</Text>
-                    <Text style={styles.summaryValue}>Rp{liabilities.toLocaleString()}</Text>
+                    <Text style={[styles.summaryValue, styles.liabilityBalance]}>Rp{liabilities.toLocaleString()}</Text>
                 </View>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Total</Text>
-                    <Text style={styles.summaryValue}>Rp{total.toLocaleString()}</Text>
+                    <Text style={[styles.summaryValue, total > 0 ? styles.assetBalance : styles.liabilityBalance]}>Rp{total.toLocaleString()}</Text>
                 </View>
             </View>
 
             {/* <Text>
-                {JSON.stringify(calculateSummary(), " ", " ")}
+                {JSON.stringify(grouped, " ", " ")}
             </Text> */}
+
             <TouchableOpacity onPress={() => router.navigate("page/CreateAccountForm")} style={{ position: "relative" }}>
                 <Text>Add account</Text>
 
@@ -94,8 +109,23 @@ export default function AccountsScreen() {
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{ paddingBottom: 100 }}
                     showsVerticalScrollIndicator={false}
-                    renderSectionHeader={({ section: { title } }) => (
-                        <Text style={styles.groupTitle}>{title}</Text>
+                    renderSectionHeader={({ section: { title, balance } }) => (
+                        <View style={{
+                            ...styles.item, padding: 0, margin: 0, paddingVertical: 18, borderBottomColor: "black",
+                            borderBottomWidth: 1
+                        }}>
+
+                            <Text style={styles.groupTitle}>{title}</Text>
+                            <Text style={[
+                                styles.accountBalance,
+                                balance < 0
+                                    ? styles.liabilityBalance
+                                    : styles.assetBalance
+                            ]}>
+                                Rp{balance.toLocaleString()}
+                            </Text>
+                        </View>
+
                     )}
                     renderItem={({ item }) => (
                         <View style={styles.item}>
@@ -154,17 +184,16 @@ const styles = StyleSheet.create({
     summaryValue: { fontSize: 16, fontWeight: 'bold' },
 
     groupTitle: {
-        borderBottomColor: "black",
-        borderBottomWidth: 1,
-        paddingBottom: 15,
+        // paddingBottom: 15,
         fontSize: 16,
         fontWeight: 'bold',
-        marginTop: 20,
-        marginBottom: 8,
+        // marginTop: 20,
+        // marginBottom: 8,
         color: '#222'
     },
     item: {
         flexDirection: 'row',
+        alignItems: "center",
         justifyContent: 'space-between',
         backgroundColor: '#f2f2f2',
         padding: 12,

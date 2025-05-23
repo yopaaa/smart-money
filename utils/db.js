@@ -174,7 +174,7 @@ export const addTransaction = (
                         'expense',
                         transaction.accountId,
                         transaction.createdAt,
-                        'Biaya Transfer'
+                        'Transfer'
                     ]
                 );
             }

@@ -1,50 +1,52 @@
-[
-    {
-        "accountId": "acc-1",
-        "amount": 1000,
-        "category": "Investasi",
-        "createdAt": "1747756572912",
-        "description": null,
-        "fee": 50,
-        "id": "DBeZyJPE",
-        "targetAccountId": null,
-        "title": "transfer",
-        "type": "transfer"
-    },
-    {
-        "accountId": "acc-2",
-        "amount": 1000,
-        "category": "Investasi",
-        "createdAt": "1747756572912",
-        "description": null,
-        "fee": 0,
-        "id": "8QmSBue7",
-        "targetAccountId": null,
-        "title": "Transfer dari Dompet",
-        "type": "income"
-    },
-    {
-        "accountId": "acc-1",
-        "amount": 50,
-        "category": "Biaya Transfer",
-        "createdAt": "1747756572912",
-        "description": "Biaya transfer ke Rekening Bank",
-        "fee": 0,
-        "id": "II4ZJm4w",
-        "targetAccountId": null,
-        "title": "Biaya transfer",
-        "type": "expense"
-    },
-    {
-        "accountId": "acc-1",
-        "amount": 0,
-        "category": "Pendapatan",
-        "createdAt": "1747756527345",
-        "description": "Transaksi awal akun",
-        "fee": 0,
-        "id": "JSO0z7TN",
-        "targetAccountId": null,
-        "title": "Transaksi awal",
-        "type": "income"
-    }
-]
+{
+    "cash": [
+        {
+            "balance": 76500,
+            "description": "",
+            "hidden": 0,
+            "icon": "wallet",
+            "iconColor": "#4caf50",
+            "id": "acc-1",
+            "isLiability": 0,
+            "name": "Dompet",
+            "type": "cash"
+        },
+        {
+            "balance": 100000,
+            "description": "",
+            "hidden": 0,
+            "icon": "credit-card",
+            "iconColor": "#f06292",
+            "id": "PL48kgve",
+            "isLiability": 0,
+            "name": "Gopay",
+            "type": "cash"
+        }
+    ],
+    "debit": [
+        {
+            "balance": 514000,
+            "description": "",
+            "hidden": 0,
+            "icon": "bank",
+            "iconColor": "#2196f3",
+            "id": "acc-2",
+            "isLiability": 0,
+            "name": "Rekening Bank",
+            "type": "debit"
+        }
+    ],
+    "debt": [
+        {
+            "balance": -16000,
+            "description": "",
+            "hidden": 0,
+            "icon": "account-cash",
+            "iconColor": "#f06292",
+            "id": "IPQSHai2",
+            "isLiability": 1,
+            "name": "Hutang",
+            "type": "debt"
+        }
+    ]
+}

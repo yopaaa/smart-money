@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function CustomPicker({ 
+export default function CustomPicker({
     label,
     selected,
     onSelect,
@@ -10,27 +10,35 @@ export default function CustomPicker({
     inputContainerStyle,
     labelStyle,
     pickerStyle,
-    selectedComponent
+    selectedComponent,
+    TouchableComponent
 }) {
     const [visible, setVisible] = useState(false);
 
     return (
         <>
-            <View style={{ ...inputContainerStyle }}>
-                <Text style={{ ...styles.label, ...labelStyle }}>{label}</Text>
-                <TouchableOpacity style={{ ...styles.picker, ...pickerStyle }} onPress={() => setVisible(true)}>
-
-                    {selected ? selectedComponent(selected) : <Text> Pilih Kategori</Text>}
-
-                    <MaterialCommunityIcons name={"arrow-down-drop-circle"} size={20} />
+            {TouchableComponent ?
+                <TouchableOpacity onPress={() => setVisible(true)}>
+                    {TouchableComponent}
                 </TouchableOpacity>
-            </View>
+                :
+                <View style={{ ...inputContainerStyle }}>
+                    <Text style={{ ...styles.label, ...labelStyle }}>{label}</Text>
+                    <TouchableOpacity style={{ ...styles.picker, ...pickerStyle }} onPress={() => setVisible(true)}>
+
+                        {selected ? selectedComponent(selected) : <Text> Pilih Kategori</Text>}
+
+                        <MaterialCommunityIcons name={"arrow-down-drop-circle"} size={20} />
+                    </TouchableOpacity>
+                </View>
+            }
 
 
             <Modal visible={visible} transparent animationType="fade">
                 <View style={styles.modalContainer}>
                     <View style={styles.modalBox}>
                         <FlatList
+                            // showsVerticalScrollIndicator={false}
                             data={options}
                             keyExtractor={(item) => item.name}
                             renderItem={({ item, index }) => (

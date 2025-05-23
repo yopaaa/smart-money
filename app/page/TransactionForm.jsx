@@ -19,20 +19,8 @@ import {
   View
 } from 'react-native';
 import { useTransactions } from '../TransactionContext';
-
-const categories = [
-  { name: 'Makanan', icon: 'silverware-fork-knife', color: '#e57373' },
-  { name: 'Transportasi', icon: 'bus', color: '#64b5f6' },
-  { name: 'Belanja', icon: 'shopping', color: '#ba68c8' },
-  { name: 'Hiburan', icon: 'movie', color: '#4db6ac' },
-  { name: 'Kesehatan', icon: 'heart-pulse', color: '#f06292' },
-  { name: 'Pendidikan', icon: 'school', color: '#7986cb' },
-  { name: 'Gaji', icon: 'cash', color: '#81c784' },
-  { name: 'Investasi', icon: 'chart-line', color: '#ffb74d' },
-  { name: 'Transfer', icon: 'bank-transfer', color: '#a1887f' },
-  { name: 'Lainnya', icon: 'dots-horizontal', color: '#90a4ae' },
-];
-
+import expenseCategories from './expenseCategories.json';
+import incomeCategories from './incomeCategories.json';
 
 const TransactionForm = () => {
   const router = useRouter();
@@ -101,7 +89,7 @@ const TransactionForm = () => {
       accountId: formData.accountId.id,
       targetAccountId: formData.type === 'transfer' ? formData.targetAccountId.id : undefined,
       createdAt: mergedDate.getTime(),
-      category: formData.category.name || undefined,
+      category: formData.type === 'transfer' ? "Transfer" : formData.category.name,
       fee: formData.type === 'transfer' ? parseInt(formData.fee || '0') : 0
     };
 
@@ -217,21 +205,24 @@ const TransactionForm = () => {
           </View>
 
           {/* Input Category */}
-          <CustomPicker
-            inputContainerStyle={styles.inputContainer}
-            labelStyle={styles.label}
-            pickerStyle={styles.picker}
-            label="Kategori"
-            selected={formData.category}
-            onSelect={(val) => handleChange('category', val)}
-            options={categories}
-            selectedComponent={(val) => {
-              return (<>
-                <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.color} />
-                <Text>{val.name}</Text>
-              </>)
-            }}
-          />
+          {formData.type != 'transfer' && (
+            <CustomPicker
+              inputContainerStyle={styles.inputContainer}
+              labelStyle={styles.label}
+              pickerStyle={styles.picker}
+              label="Kategori"
+              selected={formData.category}
+              onSelect={(val) => handleChange('category', val)}
+              options={formData.type === "income" ? incomeCategories : expenseCategories}
+              selectedComponent={(val) => {
+                return (<>
+                  <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.color} />
+                  <Text>{val.name}</Text>
+                </>)
+              }}
+            />
+          )}
+
 
           <CustomPicker
             inputContainerStyle={styles.inputContainer}

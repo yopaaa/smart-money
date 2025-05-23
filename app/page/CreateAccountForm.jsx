@@ -39,8 +39,6 @@ const TransactionForm = () => {
 
   useEffect(() => {
     console.log("Create account form")
-    console.log(accounts);
-
   }, []);
 
   const handleChange = (name, value) => {
