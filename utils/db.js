@@ -87,7 +87,7 @@ export const addTransaction = (
         amount: Number,
         type: String,
         accountId: String,
-        targetAccountId: String,
+        targetAccountId: null,
         createdAt: Number,
         category: String,
         fee: NUmber
@@ -100,8 +100,8 @@ export const addTransaction = (
         const id = generateId();
         db.runSync(
             `INSERT INTO transactions 
-                (id, title, description, amount, type, accountId, createdAt, category, fee)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                (id, title, description, amount, type, accountId, targetAccountId, createdAt, category, fee)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 id,
                 transaction.title,
@@ -109,6 +109,7 @@ export const addTransaction = (
                 transaction.amount,
                 transaction.type,
                 transaction.accountId,
+                transaction.targetAccountId,
                 transaction.createdAt,
                 transaction.category || null,
                 transaction.fee || 0
@@ -140,32 +141,13 @@ export const addTransaction = (
             const targetNewBalance = targetAccount.balance + transaction.amount;
             db.runSync('UPDATE accounts SET balance = ? WHERE id = ?', [targetNewBalance, transaction.targetAccountId]);
 
-            // Record transaction in target account (as income)
-            const targetTransactionId = generateId();
-            db.runSync(
-                `INSERT INTO transactions 
-                    (id, title, description, amount, type, accountId, createdAt, category, fee)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-                [
-                    targetTransactionId,
-                    `Transfer dari ${account.name}`,
-                    transaction.description || null,
-                    transaction.amount,
-                    'income',
-                    transaction.targetAccountId,
-                    transaction.createdAt,
-                    transaction.category || null,
-                    0
-                ]
-            );
-
             // Record fee as separate expense if exists
             if (transaction.fee && transaction.fee > 0) {
                 const feeTransactionId = generateId();
                 db.runSync(
                     `INSERT INTO transactions 
-                        (id, title, description, amount, type, accountId, createdAt, category)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
+                        (id, title, description, amount, type, accountId, targetAccountId, createdAt, category)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
                     [
                         feeTransactionId,
                         `Biaya transfer`,
@@ -173,8 +155,9 @@ export const addTransaction = (
                         transaction.fee,
                         'expense',
                         transaction.accountId,
+                        transaction.targetAccountId,
                         transaction.createdAt,
-                        'Transfer'
+                        'Biaya Admin'
                     ]
                 );
             }
@@ -193,6 +176,112 @@ export const addTransaction = (
         throw e;
     }
 };
+
+export const editTransaction = (id, updatedTransaction) => {
+    try {
+        db.execSync('BEGIN TRANSACTION;');
+
+        // Ambil data transaksi lama
+        const existing = db.getAllSync('SELECT * FROM transactions WHERE id = ?', [id]);
+        if (existing.length === 0) throw new Error('Transaksi tidak ditemukan');
+        const oldTx = existing[0];
+
+        // Rollback saldo berdasarkan transaksi lama
+        if (oldTx.type === 'income') {
+            db.runSync(
+                'UPDATE accounts SET balance = balance - ? WHERE id = ?',
+                [oldTx.amount, oldTx.accountId]
+            );
+        } else if (oldTx.type === 'expense') {
+            db.runSync(
+                'UPDATE accounts SET balance = balance + ? WHERE id = ?',
+                [oldTx.amount, oldTx.accountId]
+            );
+        } else if (oldTx.type === 'transfer') {
+            // rollback saldo transfer
+            db.runSync(
+                'UPDATE accounts SET balance = balance + ? WHERE id = ?',
+                [oldTx.amount + (oldTx.fee || 0), oldTx.accountId]
+            );
+            db.runSync(
+                'UPDATE accounts SET balance = balance - ? WHERE id = ?',
+                [oldTx.amount, oldTx.targetAccountId]
+            );
+            // hapus transaksi fee jika ada
+            db.runSync('DELETE FROM transactions WHERE title = ? AND createdAt = ? AND accountId = ?',
+                ['Biaya transfer', oldTx.createdAt, oldTx.accountId]);
+        }
+
+        // Update transaksi utama
+        db.runSync(`
+      UPDATE transactions SET 
+        title = ?, description = ?, amount = ?, type = ?, accountId = ?, 
+        targetAccountId = ?, createdAt = ?, category = ?, fee = ?
+      WHERE id = ?
+    `, [
+            updatedTransaction.title,
+            updatedTransaction.description || null,
+            updatedTransaction.amount,
+            updatedTransaction.type,
+            updatedTransaction.accountId,
+            updatedTransaction.targetAccountId,
+            updatedTransaction.createdAt,
+            updatedTransaction.category || null,
+            updatedTransaction.fee || 0,
+            id
+        ]);
+
+        // Terapkan saldo baru
+        if (updatedTransaction.type === 'income') {
+            db.runSync(
+                'UPDATE accounts SET balance = balance + ? WHERE id = ?',
+                [updatedTransaction.amount, updatedTransaction.accountId]
+            );
+        } else if (updatedTransaction.type === 'expense') {
+            db.runSync(
+                'UPDATE accounts SET balance = balance - ? WHERE id = ?',
+                [updatedTransaction.amount, updatedTransaction.accountId]
+            );
+        } else if (updatedTransaction.type === 'transfer') {
+            const totalDeduction = updatedTransaction.amount + (updatedTransaction.fee || 0);
+            db.runSync(
+                'UPDATE accounts SET balance = balance - ? WHERE id = ?',
+                [totalDeduction, updatedTransaction.accountId]
+            );
+            db.runSync(
+                'UPDATE accounts SET balance = balance + ? WHERE id = ?',
+                [updatedTransaction.amount, updatedTransaction.targetAccountId]
+            );
+
+            // Tambahkan transaksi fee baru jika ada
+            if (updatedTransaction.fee && updatedTransaction.fee > 0) {
+                const feeId = generateId();
+                db.runSync(`
+          INSERT INTO transactions
+          (id, title, description, amount, type, accountId, targetAccountId, createdAt, category)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+                    feeId,
+                    `Biaya transfer`,
+                    `Biaya transfer ke akun`,
+                    updatedTransaction.fee,
+                    'expense',
+                    updatedTransaction.accountId,
+                    updatedTransaction.targetAccountId,
+                    updatedTransaction.createdAt,
+                    'Biaya Admin'
+                ]);
+            }
+        }
+
+        db.execSync('COMMIT;');
+    } catch (e) {
+        db.execSync('ROLLBACK;');
+        console.error('Gagal mengedit transaksi:', e.message);
+        throw e;
+    }
+};
+
 
 export const getAccounts = () => {
     const result = db.getAllSync('SELECT * FROM accounts');

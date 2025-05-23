@@ -9,6 +9,7 @@ import {
     View
 } from 'react-native';
 
+import { formatNumber } from '@/utils/number';
 import { useRouter } from 'expo-router';
 import { useTransactions } from './TransactionContext';
 import groupLabels from './groupLabels.json';
@@ -80,15 +81,15 @@ export default function AccountsScreen() {
             <View style={styles.summary}>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Assets</Text>
-                    <Text style={[styles.summaryValue, styles.assetBalance]}>Rp{assets.toLocaleString()}</Text>
+                    <Text style={[styles.summaryValue, styles.assetBalance]}>Rp{formatNumber(assets)}</Text>
                 </View>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Liabilities</Text>
-                    <Text style={[styles.summaryValue, styles.liabilityBalance]}>Rp{liabilities.toLocaleString()}</Text>
+                    <Text style={[styles.summaryValue, styles.liabilityBalance]}>Rp{formatNumber(liabilities) || 0}</Text>
                 </View>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Total</Text>
-                    <Text style={[styles.summaryValue, total > 0 ? styles.assetBalance : styles.liabilityBalance]}>Rp{total.toLocaleString()}</Text>
+                    <Text style={[styles.summaryValue, total > 0 ? styles.assetBalance : styles.liabilityBalance]}>Rp{formatNumber(total)}</Text>
                 </View>
             </View>
 
@@ -122,7 +123,7 @@ export default function AccountsScreen() {
                                     ? styles.liabilityBalance
                                     : styles.assetBalance
                             ]}>
-                                Rp{balance.toLocaleString()}
+                                Rp{formatNumber(balance)}
                             </Text>
                         </View>
 
@@ -144,7 +145,7 @@ export default function AccountsScreen() {
                                         ? styles.liabilityBalance
                                         : styles.assetBalance
                             ]}>
-                                Rp{item.balance.toLocaleString()}
+                                Rp{formatNumber(item.balance)}
                             </Text>
 
                         </View>

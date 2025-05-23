@@ -1,8 +1,9 @@
+import { formatNumber } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import moment from 'moment';
 import { useMemo, useState } from 'react';
 import {
-    Alert,
     FlatList,
     SafeAreaView,
     StatusBar,
@@ -22,6 +23,7 @@ function findCategory(categoryName) {
     const category = categories.find(c => c.name === categoryName);
     return category || categories[9];
 }
+
 const timePeriods = [
     {
         "name": "week",
@@ -44,7 +46,9 @@ const timePeriods = [
         "color": "#9C27B0"
     }
 ];
+
 export default function HomeScreen() {
+    const router = useRouter();
     const { transactions } = useTransactions();
     const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
     const [selectedDate, setSelectedDate] = useState(moment()); // bisa hari berapa pun
@@ -65,7 +69,7 @@ export default function HomeScreen() {
         if (viewMode === 'year') setSelectedDate(newDate.add(1, 'year'));
     };
 
-    const filteredTransactions = useMemo(() => {
+    const filteredTransactions = useMemo(() => {        
         const start = moment(selectedDate);
         let end = moment(selectedDate);
 
@@ -144,55 +148,21 @@ export default function HomeScreen() {
             .sort((a, b) => b.timestamp - a.timestamp);
     }, [filteredTransactions]);
 
-
-    // const groupedTransactions = useMemo(() => {
-    //     const groups = {};
-
-    //     transactions.forEach((item) => {
-    //         const mDate = moment(Number(item.createdAt)).startOf('day');
-    //         const now = moment().startOf('day');
-    //         const diff = now.diff(mDate, 'days');
-
-    //         let dateKey = diff === 0 ? 'Today' :
-    //             diff === 1 ? 'Yesterday' :
-    //                 mDate.format('DD');
-
-    //         if (!groups[dateKey]) {
-    //             groups[dateKey] = {
-    //                 data: [],
-    //                 timestamp: mDate.valueOf(),
-    //                 total: 0,
-    //             };
-    //         }
-
-    //         groups[dateKey].data.push(item);
-    //         const value = item.type === 'income' ? item.amount :
-    //             item.type === 'expense' ? -item.amount : 0;
-    //         groups[dateKey].total += value;
-    //     });
-
-    //     return Object.entries(groups)
-    //         .map(([date, group]) => ({
-    //             date,
-    //             timestamp: group.timestamp,
-    //             total: group.total,
-    //             data: group.data,
-    //         }))
-    //         .sort((a, b) => b.timestamp - a.timestamp);
-    // }, [transactions]);
-
     const HistoryIcon = ({ name }) => {
         const category = findCategory(name);
         return <MaterialCommunityIcons name={category.icon} size={30} color={category.color} />;
     };
 
     const renderTransactionItem = ({ item }) => {
-        const isExpense = item.type === 'expense' || item.type === 'transfer';
-        const amountStyle = isExpense ? styles.expense : styles.income;
+        const isExpense = item.type === 'expense';
+        const isTransfer = item.type === 'transfer';
+        const amountStyle = isExpense ? styles.expense : isTransfer ? styles.transfer : styles.income;
 
         return (
             <TouchableOpacity
-                onPress={() => Alert.alert("Data", JSON.stringify(item, null, 2))}
+                onPress={() => {
+                    router.push(`/transaction/${item.id}`);
+                }}
                 style={styles.item}
             >
                 <View style={{ paddingHorizontal: 15 }}>
@@ -208,7 +178,7 @@ export default function HomeScreen() {
                     </Text>
                 </View>
                 <Text style={[styles.amount, amountStyle]}>
-                    {isExpense ? '-' : '+'}Rp {Math.abs(item.amount).toLocaleString('id-ID')}
+                    {isExpense ? '-' : isTransfer ? "" : '+'} Rp {formatNumber(item.amount)}
                 </Text>
             </TouchableOpacity>
         );
@@ -230,7 +200,7 @@ export default function HomeScreen() {
                         )}
                     </View>
                     <Text style={styles.amount}>
-                        Rp {Math.abs(item.total).toLocaleString('id-ID')}
+                        Rp {formatNumber(item.total)}
                     </Text>
                 </View>
 
@@ -288,7 +258,11 @@ export default function HomeScreen() {
                 data={groupedTransactions}
                 keyExtractor={(item) => item.date}
                 renderItem={renderGroup}
-                ListEmptyComponent={<Text>Belum ada transaksi</Text>}
+                ListEmptyComponent={
+                    <View style={{ justifyContent: "center", alignItems: "center", height: "50%" }}>
+                        <Text>Tidak ada transaksi</Text>
+                    </View>
+                }
                 showsVerticalScrollIndicator={false}
                 ListHeaderComponent={
                     <View style={styles.overviewBox}>
@@ -347,6 +321,9 @@ const styles = StyleSheet.create({
     },
     expense: {
         color: '#c62828',
+    },
+    transfer: {
+        color: '#7b7b7b',
     },
     headercontainer: {
         flexDirection: 'row',

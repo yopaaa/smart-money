@@ -3,10 +3,5 @@
         "name": "Transfer",
         "icon": "bank-transfer",
         "color": "#261e07"
-    },
-    {
-        "name": "Bonus",
-        "icon": "gift",
-        "color": "#fbc02d"
     }
 ]

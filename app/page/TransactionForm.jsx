@@ -1,5 +1,6 @@
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
+import { formatNumber, unformatNumber } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
@@ -42,6 +43,9 @@ const TransactionForm = () => {
   });
 
   useEffect(() => {
+    setSelectedDate(new Date())
+    setSelectedTime(new Date())
+
     if (accounts.length > 0) {
       setFormData(prev => ({
         ...prev,
@@ -198,9 +202,9 @@ const TransactionForm = () => {
             <TextInput
               style={styles.input}
               keyboardType="numeric"
-              placeholder="100000"
-              value={formData.amount}
-              onChangeText={(text) => handleChange('amount', text)}
+              placeholder="100.000"
+              value={formatNumber(formData.amount)}
+              onChangeText={(text) => handleChange('amount', unformatNumber(text))}
             />
           </View>
 
@@ -265,8 +269,8 @@ const TransactionForm = () => {
                   style={styles.input}
                   keyboardType="numeric"
                   placeholder="0"
-                  value={formData.fee}
-                  onChangeText={(text) => handleChange('fee', text)}
+                  value={formatNumber(formData.fee)}
+                  onChangeText={(text) => handleChange('fee', unformatNumber(text))}
                 />
               </View>
             </>

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import {
     addAccount,
     addTransaction,
+    editTransaction,
     getAccounts,
     getTransactions,
     initDB,
@@ -28,7 +29,7 @@ export const TransactionProvider = ({ children }) => {
 
     const loadAccounts = () => {
         const rows = getAccounts();
-        setAccounts(rows);        
+        setAccounts(rows);
     };
 
     useEffect(() => {
@@ -40,7 +41,7 @@ export const TransactionProvider = ({ children }) => {
     return (
         <TransactionContext.Provider value={{
             transactions, accounts,
-            refetchTransactions, resetTables, getAccounts, addTransaction, addAccount
+            refetchTransactions, resetTables, getAccounts, addTransaction, addAccount, editTransaction
         }}>
             {children}
         </TransactionContext.Provider>

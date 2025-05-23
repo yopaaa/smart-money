@@ -2,6 +2,7 @@ import CustomIconPickerGrid from '@/components/CustomIconPickerGrid';
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
 import SwitchToggle from '@/components/SwitchToggle';
+import { formatNumber, unformatNumber } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -124,9 +125,9 @@ const TransactionForm = () => {
             <TextInput
               style={styles.input}
               keyboardType="numeric"
-              placeholder="100000"
-              value={formData.balance}
-              onChangeText={(text) => handleChange('balance', text)}
+              placeholder="100.000"
+              value={formatNumber(formData.balance)}
+              onChangeText={(text) => handleChange('balance', unformatNumber(text))}
             />
           </View>
 
