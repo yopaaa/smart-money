@@ -61,10 +61,6 @@ export const initDB = () => {
     }
 };
 
-export const getTransactions = () => {
-    return db.getAllSync(`SELECT * FROM transactions ORDER BY createdAt DESC`);
-};
-
 /*
     {
         id: string,
@@ -79,6 +75,9 @@ export const getTransactions = () => {
         fee
       }
 */
+export const getTransactions = () => {
+    return db.getAllSync(`SELECT * FROM transactions ORDER BY createdAt DESC`);
+};
 
 export const addTransaction = (
     transaction = {
@@ -278,6 +277,49 @@ export const editTransaction = (id, updatedTransaction) => {
     } catch (e) {
         db.execSync('ROLLBACK;');
         console.error('Gagal mengedit transaksi:', e.message);
+        throw e;
+    }
+};
+
+export const deleteTransaction = (id) => {
+    try {
+        db.execSync('BEGIN TRANSACTION;');
+
+        // Ambil transaksi yang akan dihapus
+        const existing = db.getAllSync('SELECT * FROM transactions WHERE id = ?', [id]);
+        if (existing.length === 0) throw new Error('Transaksi tidak ditemukan');
+        const tx = existing[0];
+
+        // Rollback efek saldo
+        if (tx.type === 'income') {
+            db.runSync('UPDATE accounts SET balance = balance - ? WHERE id = ?', [tx.amount, tx.accountId]);
+        } else if (tx.type === 'expense') {
+            db.runSync('UPDATE accounts SET balance = balance + ? WHERE id = ?', [tx.amount, tx.accountId]);
+        } else if (tx.type === 'transfer') {
+            const totalDeduction = tx.amount + (tx.fee || 0);
+            // Kembalikan saldo akun asal
+            db.runSync('UPDATE accounts SET balance = balance + ? WHERE id = ?', [totalDeduction, tx.accountId]);
+            // Kurangi saldo akun tujuan
+            db.runSync('UPDATE accounts SET balance = balance - ? WHERE id = ?', [tx.amount, tx.targetAccountId]);
+
+            // Cek dan hapus fee transfer jika ada
+            db.runSync(
+                `DELETE FROM transactions 
+         WHERE title = 'Biaya transfer' 
+         AND createdAt = ? 
+         AND accountId = ?
+         AND targetAccountId = ?`,
+                [tx.createdAt, tx.accountId, tx.targetAccountId]
+            );
+        }
+
+        // Hapus transaksi utama
+        db.runSync('DELETE FROM transactions WHERE id = ?', [id]);
+
+        db.execSync('COMMIT;');
+    } catch (e) {
+        db.execSync('ROLLBACK;');
+        console.error('Gagal menghapus transaksi:', e.message);
         throw e;
     }
 };

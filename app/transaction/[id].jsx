@@ -1,3 +1,4 @@
+import ActionButton from '@/components/ActionButton';
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
 import { formatNumber, unformatNumber } from '@/utils/number';
@@ -7,7 +8,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
     Alert,
-    Button,
     KeyboardAvoidingView,
     Platform,
     Pressable,
@@ -27,7 +27,13 @@ import transferCategories from '../page/transferCategories.json';
 const TransactionForm = () => {
     const { id } = useLocalSearchParams();
     const router = useRouter();
-    const { refetchTransactions, accounts, editTransaction, transactions } = useTransactions();
+    const {
+        refetchTransactions,
+        accounts,
+        editTransaction,
+        transactions,
+        deleteTransaction
+    } = useTransactions();
 
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState(new Date());
@@ -61,7 +67,7 @@ const TransactionForm = () => {
                             : expenseCategories;
 
                 const matchedCategory = categories.find(cat => cat.name.toLowerCase() === tx.category.toLowerCase());
-                
+
                 setIsFormEditable(tx.category == "Biaya Admin" ? false : true)
 
                 setFormData({
@@ -91,8 +97,7 @@ const TransactionForm = () => {
         }));
     };
 
-    const handleSubmit = () => {
-
+    const handleEdit = () => {
         if (!formData.title.trim() || !formData.amount || isNaN(formData.amount)) {
             Alert.alert('Error', 'Mohon isi semua data dengan benar');
             return;
@@ -128,17 +133,30 @@ const TransactionForm = () => {
         };
 
         try {
-            // console.log(transaction);
             editTransaction(formData.id, transaction)
-            Alert.alert('Sukses', 'Transaksi berhasil ditambahkan');
+            Alert.alert('Sukses', 'Transaksi berhasil diperbarui');
             refetchTransactions();
 
 
-            router.push("/");
+            router.back();
         } catch (e) {
             Alert.alert('Error', e.message);
         }
     };
+
+    const handleDelete = () => {
+        try {
+            deleteTransaction(formData.id)
+            Alert.alert('Sukses', 'Transaksi berhasil dihapus');
+            refetchTransactions();
+
+
+            router.back();
+        } catch (e) {
+            Alert.alert('Error', e.message);
+        }
+    }
+    const handleCopy = () => { }
 
     return (
         <KeyboardAvoidingView
@@ -305,19 +323,20 @@ const TransactionForm = () => {
                         onChangeText={(text) => handleChange('description', text)}
                     />
 
-                    {/* Save Button */}
-                    <View style={styles.buttonContainer}>
-                        <Button
-                            title="Tambah Transaksi"
-                            onPress={handleSubmit}
-                            color="#4CAF50"
-                        />
+                    {/* Actions Button */}
+                    <View style={{ flexDirection: 'row', marginTop: 16 }}>
+                        <ActionButton title="Hapus" backgroundColor="#F44336" onPress={handleDelete} />
+                        <ActionButton title="Salin" backgroundColor="#2196F3" onPress={handleCopy} />
+                        <ActionButton title="Edit" backgroundColor="#4CAF50" onPress={handleEdit} disabled={!isFormEditable}/>
                     </View>
+
+
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
     );
 };
+
 
 const styles = StyleSheet.create({
     dateInput: {
@@ -329,11 +348,10 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         backgroundColor: '#f9f9f9',
     },
-
     container: {
         padding: 16,
         flex: 1,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
     },
     saveButton: {
         borderWidth: 1,
@@ -412,6 +430,7 @@ const styles = StyleSheet.create({
         marginTop: 24,
         borderRadius: 8,
         overflow: 'hidden',
+        // padding: 15
     },
 });
 

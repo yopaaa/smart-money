@@ -1,11 +1,11 @@
-import Account from '@/app/Account';
-import Home from '@/app/Home';
-import Settings from '@/app/Settings';
-import StatsScreen from '@/app/StatsScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { CurvedBottomBarExpo } from 'react-native-curved-bottom-bar';
+import Account from './Account';
+import Home from './Home';
+import Settings from './Settings';
+import StatsScreen from './StatsScreen';
 
 const renderTabBar = ({ routeName, selectedTab, navigate }) => {
   return (

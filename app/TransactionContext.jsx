@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import {
     addAccount,
     addTransaction,
+    deleteTransaction,
     editTransaction,
     getAccounts,
     getTransactions,
@@ -40,8 +41,15 @@ export const TransactionProvider = ({ children }) => {
 
     return (
         <TransactionContext.Provider value={{
-            transactions, accounts,
-            refetchTransactions, resetTables, getAccounts, addTransaction, addAccount, editTransaction
+            transactions,
+            accounts,
+            refetchTransactions,
+            resetTables,
+            getAccounts,
+            addTransaction,
+            addAccount,
+            editTransaction,
+            deleteTransaction
         }}>
             {children}
         </TransactionContext.Provider>

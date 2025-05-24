@@ -300,6 +300,10 @@ const TransactionForm = () => {
   );
 };
 
+export const options = {
+  animation: 'fade_from_bottom',
+};
+
 const styles = StyleSheet.create({
   dateInput: {
     borderWidth: 1,
