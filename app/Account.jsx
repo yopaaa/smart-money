@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
+    RefreshControl,
     SafeAreaView,
     SectionList,
     StatusBar,
@@ -11,12 +12,23 @@ import {
 
 import { formatNumber } from '@/utils/number';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { useTransactions } from './TransactionContext';
 import groupLabels from './groupLabels.json';
 
 export default function AccountsScreen() {
-    const { accounts } = useTransactions();
+    const { accounts, refetchTransactions } = useTransactions();
     const router = useRouter();
+
+    const [isRefreshing, setisRefreshing] = useState(false)
+
+    const handleRefresh = () => {
+        refetchTransactions()
+        setisRefreshing(true)
+        setTimeout(() => {
+            setisRefreshing(false)
+        }, 1000);
+    }
 
     const calculateSummary = () => {
         let assets = 0;
@@ -104,6 +116,7 @@ export default function AccountsScreen() {
 
             <View style={{ flex: 1 }}>
                 <SectionList
+                    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
                     style={{ flex: 1 }}
                     scrollEnabled
                     sections={grouped}
@@ -123,7 +136,7 @@ export default function AccountsScreen() {
                                     ? styles.liabilityBalance
                                     : styles.assetBalance
                             ]}>
-                                Rp{formatNumber(balance)}
+                                Rp{formatNumber(balance) || 0}
                             </Text>
                         </View>
 
@@ -145,7 +158,7 @@ export default function AccountsScreen() {
                                         ? styles.liabilityBalance
                                         : styles.assetBalance
                             ]}>
-                                Rp{formatNumber(item.balance)}
+                                Rp{formatNumber(item.balance) || 0}
                             </Text>
 
                         </View>

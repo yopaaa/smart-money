@@ -20,7 +20,6 @@ export default function RootLayout() {
 
   return (
     <TransactionProvider>
-
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{
           animation: "fade_from_bottom",
@@ -30,7 +29,9 @@ export default function RootLayout() {
           headerTitleAlign: 'center',
         }}
         >
-          <Stack.Screen name="index" />
+          <Stack.Screen name="index" options={{animation: "fade"}}/>
+          <Stack.Screen name="transaction/[id]"  />
+          <Stack.Screen name="page/TransactionForm" />
           <Stack.Screen name="+not-found" /> 
         </Stack>
         <StatusBar style="auto" />

@@ -5,6 +5,7 @@ import moment from 'moment';
 import { useMemo, useState } from 'react';
 import {
     FlatList,
+    RefreshControl,
     SafeAreaView,
     StatusBar,
     StyleSheet,
@@ -49,9 +50,18 @@ const timePeriods = [
 
 export default function HomeScreen() {
     const router = useRouter();
-    const { transactions } = useTransactions();
+    const { transactions, refetchTransactions } = useTransactions();
     const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
     const [selectedDate, setSelectedDate] = useState(moment()); // bisa hari berapa pun
+    const [isRefreshing, setisRefreshing] = useState(false)
+
+    const handleRefresh = () => {
+        refetchTransactions()
+        setisRefreshing(true)
+        setTimeout(() => {
+            setisRefreshing(false)
+        }, 1000);
+    }
 
     const goToPrev = () => {
         const newDate = moment(selectedDate);
@@ -69,7 +79,19 @@ export default function HomeScreen() {
         if (viewMode === 'year') setSelectedDate(newDate.add(1, 'year'));
     };
 
-    const filteredTransactions = useMemo(() => {        
+    const getPeriodLabel = () => {
+        if (viewMode === 'week') {
+            const start = moment(selectedDate).startOf('week');
+            const end = moment(selectedDate).endOf('week');
+            return `${start.format('D MMM')} - ${end.format('D MMM YYYY')}`;
+        }
+        if (viewMode === 'month') return selectedDate.format('MMMM YYYY');
+        if (viewMode === 'quarter') return `Q${selectedDate.quarter()} ${selectedDate.year()}`;
+        if (viewMode === 'year') return selectedDate.format('YYYY');
+    };
+
+    // Hnaya Mengembalikan Transaksi Yang Berada DI Range yang Di Minta
+    const filteredTransactions = useMemo(() => {
         const start = moment(selectedDate);
         let end = moment(selectedDate);
 
@@ -93,19 +115,10 @@ export default function HomeScreen() {
         });
     }, [transactions, selectedDate, viewMode]);
 
-    const getPeriodLabel = () => {
-        if (viewMode === 'week') {
-            const start = moment(selectedDate).startOf('week');
-            const end = moment(selectedDate).endOf('week');
-            return `${start.format('D MMM')} - ${end.format('D MMM YYYY')}`;
-        }
-        if (viewMode === 'month') return selectedDate.format('MMMM YYYY');
-        if (viewMode === 'quarter') return `Q${selectedDate.quarter()} ${selectedDate.year()}`;
-        if (viewMode === 'year') return selectedDate.format('YYYY');
-    };
-
     const groupedTransactions = useMemo(() => {
         const groups = {};
+
+        // console.log(filteredTransactions);
 
         filteredTransactions.forEach((item) => {
             const mDate = moment(Number(item.createdAt)).startOf('day');
@@ -148,6 +161,26 @@ export default function HomeScreen() {
             .sort((a, b) => b.timestamp - a.timestamp);
     }, [filteredTransactions]);
 
+    const totalOverview = useMemo(() => {
+        let totalIncome = 0;
+        let totalExpense = 0;
+
+        filteredTransactions.forEach((item) => {
+            if (item.type === 'income') {
+                totalIncome += item.amount;
+            } else if (item.type === 'expense') {
+                totalExpense += item.amount;
+            }
+        });
+
+        return {
+            income: totalIncome,
+            expense: totalExpense,
+            net: totalIncome - totalExpense,
+        };
+    }, [filteredTransactions]);
+
+
     const HistoryIcon = ({ name }) => {
         const category = findCategory(name);
         return <MaterialCommunityIcons name={category.icon} size={30} color={category.color} />;
@@ -161,7 +194,7 @@ export default function HomeScreen() {
         return (
             <TouchableOpacity
                 onPress={() => {
-                    router.push(`/(transaction)/${item.id}`);
+                    router.push(`/transaction/${item.id}`);
                 }}
                 style={styles.item}
             >
@@ -186,6 +219,7 @@ export default function HomeScreen() {
 
     const renderGroup = ({ item }) => {
         const isNew = item.date !== "Today" && item.date !== "Yesterday";
+        const amountStyle = item.total < 0 ? styles.expense : styles.income;
 
         return (
             <View style={{ marginTop: 20 }}>
@@ -199,8 +233,8 @@ export default function HomeScreen() {
                             </View>
                         )}
                     </View>
-                    <Text style={styles.amount}>
-                        Rp {formatNumber(item.total)}
+                    <Text style={[styles.amount, amountStyle]}>
+                        {item.total < 0 ? "-" : "+"} Rp {formatNumber(item.total)}
                     </Text>
                 </View>
 
@@ -258,6 +292,7 @@ export default function HomeScreen() {
                 data={groupedTransactions}
                 keyExtractor={(item) => item.date}
                 renderItem={renderGroup}
+                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
                 ListEmptyComponent={
                     <View style={{ justifyContent: "center", alignItems: "center", height: "50%" }}>
                         <Text>Tidak ada transaksi</Text>
@@ -272,15 +307,15 @@ export default function HomeScreen() {
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Income</Text>
-                            <Text style={[styles.amount, { color: '#2196f3' }]}>Rp 0</Text>
+                            <Text style={[styles.amount, { color: '#2196f3' }]}>Rp {formatNumber(totalOverview.income) || 0}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Expense</Text>
-                            <Text style={[styles.amount, { color: '#f44336' }]}>-Rp 1,000</Text>
+                            <Text style={[styles.amount, { color: '#f44336' }]}>- Rp {formatNumber(totalOverview.expense) || 0}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Total</Text>
-                            <Text style={styles.amount}>-Rp 1,000</Text>
+                            <Text style={styles.amount}>Rp {formatNumber(totalOverview.net) || 0}</Text>
                         </View>
                     </View>
                 }
@@ -357,9 +392,10 @@ const styles = StyleSheet.create({
     },
     overviewHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        // justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 8,
+        gap: 10
     },
     overviewTitle: {
         fontSize: 16,

@@ -1,52 +1,26 @@
-{
-    "cash": [
-        {
-            "balance": 76500,
-            "description": "",
-            "hidden": 0,
-            "icon": "wallet",
-            "iconColor": "#4caf50",
-            "id": "acc-1",
-            "isLiability": 0,
-            "name": "Dompet",
-            "type": "cash"
-        },
-        {
-            "balance": 100000,
-            "description": "",
-            "hidden": 0,
-            "icon": "credit-card",
-            "iconColor": "#f06292",
-            "id": "PL48kgve",
-            "isLiability": 0,
-            "name": "Gopay",
-            "type": "cash"
-        }
-    ],
-    "debit": [
-        {
-            "balance": 514000,
-            "description": "",
-            "hidden": 0,
-            "icon": "bank",
-            "iconColor": "#2196f3",
-            "id": "acc-2",
-            "isLiability": 0,
-            "name": "Rekening Bank",
-            "type": "debit"
-        }
-    ],
-    "debt": [
-        {
-            "balance": -16000,
-            "description": "",
-            "hidden": 0,
-            "icon": "account-cash",
-            "iconColor": "#f06292",
-            "id": "IPQSHai2",
-            "isLiability": 1,
-            "name": "Hutang",
-            "type": "debt"
-        }
-    ]
-}
+[
+    {
+        "accountId": "acc-2",
+        "amount": 500000,
+        "category": "initial-balance",
+        "createdAt": "1748101615997",
+        "description": "Initial balance setup for account Rekening Bank",
+        "fee": 0,
+        "id": "g595wl5I",
+        "targetAccountId": null,
+        "title": "Initial balance for Rekening Bank",
+        "type": "income"
+    },
+    {
+        "accountId": "acc-1",
+        "amount": 100000,
+        "category": "initial-balance",
+        "createdAt": "1748101615975",
+        "description": "Initial balance setup for account Dompet",
+        "fee": 0,
+        "id": "DidoFsrr",
+        "targetAccountId": null,
+        "title": "Initial balance for Dompet",
+        "type": "income"
+    }
+]
