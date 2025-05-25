@@ -1,26 +1,86 @@
 [
     {
-        "accountId": "acc-2",
-        "amount": 500000,
-        "category": "initial-balance",
-        "createdAt": "1748101615997",
-        "description": "Initial balance setup for account Rekening Bank",
+        "accountId": "acc-1",
+        "amount": 10000,
+        "category": "Makanan",
+        "createdAt": "1748136720000",
+        "description": null,
         "fee": 0,
-        "id": "g595wl5I",
+        "id": "VLTG9Yut",
         "targetAccountId": null,
-        "title": "Initial balance for Rekening Bank",
-        "type": "income"
+        "title": "Makan",
+        "type": "expense"
+    },
+    {
+        "accountId": "acc-1",
+        "amount": 10000,
+        "category": "Transfer",
+        "createdAt": "1748089200000",
+        "description": null,
+        "fee": 500,
+        "id": "aoqboznb",
+        "targetAccountId": "acc-2",
+        "title": "transfer",
+        "type": "transfer"
+    },
+    {
+        "accountId": "acc-1",
+        "amount": 500,
+        "category": "Biaya Admin",
+        "createdAt": "1748089200000",
+        "description": "Biaya transfer ke akun",
+        "fee": 0,
+        "id": "jHejf8f8",
+        "targetAccountId": "acc-2",
+        "title": "Biaya transfer",
+        "type": "expense"
+    },
+    {
+        "accountId": "acc-1",
+        "amount": 5000,
+        "category": "Minuman",
+        "createdAt": "1748050320000",
+        "description": null,
+        "fee": 0,
+        "id": "1hpNW45s",
+        "targetAccountId": null,
+        "title": "Minum",
+        "type": "expense"
     },
     {
         "accountId": "acc-1",
         "amount": 100000,
         "category": "initial-balance",
-        "createdAt": "1748101615975",
+        "createdAt": "1748002813386",
         "description": "Initial balance setup for account Dompet",
         "fee": 0,
-        "id": "DidoFsrr",
+        "id": "sTJlhFTb",
         "targetAccountId": null,
         "title": "Initial balance for Dompet",
+        "type": "income"
+    },
+    {
+        "accountId": "acc-1",
+        "amount": 8000,
+        "category": "Kesehatan",
+        "createdAt": "1747966500000",
+        "description": null,
+        "fee": 0,
+        "id": "Y1AGKOYs",
+        "targetAccountId": null,
+        "title": "Obat",
+        "type": "expense"
+    },
+    {
+        "accountId": "acc-2",
+        "amount": 500000,
+        "category": "initial-balance",
+        "createdAt": "1747657200000",
+        "description": "Initial balance setup for account Rekening Bank",
+        "fee": 0,
+        "id": "Yp18IyKZ",
+        "targetAccountId": null,
+        "title": "Initial balance for Rekening Bank",
         "type": "income"
     }
 ]

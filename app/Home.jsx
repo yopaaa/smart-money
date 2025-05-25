@@ -18,35 +18,18 @@ import { useTransactions } from './TransactionContext';
 import expenseCategories from './page/expenseCategories.json';
 import incomeCategories from './page/incomeCategories.json';
 import transferCategories from './page/transferCategories.json';
+import timePeriods from './timePeriods.json';
 
-function findCategory(categoryName) {
+export function findCategory(categoryName) {
     const categories = [...expenseCategories, ...incomeCategories, ...transferCategories];
     const category = categories.find(c => c.name === categoryName);
     return category || categories[9];
 }
 
-const timePeriods = [
-    {
-        "name": "week",
-        "icon": "calendar-week",
-        "color": "#2196F3"
-    },
-    {
-        "name": "month",
-        "icon": "calendar-month",
-        "color": "#4CAF50"
-    },
-    {
-        "name": "quarter",
-        "icon": "calendar-blank",
-        "color": "#FF9800"
-    },
-    {
-        "name": "year",
-        "icon": "calendar-blank-multiple",
-        "color": "#9C27B0"
-    }
-];
+export function FindIcon({ name, size = 30 }) {
+    const category = findCategory(name);
+    return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} />;
+};
 
 export default function HomeScreen() {
     const router = useRouter();
@@ -118,7 +101,7 @@ export default function HomeScreen() {
     const groupedTransactions = useMemo(() => {
         const groups = {};
 
-        // console.log(filteredTransactions);
+        // console.log(filteredTransactions); 
 
         filteredTransactions.forEach((item) => {
             const mDate = moment(Number(item.createdAt)).startOf('day');
@@ -181,10 +164,7 @@ export default function HomeScreen() {
     }, [filteredTransactions]);
 
 
-    const HistoryIcon = ({ name }) => {
-        const category = findCategory(name);
-        return <MaterialCommunityIcons name={category.icon} size={30} color={category.color} />;
-    };
+
 
     const renderTransactionItem = ({ item }) => {
         const isExpense = item.type === 'expense';
@@ -199,7 +179,7 @@ export default function HomeScreen() {
                 style={styles.item}
             >
                 <View style={{ paddingHorizontal: 15 }}>
-                    <HistoryIcon name={item.category} />
+                    <FindIcon name={item.category} />
                 </View>
 
                 <View style={{ flex: 1 }}>

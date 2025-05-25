@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Week",
+        "icon": "calendar-week",
+        "color": "#2196F3"
+    },
+    {
+        "name": "Month",
+        "icon": "calendar-month",
+        "color": "#4CAF50"
+    },
+    {
+        "name": "Quarter",
+        "icon": "calendar-blank",
+        "color": "#FF9800"
+    },
+    {
+        "name": "Year",
+        "icon": "calendar-blank-multiple",
+        "color": "#9C27B0"
+    }
+]

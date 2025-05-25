@@ -66,7 +66,12 @@ const TransactionForm = () => {
                             ? incomeCategories
                             : expenseCategories;
 
-                const matchedCategory = categories.find(cat => cat.name.toLowerCase() === tx.category.toLowerCase());
+                let matchedCategory
+                if (tx.category == "initial-balance") {
+                    matchedCategory = { "color": "#a1887f", "icon": "bank-transfer-in", "name": "initial-balance" }
+                } else {
+                    matchedCategory = categories.find(cat => cat.name.toLowerCase() === tx.category.toLowerCase());
+                }
 
                 setIsFormEditable(tx.category == "Biaya Admin" ? false : true)
 
@@ -327,7 +332,7 @@ const TransactionForm = () => {
                     <View style={{ flexDirection: 'row', marginTop: 16 }}>
                         <ActionButton title="Hapus" backgroundColor="#F44336" onPress={handleDelete} />
                         <ActionButton title="Salin" backgroundColor="#2196F3" onPress={handleCopy} />
-                        <ActionButton title="Edit" backgroundColor="#4CAF50" onPress={handleEdit} disabled={!isFormEditable}/>
+                        <ActionButton title="Edit" backgroundColor="#4CAF50" onPress={handleEdit} disabled={!isFormEditable} />
                     </View>
 
 
