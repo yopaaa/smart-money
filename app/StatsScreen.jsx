@@ -182,7 +182,6 @@ export default function HomeScreen() {
 
             </View>
 
-
             <FlatList
                 data={expenseCategoriesGroub}
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
