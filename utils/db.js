@@ -324,6 +324,77 @@ export const deleteTransaction = (id) => {
     }
 };
 
+/**
+ * Fungsi untuk filter transaksi dengan berbagai kriteria
+ * @param {Object} query - Objek berisi parameter filter
+ * @param {string} [query.search] - Pencarian di title/description (case insensitive)
+ * @param {string} [query.type] - Jenis transaksi (income/expense/transfer)
+ * @param {string} [query.category] - Kategori transaksi
+ * @param {string} [query.accountId] - ID akun terkait
+ * @param {number} [query.minAmount] - Jumlah minimum
+ * @param {number} [query.maxAmount] - Jumlah maksimum
+ * @param {number} [query.startDate] - Timestamp awal (createdAt >= startDate)
+ * @param {number} [query.endDate] - Timestamp akhir (createdAt <= endDate)
+ * @returns {Array} Array transaksi yang memenuhi kriteria
+ */
+export const filterTransactions = (query = {}) => {
+    try {
+        // Base query
+        let sql = `SELECT * FROM transactions WHERE 1=1`;
+        const params = [];
+
+        // Dynamic filter builder
+        if (query.search) {
+            sql += ` AND (title LIKE ? OR description LIKE ?)`;
+            params.push(`%${query.search}%`, `%${query.search}%`);
+        }
+
+        if (query.type) {
+            sql += ` AND type = ?`;
+            params.push(query.type);
+        }
+
+        if (query.category) {
+            sql += ` AND category = ?`;
+            params.push(query.category);
+        }
+
+        if (query.accountId) {
+            sql += ` AND (accountId = ? OR targetAccountId = ?)`;
+            params.push(query.accountId, query.accountId);
+        }
+
+        if (query.minAmount !== undefined) {
+            sql += ` AND amount >= ?`;
+            params.push(query.minAmount);
+        }
+
+        if (query.maxAmount !== undefined) {
+            sql += ` AND amount <= ?`;
+            params.push(query.maxAmount);
+        }
+
+        if (query.startDate) {
+            sql += ` AND createdAt >= ?`;
+            params.push(query.startDate);
+        }
+
+        if (query.endDate) {
+            sql += ` AND createdAt <= ?`;
+            params.push(query.endDate);
+        }
+
+        // Sorting default: terbaru dulu
+        sql += ` ORDER BY createdAt DESC`;
+
+        return db.getAllSync(sql, params);
+    } catch (e) {
+        console.error('Gagal memfilter transaksi:', e.message);
+        throw e;
+    }
+};
+
+
 
 export const getAccounts = () => {
     const result = db.getAllSync('SELECT * FROM accounts');

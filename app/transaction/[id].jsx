@@ -20,9 +20,9 @@ import {
     View
 } from 'react-native';
 import { useTransactions } from '../TransactionContext';
-import expenseCategories from '../page/expenseCategories.json';
-import incomeCategories from '../page/incomeCategories.json';
-import transferCategories from '../page/transferCategories.json';
+import expenseCategories from '../json/expenseCategories.json';
+import incomeCategories from '../json/incomeCategories.json';
+import transferCategories from '../json/transferCategories.json';
 
 const TransactionForm = () => {
     const { id } = useLocalSearchParams();

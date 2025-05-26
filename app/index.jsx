@@ -46,7 +46,7 @@ export default function App() {
             alignItems: 'center',
             bottom: 15,
           }}
-          onPress={() => router.navigate("page/TransactionForm")}
+          onPress={() => router.navigate("transaction/TransactionForm")}
         >
           <Ionicons name="add" size={24} color="#FFF" />
         </TouchableOpacity>

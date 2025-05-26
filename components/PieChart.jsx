@@ -22,41 +22,46 @@ const AnimatedPieChart = ({ data, refreshControl }) => {
 
     useEffect(() => {
         if (data.length === 1) {
-            // Untuk single data, langsung set ke 360 derajat tanpa animasi
-            setAnimatedValues([360]);
-            setIsLoaded(true);
-            setchartData([{
+            const singleDataFormatted = [{
                 label: data[0].category,
                 value: 100,
                 amount: data[0].amount,
                 color: data[0].icon.color,
                 icon: data[0].icon.icon
-            }]);
+            }];
+
+            setchartData(singleDataFormatted);
+            setAnimatedValues([360]); // Set langsung ke 360
+            setIsLoaded(true);
+            setSelectedIndex(null);
             return;
         }
+
         setAnimatedValues(data.map(() => 0));
         setSelectedIndex(null);
         setIsLoaded(false);
-        let x = data.map(item => ({
+
+        let formattedData = data.map(item => ({
             label: item.category,
             value: item.percent,
             amount: item.amount,
             color: item.icon.color,
             icon: item.icon.icon
-        }))
-        // Animasi loading dengan stagger effect
-        x.forEach((_, index) => {
+        }));
+
+        setchartData(formattedData);
+
+        formattedData.forEach((_, index) => {
             setTimeout(() => {
                 setAnimatedValues(prev => {
                     const newValues = [...prev];
-                    newValues[index] = (x[index].value / 100) * 360;
+                    newValues[index] = (formattedData[index].value / 100) * 360;
                     return newValues;
                 });
             }, index * 150);
         });
 
-        setchartData(x)
-        setTimeout(() => setIsLoaded(true), chartData.length * 150 + 300);
+        setTimeout(() => setIsLoaded(true), formattedData.length * 150 + 300);
     }, [data]);
 
     const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
@@ -79,6 +84,24 @@ const AnimatedPieChart = ({ data, refreshControl }) => {
         const adjustedCenterX = centerX + offsetX;
         const adjustedCenterY = centerY + offsetY;
 
+        // Handle lingkaran penuh (360 derajat)
+        if (endAngle - startAngle >= 360) {
+            // Untuk lingkaran penuh, buat 2 arc yang masing-masing 180 derajat
+            const midAngle = startAngle + 180;
+            const start1 = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle);
+            const mid = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, midAngle);
+            const end1 = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle + 359.9); // Sedikit kurang dari 360
+
+            return [
+                'M', adjustedCenterX, adjustedCenterY,
+                'L', start1.x, start1.y,
+                'A', actualRadius, actualRadius, 0, '0', 1, mid.x, mid.y,
+                'A', actualRadius, actualRadius, 0, '0', 1, end1.x, end1.y,
+                'Z',
+            ].join(' ');
+        }
+
+        // Path normal untuk arc biasa
         const start = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, endAngle);
         const end = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle);
         const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
@@ -114,6 +137,8 @@ const AnimatedPieChart = ({ data, refreshControl }) => {
                     stroke="#2C3E50"
                     strokeWidth={0.5}
                     onPress={() => {
+                        console.log(index);
+
                         if (selectedIndex === index) {
                             setSelectedIndex(null); // batal pilih
                         } else {
@@ -177,11 +202,11 @@ const AnimatedPieChart = ({ data, refreshControl }) => {
 
                     {chartData.length > 0 ? chartData.map((item, index) => {
                         const startAngle = cumulativeAngle;
-                        const sliceAngle = (item.value / 100) * 360;
+                        const sliceAngle = chartData.length === 1 ? 360 : (item.value / 100) * 360;
                         const slice = renderSlice(item, index, startAngle, startAngle + sliceAngle);
                         cumulativeAngle += sliceAngle;
                         return slice;
-                    }) : ""}
+                    }) : null}
                 </Svg>
 
                 {/* Center Content */}
@@ -203,7 +228,7 @@ const AnimatedPieChart = ({ data, refreshControl }) => {
                     styles.legendItem,
                     isSelected && styles.selectedLegendItem
                 ]}
-                onPress={() => setSelectedIndex(index)}
+                onPress={() => { setSelectedIndex(index) }}
                 activeOpacity={0.7}
             >
                 <FindIcon name={item.category} style={{ paddingHorizontal: 10 }} />

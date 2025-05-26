@@ -1,8 +1,8 @@
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
     FlatList,
     RefreshControl,
@@ -15,10 +15,10 @@ import {
 } from 'react-native';
 import CustomPicker from '../components/CustomPicker';
 import { useTransactions } from './TransactionContext';
-import expenseCategories from './page/expenseCategories.json';
-import incomeCategories from './page/incomeCategories.json';
-import transferCategories from './page/transferCategories.json';
-import timePeriods from './timePeriods.json';
+import expenseCategories from './json/expenseCategories.json';
+import incomeCategories from './json/incomeCategories.json';
+import timePeriods from './json/timePeriods.json';
+import transferCategories from './json/transferCategories.json';
 
 export function findCategory(categoryName) {
     const categories = [...expenseCategories, ...incomeCategories, ...transferCategories];
@@ -33,10 +33,18 @@ export function FindIcon({ name, size = 30, style }) {
 
 export default function HomeScreen() {
     const router = useRouter();
-    const { transactions, refetchTransactions } = useTransactions();
+    const { transactions, refetchTransactions, filterTransactions } = useTransactions();
     const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
     const [selectedDate, setSelectedDate] = useState(moment()); // bisa hari berapa pun
     const [isRefreshing, setisRefreshing] = useState(false)
+
+    // Auto refresh when focus
+    const [updateTrigers, setupdateTrigers] = useState()
+    useFocusEffect(
+        useCallback(() => {
+            setupdateTrigers(Date.now());
+        }, [])
+    );
 
     const handleRefresh = () => {
         refetchTransactions()
@@ -73,7 +81,6 @@ export default function HomeScreen() {
         if (viewMode === 'year') return selectedDate.format('YYYY');
     };
 
-    // Hnaya Mengembalikan Transaksi Yang Berada DI Range yang Di Minta
     const filteredTransactions = useMemo(() => {
         const start = moment(selectedDate);
         let end = moment(selectedDate);
@@ -92,11 +99,12 @@ export default function HomeScreen() {
             end.endOf('year');
         }
 
-        return transactions.filter(item => {
-            const created = moment(Number(item.createdAt));
-            return created.isBetween(start, end, null, '[]'); // inklusif
+        // Gunakan filterTransactions dari context
+        return filterTransactions({
+            startDate: start.valueOf(),
+            endDate: end.valueOf()
         });
-    }, [transactions, selectedDate, viewMode]);
+    }, [selectedDate, viewMode, filterTransactions, isRefreshing, updateTrigers]);
 
     const groupedTransactions = useMemo(() => {
         const groups = {};

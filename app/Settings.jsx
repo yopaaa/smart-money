@@ -1,22 +1,64 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { Dimensions, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTransactions } from './TransactionContext';
 
-const iconItems = [
-  { icon: 'settings-outline', label: 'Configuration' },
-  { icon: 'wallet-outline', label: 'Accounts' },
-  { icon: 'lock-open-outline', label: 'Passcode' },
-  { icon: 'calculator-outline', label: 'CalcBox' },
-  { icon: 'desktop-outline', label: 'PC Manager' },
-  { icon: 'refresh-outline', label: 'Backup' },
-  { icon: 'mail-outline', label: 'Feedback' },
-  { icon: 'help-circle-outline', label: 'Help' },
-  { icon: 'thumbs-up-outline', label: 'Recommend' },
-];
+
+import { useNavigation } from '@react-navigation/native';
 
 const SettingsScreen = () => {
-  const { resetTables } = useTransactions();
+  const router = useRouter();
+const navigation = useNavigation();
 
+  const { resetTables } = useTransactions();
+  const iconItems = [
+    {
+      icon: 'settings-outline', label: 'Configuration', function: function () {
+        router.push("transaction/WebView");
+      }
+    },
+    {
+      icon: 'wallet-outline', label: 'Accounts', function: function () {
+        // console.log("albums");
+        navigation.goBack()
+      }
+    },
+    {
+      icon: 'lock-open-outline', label: 'Passcode', function: function () {
+        console.log("this.label");
+      }
+    },
+    {
+      icon: 'calculator-outline', label: 'CalcBox', function: function () {
+        console.log("this.label");
+      }
+    },
+    {
+      icon: 'desktop-outline', label: 'PC Manager', function: function () {
+        console.log("this.label");
+      }
+    },
+    {
+      icon: 'refresh-outline', label: 'Backup', function: function () {
+        console.log("this.label");
+      }
+    },
+    {
+      icon: 'mail-outline', label: 'Feedback', function: function () {
+        console.log("this.label");
+      }
+    },
+    {
+      icon: 'help-circle-outline', label: 'Help', function: function () {
+        console.log("this.label");
+      }
+    },
+    {
+      icon: 'thumbs-up-outline', label: 'Recommend', function: function () {
+        console.log("this.label");
+      }
+    },
+  ];
   return (
     <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
       {/* Header */}
@@ -41,7 +83,7 @@ const SettingsScreen = () => {
       {/* Grid Menu */}
       <ScrollView contentContainerStyle={styles.grid}>
         {iconItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.gridItem}>
+          <TouchableOpacity key={index} style={styles.gridItem} onPress={item.function}>
             <Ionicons name={item.icon} size={28} color="#222" />
             <Text style={styles.label}>{item.label}</Text>
           </TouchableOpacity>

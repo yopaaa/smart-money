@@ -1,10 +1,10 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import {
-    Animated,
-    StyleSheet,
-    TouchableWithoutFeedback,
-    View
+  Animated,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 const SlideSelect = ({
@@ -41,7 +41,7 @@ const SlideSelect = ({
 
   return (
     <View style={styles.container}>
-      <TouchableWithoutFeedback onPress={toggle}>
+      <TouchableOpacity onPress={toggle}>
         <Animated.View style={[styles.item, { width: firstWidth }]}>
           <MaterialCommunityIcons name={options[0].icon} size={22} color="#333" />
           <Animated.Text style={[styles.text, {
@@ -51,19 +51,20 @@ const SlideSelect = ({
             {options[0].label}
           </Animated.Text>
         </Animated.View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
 
-      <TouchableWithoutFeedback onPress={toggle}>
+      <TouchableOpacity onPress={toggle}>
         <Animated.View style={[styles.item, { width: secondWidth, justifyContent: 'flex-end' }]}>
+          <MaterialCommunityIcons name={options[1].icon} size={22} color="#333" />
+
           <Animated.Text style={[styles.text, {
             opacity: selected === options[1].key ? 1 : 0,
             position: "absolute", left: 0, marginLeft: 25
           }]}>
             {options[1].label}
           </Animated.Text>
-          <MaterialCommunityIcons name={options[1].icon} size={22} color="#333" />
         </Animated.View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     </View>
   );
 };

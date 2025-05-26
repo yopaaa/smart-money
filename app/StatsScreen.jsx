@@ -1,8 +1,10 @@
+import CustomPicker from '@/components/CustomPicker';
 import PieChart from '@/components/PieChart';
+import SlideSelect from '@/components/SlideSelect';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
     RefreshControl,
     SafeAreaView,
@@ -12,17 +14,9 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import CustomPicker from '../components/CustomPicker';
 import { findCategory } from './Home';
-import SlideSelectHorizontal from './SlideSelectHorizontal';
 import { useTransactions } from './TransactionContext';
-import timePeriods from './timePeriods.json';
-
-const options = [
-    { name: 'Makanan', icon: 'food', color: '#e74c3c' },
-    { name: 'Transportasi', icon: 'bus', color: '#3498db' },
-    { name: 'Belanja', icon: 'shopping', color: '#2ecc71' },
-];
+import timePeriods from './json/timePeriods.json';
 
 
 function convertTransactionsByType(transactions, type = 'expense') {
@@ -55,7 +49,7 @@ function convertTransactionsByType(transactions, type = 'expense') {
 
 export default function HomeScreen() {
     const router = useRouter();
-    const { transactions, refetchTransactions } = useTransactions();
+    const { filterTransactions } = useTransactions();
     const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
     const [selectedDate, setSelectedDate] = useState(moment()); // bisa hari berapa pun
     const [isRefreshing, setisRefreshing] = useState(false)
@@ -64,7 +58,28 @@ export default function HomeScreen() {
     const [incomeCategoriesGroub, setIncomeCategoriesGroub] = useState([])
     const [type, setType] = useState('expense');
 
-    // Hnaya Mengembalikan Transaksi Yang Berada DI Range yang Di Minta
+    // Auto refresh when focus
+    const [updateTrigers, setupdateTrigers] = useState()
+    useFocusEffect(
+        useCallback(() => {
+            console.log("statsscrenn trigered");
+            
+            setupdateTrigers(Date.now());
+
+            try {
+                const expenseData = convertTransactionsByType(filteredTransactions, 'expense');
+                const incomeData = convertTransactionsByType(filteredTransactions, 'income');
+
+                setExpenseCategoriesGroub(expenseData || []);
+                setIncomeCategoriesGroub(incomeData || []);
+            } catch (error) {
+                console.error('Error converting transactions:', error);
+                setExpenseCategoriesGroub([]);
+                setIncomeCategoriesGroub([]);
+            }
+        }, [type, selectedDate, viewMode])
+    );
+
     const filteredTransactions = useMemo(() => {
         const start = moment(selectedDate);
         let end = moment(selectedDate);
@@ -83,30 +98,17 @@ export default function HomeScreen() {
             end.endOf('year');
         }
 
-        return transactions.filter(item => {
-            const created = moment(Number(item.createdAt));
-            return created.isBetween(start, end, null, '[]'); // inklusif
+        // Gunakan filterTransactions dari context
+        return filterTransactions({
+            startDate: start.valueOf(),
+            endDate: end.valueOf()
         });
-    }, [transactions, selectedDate, viewMode]);
-
-    useEffect(() => {
-        try {
-            const expenseData = convertTransactionsByType(filteredTransactions, 'expense');
-            const incomeData = convertTransactionsByType(filteredTransactions, 'income');
-
-            setExpenseCategoriesGroub(expenseData || []);
-            setIncomeCategoriesGroub(incomeData || []);
-        } catch (error) {
-            console.error('Error converting transactions:', error);
-            setExpenseCategoriesGroub([]);
-            setIncomeCategoriesGroub([]);
-        }
-    }, [filteredTransactions, type]);
+    }, [selectedDate, viewMode, updateTrigers]);
 
 
     const handleRefresh = () => {
-        refetchTransactions()
         setisRefreshing(true)
+        setupdateTrigers(Date.now())
         setTimeout(() => {
             setisRefreshing(false)
         }, 1000);
@@ -165,7 +167,7 @@ export default function HomeScreen() {
 
             {/* Header */}
             <View style={styles.headercontainer}>
-                <SlideSelectHorizontal
+                <SlideSelect
                     initial={type}
                     onChange={(val) => setType(val)}
                     options={[
@@ -213,7 +215,7 @@ export default function HomeScreen() {
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
             />}
 
-             {type == "expense" && <PieChart
+            {type == "expense" && <PieChart
                 data={expenseCategoriesGroub}
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
             />}

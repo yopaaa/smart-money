@@ -11,14 +11,14 @@ import {
 } from 'react-native';
 
 import { formatCurrency } from '@/utils/number';
-import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import { useTransactions } from './TransactionContext';
-import groupLabels from './groupLabels.json';
+import groupLabels from './json/groupLabels.json';
 
 export default function AccountsScreen() {
     const { accounts, refetchTransactions } = useTransactions();
-    const router = useRouter();
+    const router = useNavigation();
 
     const [isRefreshing, setisRefreshing] = useState(false)
 
@@ -109,7 +109,7 @@ export default function AccountsScreen() {
                 {JSON.stringify(grouped, " ", " ")}
             </Text> */}
 
-            <TouchableOpacity onPress={() => router.navigate("page/CreateAccountForm")} style={{ position: "relative" }}>
+            <TouchableOpacity onPress={() => router.navigate("transaction/CreateAccountForm")} style={{ position: "relative" }}>
                 <Text>Add account</Text>
 
             </TouchableOpacity>

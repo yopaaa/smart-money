@@ -4,6 +4,7 @@ import {
     addTransaction,
     deleteTransaction,
     editTransaction,
+    filterTransactions,
     getAccounts,
     getTransactions,
     initDB,
@@ -49,7 +50,7 @@ export const TransactionProvider = ({ children }) => {
             addTransaction,
             addAccount,
             editTransaction,
-            deleteTransaction
+            deleteTransaction,filterTransactions
         }}>
             {children}
         </TransactionContext.Provider>

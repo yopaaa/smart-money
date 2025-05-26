@@ -4,27 +4,27 @@ import SimpleHeader from '@/components/SimpleHeader';
 import SwitchToggle from '@/components/SwitchToggle';
 import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import {
-    Alert,
-    Button,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    View
+  Alert,
+  Button,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
 } from 'react-native';
-import groupLabels from '../groupLabels.json';
+import colorOptions from '../json/colorOptions.json';
+import groupLabels from '../json/groupLabels.json';
+import iconOptions from '../json/iconOptions.json';
 import { useTransactions } from '../TransactionContext';
-import colorOptions from './colorOptions.json';
-import iconOptions from './iconOptions.json';
 
 const TransactionForm = () => {
-  const router = useRouter();
+  const router = useNavigation();
   const { refetchTransactions, addAccount, accounts } = useTransactions();
   const [selectedIcon, setSelectedIcon] = useState(iconOptions[0]);
   const [selectedIconColor, setSelectedIconColor] = useState(colorOptions[0]);
@@ -92,7 +92,7 @@ const TransactionForm = () => {
       setSelectedIconColor(colorOptions[0])
       setIsVisible(true)
 
-      router.push("/");
+      router.goBack();
     } catch (e) {
       Alert.alert('Error', e.message);
     }

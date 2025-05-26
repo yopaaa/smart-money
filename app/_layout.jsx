@@ -31,7 +31,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="index" options={{animation: "fade"}}/>
           <Stack.Screen name="transaction/[id]"  />
-          <Stack.Screen name="page/TransactionForm" />
+          <Stack.Screen name="transaction/TransactionForm" />
           <Stack.Screen name="+not-found" /> 
         </Stack>
         <StatusBar style="auto" />
