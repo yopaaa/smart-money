@@ -1,13 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import {
-    Button,
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View
+  Button,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
 } from 'react-native';
 import { parseTransaction } from '../utils/parser';
 
@@ -53,7 +53,7 @@ export default function HomeScreen() {
     return (
       <View style={styles.item}>
         <Text style={styles.category}>{item.category}</Text>
-        <Text style={styles.amount}>Rp{item.amount}</Text>
+        <Text style={styles.amount}>{item.amount}</Text>
         <Text style={styles.note}>{item.raw}</Text>
         <Text style={styles.date}>{formatted}</Text>
       </View>

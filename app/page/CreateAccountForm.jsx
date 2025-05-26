@@ -2,21 +2,21 @@ import CustomIconPickerGrid from '@/components/CustomIconPickerGrid';
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
 import SwitchToggle from '@/components/SwitchToggle';
-import { formatNumber, unformatNumber } from '@/utils/number';
+import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
-  Button,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View
+    Alert,
+    Button,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    View
 } from 'react-native';
 import groupLabels from '../groupLabels.json';
 import { useTransactions } from '../TransactionContext';
@@ -121,13 +121,13 @@ const TransactionForm = () => {
 
           {/* Input Amount */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Jumlah (Rp)</Text>
+            <Text style={styles.label}>Jumlah ()</Text>
             <TextInput
               style={styles.input}
               keyboardType="numeric"
               placeholder="100.000"
-              value={formatNumber(formData.balance)}
-              onChangeText={(text) => handleChange('balance', unformatNumber(text))}
+              value={formatCurrency(formData.balance)}
+              onChangeText={(text) => handleChange('balance', unformatCurrency(text))}
             />
           </View>
 

@@ -1,10 +1,9 @@
-import { formatNumber } from '@/utils/number';
+import PieChart from '@/components/PieChart';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import {
-    FlatList,
     RefreshControl,
     SafeAreaView,
     StatusBar,
@@ -14,9 +13,16 @@ import {
     View
 } from 'react-native';
 import CustomPicker from '../components/CustomPicker';
-import { FindIcon } from './Home';
+import { findCategory } from './Home';
+import SlideSelectHorizontal from './SlideSelectHorizontal';
 import { useTransactions } from './TransactionContext';
 import timePeriods from './timePeriods.json';
+
+const options = [
+    { name: 'Makanan', icon: 'food', color: '#e74c3c' },
+    { name: 'Transportasi', icon: 'bus', color: '#3498db' },
+    { name: 'Belanja', icon: 'shopping', color: '#2ecc71' },
+];
 
 
 function convertTransactionsByType(transactions, type = 'expense') {
@@ -26,7 +32,7 @@ function convertTransactionsByType(transactions, type = 'expense') {
     // Hitung total nominal untuk semua kategori
     const total = filtered.reduce((sum, t) => sum + t.amount, 0);
 
-    // Kelompokkan berdasarkan kategori
+    // Kelompokkan berdasarkan kategori 
     const grouped = {};
     filtered.forEach(t => {
         const key = t.category || 'Other';
@@ -36,10 +42,11 @@ function convertTransactionsByType(transactions, type = 'expense') {
         grouped[key] += t.amount;
     });
 
-    // Konversi ke array dengan persentase
+    // Konversi ke array dengan persentase 
     const result = Object.entries(grouped).map(([category, amount]) => {
         const percent = total > 0 ? Math.round((amount / total) * 100) : 0;
-        return { category, amount, percent };
+        const icon = findCategory(category)
+        return { category, amount, percent, icon };
     });
 
     // Urutkan berdasarkan amount terbesar
@@ -55,6 +62,7 @@ export default function HomeScreen() {
 
     const [expenseCategoriesGroub, setExpenseCategoriesGroub] = useState([])
     const [incomeCategoriesGroub, setIncomeCategoriesGroub] = useState([])
+    const [type, setType] = useState('expense');
 
     // Hnaya Mengembalikan Transaksi Yang Berada DI Range yang Di Minta
     const filteredTransactions = useMemo(() => {
@@ -82,9 +90,19 @@ export default function HomeScreen() {
     }, [transactions, selectedDate, viewMode]);
 
     useEffect(() => {
-        setExpenseCategoriesGroub(convertTransactionsByType(filteredTransactions, 'expense'))
-        setIncomeCategoriesGroub(convertTransactionsByType(filteredTransactions, 'income'))
-    }, [filteredTransactions])
+        try {
+            const expenseData = convertTransactionsByType(filteredTransactions, 'expense');
+            const incomeData = convertTransactionsByType(filteredTransactions, 'income');
+
+            setExpenseCategoriesGroub(expenseData || []);
+            setIncomeCategoriesGroub(incomeData || []);
+        } catch (error) {
+            console.error('Error converting transactions:', error);
+            setExpenseCategoriesGroub([]);
+            setIncomeCategoriesGroub([]);
+        }
+    }, [filteredTransactions, type]);
+
 
     const handleRefresh = () => {
         refetchTransactions()
@@ -121,8 +139,6 @@ export default function HomeScreen() {
         if (viewMode === 'year') return selectedDate.format('YYYY');
     };
 
-
-
     const totalOverview = useMemo(() => {
         let totalIncome = 0;
         let totalExpense = 0;
@@ -141,22 +157,31 @@ export default function HomeScreen() {
             net: totalIncome - totalExpense,
         };
     }, [filteredTransactions]);
+    const [selected, setSelected] = useState(null);
 
 
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
+
             {/* Header */}
             <View style={styles.headercontainer}>
-                <Text style={styles.headerTitle}>Balance Statistics</Text>
+                <SlideSelectHorizontal
+                    initial={type}
+                    onChange={(val) => setType(val)}
+                    options={[
+                        { key: 'income', label: 'Income', icon: 'arrow-down-circle' },
+                        { key: 'expense', label: 'Expense', icon: 'arrow-up-circle' },
+                    ]}
+                />
+                <Text style={styles.headerTitle}>Statistics</Text>
                 <View style={styles.headerIcons}>
-                    <MaterialCommunityIcons name="magnify" size={25} style={styles.iconSpacing} />
 
                     <CustomPicker
                         inputContainerStyle={styles.inputContainer}
                         labelStyle={styles.label}
                         pickerStyle={styles.picker}
                         TouchableComponent={<MaterialCommunityIcons name="calendar-month" size={25} />}
-                        onSelect={(val) => setViewMode(val.name)}
+                        onSelect={(val) => { setViewMode(String(val.name).toLocaleLowerCase()) }}
                         options={timePeriods}
                         selectedComponent={(val) => {
                             return (<>
@@ -182,50 +207,18 @@ export default function HomeScreen() {
 
             </View>
 
-            <FlatList
+
+            {type == "income" && <PieChart
+                data={incomeCategoriesGroub}
+                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+            />}
+
+             {type == "expense" && <PieChart
                 data={expenseCategoriesGroub}
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-                keyExtractor={(item, i) => i.toString()}
-                renderItem={({ item }) => (
-                    <View style={styles.itemRow}>
-                        <View style={styles.itemLeft}>
-                            <View style={[styles.percentBox]}>
-                                <Text style={styles.percentText}>{item.percent}%</Text>
-                            </View>
-                            <FindIcon name={item.category} />
-                            <Text style={styles.label}>{item.category}</Text>
-                        </View>
-                        <Text style={styles.amount}>Rp {formatNumber(item.amount) || 0}</Text>
-                    </View>
-                )}
-                ListEmptyComponent={
-                    <View style={{ justifyContent: "center", alignItems: "center", height: "50%" }}>
-                        <Text>Tidak ada transaksi</Text>
-                    </View>
-                }
-                showsVerticalScrollIndicator={false}
-                ListHeaderComponent={
-                    <View style={styles.overviewBox}>
-                        <View style={styles.overviewHeader}>
-                            <Text style={styles.overviewTitle}>Overview</Text>
-                            <MaterialCommunityIcons name="information-outline" size={16} />
-                        </View>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>Income</Text>
-                            <Text style={[styles.amount, { color: '#2196f3' }]}>Rp {formatNumber(totalOverview.income) || 0}</Text>
-                        </View>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>Expense</Text>
-                            <Text style={[styles.amount, { color: '#f44336' }]}>- Rp {formatNumber(totalOverview.expense) || 0}</Text>
-                        </View>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>Total</Text>
-                            <Text style={styles.amount}>Rp {formatNumber(totalOverview.net) || 0}</Text>
-                        </View>
-                    </View>
-                }
-                ListFooterComponent={<View style={{ margin: 200 }} />}
-            />
+            />}
+
+
         </SafeAreaView>
     );
 }
@@ -235,7 +228,7 @@ const styles = StyleSheet.create({
         padding: 16,
         flex: 1,
         flexDirection: "column",
-        paddingBottom: 100
+        // paddingBottom: 100
     },
     item: {
         flexDirection: 'row',

@@ -1,4 +1,4 @@
-import { formatNumber } from '@/utils/number';
+import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import moment from 'moment';
@@ -26,9 +26,9 @@ export function findCategory(categoryName) {
     return category || categories[9];
 }
 
-export function FindIcon({ name, size = 30 }) {
+export function FindIcon({ name, size = 30, style }) {
     const category = findCategory(name);
-    return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} />;
+    return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} style={style} />;
 };
 
 export default function HomeScreen() {
@@ -163,9 +163,6 @@ export default function HomeScreen() {
         };
     }, [filteredTransactions]);
 
-
-
-
     const renderTransactionItem = ({ item }) => {
         const isExpense = item.type === 'expense';
         const isTransfer = item.type === 'transfer';
@@ -191,7 +188,7 @@ export default function HomeScreen() {
                     </Text>
                 </View>
                 <Text style={[styles.amount, amountStyle]}>
-                    {isExpense ? '-' : isTransfer ? "" : '+'} Rp {formatNumber(item.amount)}
+                    {isExpense ? '-' : isTransfer ? "" : '+'}  {formatCurrency(item.amount)}
                 </Text>
             </TouchableOpacity>
         );
@@ -214,7 +211,7 @@ export default function HomeScreen() {
                         )}
                     </View>
                     <Text style={[styles.amount, amountStyle]}>
-                        {item.total < 0 ? "-" : "+"} Rp {formatNumber(item.total)}
+                        {item.total < 0 ? "-" : "+"}  {formatCurrency(item.total)}
                     </Text>
                 </View>
 
@@ -240,7 +237,7 @@ export default function HomeScreen() {
                         labelStyle={styles.label}
                         pickerStyle={styles.picker}
                         TouchableComponent={<MaterialCommunityIcons name="calendar-month" size={25} />}
-                        onSelect={(val) => setViewMode(val.name)}
+                        onSelect={(val) => { setViewMode(String(val.name).toLocaleLowerCase()) }}
                         options={timePeriods}
                         selectedComponent={(val) => {
                             return (<>
@@ -251,8 +248,6 @@ export default function HomeScreen() {
                     />
                 </View>
             </View>
-
-
 
             {/* Month Navigation */}
             <View style={styles.monthNav}>
@@ -287,15 +282,15 @@ export default function HomeScreen() {
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Income</Text>
-                            <Text style={[styles.amount, { color: '#2196f3' }]}>Rp {formatNumber(totalOverview.income) || 0}</Text>
+                            <Text style={[styles.amount, { color: '#2196f3' }]}> {formatCurrency(totalOverview.income) || 0}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Expense</Text>
-                            <Text style={[styles.amount, { color: '#f44336' }]}>- Rp {formatNumber(totalOverview.expense) || 0}</Text>
+                            <Text style={[styles.amount, { color: '#f44336' }]}>-  {formatCurrency(totalOverview.expense) || 0}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Total</Text>
-                            <Text style={styles.amount}>Rp {formatNumber(totalOverview.net) || 0}</Text>
+                            <Text style={styles.amount}> {formatCurrency(totalOverview.net) || 0}</Text>
                         </View>
                     </View>
                 }
@@ -310,14 +305,29 @@ const styles = StyleSheet.create({
         padding: 16,
         flex: 1,
         flexDirection: "column",
-        paddingBottom: 100
     },
     item: {
         flexDirection: 'row',
         paddingVertical: 12,
-        borderBottomColor: '#ddd',
-        borderBottomWidth: 1,
+        // borderBottomColor: '#ddd',
+        // borderBottomWidth: 1,
         alignItems: 'center',
+
+        padding: 10,
+        marginHorizontal: 4,
+        marginVertical: 2,
+        borderRadius: 12,
+        backgroundColor: '#f8f9fa',
+        borderWidth: 1,
+        borderColor: 'transparent',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+        elevation: 1,
     },
     title: {
         fontSize: 16,

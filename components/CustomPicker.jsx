@@ -35,10 +35,15 @@ export default function CustomPicker({
 
 
             <Modal visible={visible} transparent animationType="fade">
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalBox}>
+                <TouchableOpacity
+                    style={styles.modalContainer}
+                    onPress={() => setVisible(false)} // Tutup jika ditekan di luar
+                >
+                    <TouchableOpacity
+                        style={styles.modalBox}
+                        onPress={(e) => e.stopPropagation()} // Jangan tutup saat tekan isi modal
+                    >
                         <FlatList
-                            // showsVerticalScrollIndicator={false}
                             data={options}
                             keyExtractor={(item) => item.name}
                             renderItem={({ item, index }) => (
@@ -49,7 +54,12 @@ export default function CustomPicker({
                                         setVisible(false);
                                     }}
                                 >
-                                    <MaterialCommunityIcons name={item.icon} size={20} style={{ marginRight: 10 }} color={item.color || item.iconColor} />
+                                    <MaterialCommunityIcons
+                                        name={item.icon}
+                                        size={20}
+                                        style={{ marginRight: 10 }}
+                                        color={item.color || item.iconColor}
+                                    />
                                     <Text>{item.name}</Text>
                                 </TouchableOpacity>
                             )}
@@ -57,8 +67,8 @@ export default function CustomPicker({
                         <TouchableOpacity onPress={() => setVisible(false)}>
                             <Text style={{ textAlign: 'center', color: '#888', marginTop: 10 }}>Tutup</Text>
                         </TouchableOpacity>
-                    </View>
-                </View>
+                    </TouchableOpacity>
+                </TouchableOpacity>
             </Modal>
 
         </>
@@ -119,5 +129,19 @@ const styles = StyleSheet.create({
         borderBottomColor: '#eee',
         borderBottomWidth: 1,
     },
+// modalContainer: {
+//   flex: 1,
+//   backgroundColor: 'rgba(0,0,0,0.5)',
+//   justifyContent: 'center',
+//   alignItems: 'center',
+// },
+
+// modalBox: {
+//   backgroundColor: 'white',
+//   borderRadius: 10,
+//   padding: 20,
+//   maxHeight: '80%',
+//   width: '80%',
+// },
 
 });

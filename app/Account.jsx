@@ -10,7 +10,7 @@ import {
     View
 } from 'react-native';
 
-import { formatNumber } from '@/utils/number';
+import { formatCurrency } from '@/utils/number';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTransactions } from './TransactionContext';
@@ -93,15 +93,15 @@ export default function AccountsScreen() {
             <View style={styles.summary}>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Assets</Text>
-                    <Text style={[styles.summaryValue, styles.assetBalance]}>Rp{formatNumber(assets)}</Text>
+                    <Text style={[styles.summaryValue, styles.assetBalance]}>{formatCurrency(assets)}</Text>
                 </View>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Liabilities</Text>
-                    <Text style={[styles.summaryValue, styles.liabilityBalance]}>Rp{formatNumber(liabilities) || 0}</Text>
+                    <Text style={[styles.summaryValue, styles.liabilityBalance]}>{formatCurrency(liabilities) || 0}</Text>
                 </View>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Total</Text>
-                    <Text style={[styles.summaryValue, total > 0 ? styles.assetBalance : styles.liabilityBalance]}>Rp{formatNumber(total)}</Text>
+                    <Text style={[styles.summaryValue, total > 0 ? styles.assetBalance : styles.liabilityBalance]}>{formatCurrency(total)}</Text>
                 </View>
             </View>
 
@@ -126,7 +126,7 @@ export default function AccountsScreen() {
                     renderSectionHeader={({ section: { title, balance } }) => (
                         <View style={{
                             ...styles.item, padding: 0, margin: 0, paddingVertical: 18, borderBottomColor: "black",
-                            borderBottomWidth: 1
+                            borderBottomWidth: 1,
                         }}>
 
                             <Text style={styles.groupTitle}>{title}</Text>
@@ -136,13 +136,29 @@ export default function AccountsScreen() {
                                     ? styles.liabilityBalance
                                     : styles.assetBalance
                             ]}>
-                                Rp{formatNumber(balance) || 0}
+                                {formatCurrency(balance) || 0}
                             </Text>
                         </View>
 
                     )}
                     renderItem={({ item }) => (
-                        <View style={styles.item}>
+                        <View style={[styles.item, {
+                            padding: 10,
+                            marginHorizontal: 4,
+                            marginVertical: 2,
+                            borderRadius: 12,
+                            backgroundColor: '#f8f9fa',
+                            borderWidth: 1,
+                            borderColor: 'transparent',
+                            shadowColor: '#000',
+                            shadowOffset: {
+                                width: 0,
+                                height: 1,
+                            },
+                            shadowOpacity: 0.1,
+                            shadowRadius: 1,
+                            elevation: 1,
+                        }]}>
 
                             <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 20 }}>
                                 <MaterialCommunityIcons name={item.icon} size={24} color={item.iconColor} />
@@ -154,11 +170,11 @@ export default function AccountsScreen() {
                                 styles.accountBalance,
                                 item.hidden
                                     ? styles.hiddenBalance
-                                    : item.isLiability
+                                    : item.isLiability || item.balance < 0
                                         ? styles.liabilityBalance
                                         : styles.assetBalance
                             ]}>
-                                Rp{formatNumber(item.balance) || 0}
+                                {formatCurrency(item.balance) || 0}
                             </Text>
 
                         </View>
@@ -212,7 +228,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f2f2f2',
         padding: 12,
         borderRadius: 8,
-        marginBottom: 8
+        marginBottom: 8,
     },
     accountName: { fontSize: 16 },
     accountBalance: { fontSize: 16, fontWeight: 'bold' }, assetBalance: {

@@ -4,8 +4,60 @@ const formatNumber = (value, format = 'id-ID') => {
     return isNaN(number) ? '' : number.toLocaleString(format);
 };
 
-const unformatNumber = (formattedValue) => {
-    return formattedValue.replace(/[^0-9]/g, '');
+const unformatCurrency = (formatted, locale = 'id-ID', currency = 'IDR') => {
+  if (typeof formatted !== 'string') return 0;
+
+  // Contoh angka besar untuk melihat pemisah ribuan & desimal
+  const example = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+  }).format(1234567.89);
+
+  // Ambil simbol mata uang
+  const currencySymbol = example.replace(/[\d\s.,]/g, '');
+
+  // Deteksi pemisah ribuan dan desimal
+  const parts = example.match(/(\d{1,3})([^0-9])(\d{3})[^0-9]+(\d{2})$/);
+  const groupSeparator = parts ? parts[2] : '.';
+  const decimalSeparator = parts ? example.match(/(\d+)([^0-9])(\d{2})$/)?.[2] : ',';
+
+  // Proses string
+  const cleaned = formatted
+    .replace(currencySymbol, '')
+    .replace(/\s/g, '')
+    .replace(new RegExp(`\\${groupSeparator}`, 'g'), '') // hapus pemisah ribuan
+    .replace(decimalSeparator, '.'); // ubah pemisah desimal jadi titik
+
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? 0 : parsed;
 };
 
-export { formatNumber, unformatNumber };
+
+
+const formatCurrency = (
+    amount,
+    {
+        locale = 'id-ID',
+        currency = 'IDR',
+        minimumFractionDigits = 0,
+        maximumFractionDigits = 0,
+    } = {}
+) => {
+    if (typeof amount !== 'number') {
+        amount = Number(amount);
+    }
+
+    if (isNaN(amount)) return '';
+
+    return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+        minimumFractionDigits,
+        maximumFractionDigits,
+    }).format(amount);
+};
+
+
+export { formatCurrency, formatNumber, unformatCurrency };
+

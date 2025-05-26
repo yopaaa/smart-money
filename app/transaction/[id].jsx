@@ -1,7 +1,7 @@
 import ActionButton from '@/components/ActionButton';
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
-import { formatNumber, unformatNumber } from '@/utils/number';
+import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -67,7 +67,7 @@ const TransactionForm = () => {
                             : expenseCategories;
 
                 let matchedCategory
-                if (tx.category == "initial-balance") {
+                if (tx.category == "initial-balance" || !tx.category) {
                     matchedCategory = { "color": "#a1887f", "icon": "bank-transfer-in", "name": "initial-balance" }
                 } else {
                     matchedCategory = categories.find(cat => cat.name.toLowerCase() === tx.category.toLowerCase());
@@ -90,6 +90,8 @@ const TransactionForm = () => {
                 setSelectedDate(txDate);
                 setSelectedTime(txDate);
             }
+        } else {
+            router.back();
         }
 
     }, [accounts, transactions]);
@@ -244,8 +246,8 @@ const TransactionForm = () => {
                             style={styles.input}
                             keyboardType="numeric"
                             placeholder="100000"
-                            value={formatNumber(formData.amount)}
-                            onChangeText={(text) => handleChange('amount', unformatNumber(text))}
+                            value={formatCurrency(formData.amount)}
+                            onChangeText={(text) => handleChange('amount', unformatCurrency(text))}
                             editable={isFormEditable}
                         />
                     </View>
@@ -281,7 +283,7 @@ const TransactionForm = () => {
                         selectedComponent={(val) => {
                             return (<>
                                 <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.iconColor} />
-                                <Text>{`${val.name} (Rp ${formatNumber(val.balance)})`}</Text>
+                                <Text>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
                             </>)
                         }}
                     />
@@ -300,7 +302,7 @@ const TransactionForm = () => {
                                 selectedComponent={(val) => {
                                     return (<>
                                         <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.iconColor} />
-                                        <Text>{`${val.name} (Rp ${formatNumber(val.balance)})`}</Text>
+                                        <Text>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
                                     </>)
                                 }}
                             />
@@ -311,8 +313,8 @@ const TransactionForm = () => {
                                     style={styles.input}
                                     keyboardType="numeric"
                                     placeholder="0"
-                                    value={formatNumber(formData.fee)}
-                                    onChangeText={(text) => handleChange('fee', unformatNumber(text))}
+                                    value={formatCurrency(formData.fee)}
+                                    onChangeText={(text) => handleChange('fee', unformatCurrency(text))}
                                 />
                             </View>
                         </>
@@ -379,7 +381,17 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: '#ccc'
+        borderColor: '#ccc',
+        backgroundColor: '#fff',
+        borderColor: '#e0e0e0',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     activeTab: {
         backgroundColor: '#E0F0FF',
