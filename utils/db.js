@@ -79,6 +79,29 @@ export const getTransactions = () => {
     return db.getAllSync(`SELECT * FROM transactions ORDER BY createdAt DESC`);
 };
 
+/**
+ * Fungsi untuk mendapatkan transaksi berdasarkan ID
+ * @param {string} id - ID transaksi yang dicari
+ * @returns {Object|null} Objek transaksi jika ditemukan, null jika tidak
+ */
+export const getTransactionById = (id) => {
+    try {
+        const sql = `SELECT * FROM transactions WHERE id = ? LIMIT 1`;
+        const params = [id];
+
+        const result = db.getAllSync(sql, params);
+
+        if (result.length > 0) {
+            return result[0];
+        }
+
+        return null;
+    } catch (e) {
+        console.error('Gagal mendapatkan transaksi:', e.message);
+        throw e;
+    }
+};
+
 export const addTransaction = (
     transaction = {
         title: String,

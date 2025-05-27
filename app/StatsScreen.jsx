@@ -4,7 +4,7 @@ import SlideSelect from '@/components/SlideSelect';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     RefreshControl,
     SafeAreaView,
@@ -60,10 +60,11 @@ export default function HomeScreen() {
 
     // Auto refresh when focus
     const [updateTrigers, setupdateTrigers] = useState()
+    useEffect(() => {
+    }, [])
+
     useFocusEffect(
         useCallback(() => {
-            console.log("statsscrenn trigered");
-            
             setupdateTrigers(Date.now());
 
             try {
@@ -213,11 +214,32 @@ export default function HomeScreen() {
             {type == "income" && <PieChart
                 data={incomeCategoriesGroub}
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+                legendOnPress={(data) => {
+                    router.push({
+                        pathname: 'transaction/PerCategoriesTransactions',
+                        params: {
+                            category: data.category,
+                            type: type,
+                            viewMode, selectedDate
+                        }
+                    });
+                }}
             />}
 
             {type == "expense" && <PieChart
                 data={expenseCategoriesGroub}
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+                legendOnPress={(data) => {
+                    router.push({
+                        pathname: 'transaction/PerCategoriesTransactions',
+                        params: {
+                            category: data.category,
+                            type: type,
+                            viewMode, selectedDate
+                        }
+                    });
+                }}
+
             />}
 
 

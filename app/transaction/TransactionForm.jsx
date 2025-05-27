@@ -7,18 +7,18 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
-  Button,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    Alert,
+    Button,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import ChatInput from '../ChatInput';
 import { useTransactions } from '../TransactionContext';
@@ -27,7 +27,7 @@ import incomeCategories from '../json/incomeCategories.json';
 
 const TransactionForm = () => {
   const router = useRouter();
-  const { refetchTransactions, accounts, addTransaction } = useTransactions();
+  const { refetchData, accounts, addTransaction } = useTransactions();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
@@ -106,7 +106,7 @@ const TransactionForm = () => {
     try {
       addTransaction(transaction);
       Alert.alert('Sukses', 'Transaksi berhasil ditambahkan');
-      refetchTransactions();
+      refetchData();
 
 
       // reset form

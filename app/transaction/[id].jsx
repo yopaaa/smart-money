@@ -28,11 +28,10 @@ const TransactionForm = () => {
     const { id } = useLocalSearchParams();
     const router = useRouter();
     const {
-        refetchTransactions,
         accounts,
         editTransaction,
-        transactions,
-        deleteTransaction
+        deleteTransaction,
+        getTransactionById
     } = useTransactions();
 
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -54,8 +53,8 @@ const TransactionForm = () => {
     });
 
     useEffect(() => {
-        if (id && transactions.length > 0) {
-            const tx = transactions.find(t => t.id === id);
+        if (id) {
+            const tx = getTransactionById(id); // Use the new function
 
             if (tx) {
                 const txDate = new Date(parseInt(tx.createdAt));
@@ -89,13 +88,11 @@ const TransactionForm = () => {
 
                 setSelectedDate(txDate);
                 setSelectedTime(txDate);
+            } else {
+                router.back();
             }
-        } else {
-            router.back();
         }
-
-    }, [accounts, transactions]);
-
+    }, [id, accounts]);
 
     const handleChange = (name, value) => {
         setFormData(prev => ({
@@ -142,8 +139,6 @@ const TransactionForm = () => {
         try {
             editTransaction(formData.id, transaction)
             Alert.alert('Sukses', 'Transaksi berhasil diperbarui');
-            refetchTransactions();
-
 
             router.back();
         } catch (e) {
@@ -155,8 +150,6 @@ const TransactionForm = () => {
         try {
             deleteTransaction(formData.id)
             Alert.alert('Sukses', 'Transaksi berhasil dihapus');
-            refetchTransactions();
-
 
             router.back();
         } catch (e) {

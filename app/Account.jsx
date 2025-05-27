@@ -17,13 +17,13 @@ import { useTransactions } from './TransactionContext';
 import groupLabels from './json/groupLabels.json';
 
 export default function AccountsScreen() {
-    const { accounts, refetchTransactions } = useTransactions();
+    const { accounts, refetchData } = useTransactions();
     const router = useNavigation();
 
     const [isRefreshing, setisRefreshing] = useState(false)
 
     const handleRefresh = () => {
-        refetchTransactions()
+        refetchData()
         setisRefreshing(true)
         setTimeout(() => {
             setisRefreshing(false)

@@ -25,7 +25,7 @@ import { useTransactions } from '../TransactionContext';
 
 const TransactionForm = () => {
   const router = useNavigation();
-  const { refetchTransactions, addAccount, accounts } = useTransactions();
+  const { refetchData, addAccount, accounts } = useTransactions();
   const [selectedIcon, setSelectedIcon] = useState(iconOptions[0]);
   const [selectedIconColor, setSelectedIconColor] = useState(colorOptions[0]);
   const [isVisible, setIsVisible] = useState(true);
@@ -78,7 +78,7 @@ const TransactionForm = () => {
     try {
       addAccount(accountData)
       Alert.alert('Sukses', 'Transaksi berhasil ditambahkan');
-      refetchTransactions();
+      refetchData();
 
 
       // reset form

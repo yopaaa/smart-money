@@ -7,7 +7,7 @@ import { formatCurrency } from '../utils/number';
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 
-const AnimatedPieChart = ({ data, refreshControl }) => {
+const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { } }) => {
     const [animatedValues, setAnimatedValues] = useState();
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -228,7 +228,10 @@ const AnimatedPieChart = ({ data, refreshControl }) => {
                     styles.legendItem,
                     isSelected && styles.selectedLegendItem
                 ]}
-                onPress={() => { setSelectedIndex(index) }}
+                onPress={() => {
+                    setSelectedIndex(index)
+                    legendOnPress(item)
+                }}
                 activeOpacity={0.7}
             >
                 <FindIcon name={item.category} style={{ paddingHorizontal: 10 }} />

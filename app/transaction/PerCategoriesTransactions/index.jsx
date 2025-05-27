@@ -1,6 +1,7 @@
+import SimpleHeader from '@/components/SimpleHeader';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import moment from 'moment';
 import { useCallback, useMemo, useState } from 'react';
 import {
@@ -13,12 +14,10 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import CustomPicker from '../components/CustomPicker';
-import { useTransactions } from './TransactionContext';
-import expenseCategories from './json/expenseCategories.json';
-import incomeCategories from './json/incomeCategories.json';
-import timePeriods from './json/timePeriods.json';
-import transferCategories from './json/transferCategories.json';
+import { useTransactions } from '../../TransactionContext';
+import expenseCategories from '../../json/expenseCategories.json';
+import incomeCategories from '../../json/incomeCategories.json';
+import transferCategories from '../../json/transferCategories.json';
 
 export function findCategory(categoryName) {
     const categories = [...expenseCategories, ...incomeCategories, ...transferCategories];
@@ -32,26 +31,26 @@ export function FindIcon({ name, size = 30, style }) {
 };
 
 export default function HomeScreen() {
+    const { category, type, viewMode = "month", selectedDate: selectedDates } = useLocalSearchParams();
     const router = useRouter();
     const { filterTransactions } = useTransactions();
-    const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
-    const [selectedDate, setSelectedDate] = useState(moment()); // bisa hari berapa pun
-    const [isRefreshing, setisRefreshing] = useState(false)
+    const [selectedDate, setSelectedDate] = useState(moment());
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [updateTriggers, setUpdateTriggers] = useState();
 
-    // Auto refresh when focus
-    const [updateTrigers, setupdateTrigers] = useState()
     useFocusEffect(
         useCallback(() => {
-            setupdateTrigers(Date.now());
+            setSelectedDate(moment(selectedDates))
+            setUpdateTriggers(Date.now());
         }, [])
     );
 
     const handleRefresh = () => {
-        setisRefreshing(true)
+        setIsRefreshing(true);
         setTimeout(() => {
-            setisRefreshing(false)
+            setIsRefreshing(false);
         }, 1000);
-    }
+    };
 
     const goToPrev = () => {
         const newDate = moment(selectedDate);
@@ -73,7 +72,7 @@ export default function HomeScreen() {
         if (viewMode === 'week') {
             const start = moment(selectedDate).startOf('week');
             const end = moment(selectedDate).endOf('week');
-            return `${start.format('D MMM')} - ${end.format('D MMM YYYY')}`;
+            return `${start.format('D')}-${end.format('D MMM YYYY')}`;
         }
         if (viewMode === 'month') return selectedDate.format('MMMM YYYY');
         if (viewMode === 'quarter') return `Q${selectedDate.quarter()} ${selectedDate.year()}`;
@@ -98,17 +97,16 @@ export default function HomeScreen() {
             end.endOf('year');
         }
 
-        // Gunakan filterTransactions dari context
         return filterTransactions({
             startDate: start.valueOf(),
-            endDate: end.valueOf()
+            endDate: end.valueOf(),
+            ...(category && { category }),
+            ...(type && { type })
         });
-    }, [selectedDate, viewMode, filterTransactions, isRefreshing, updateTrigers]);
+    }, [selectedDate, viewMode, filterTransactions, isRefreshing, updateTriggers, category, type]);
 
     const groupedTransactions = useMemo(() => {
         const groups = {};
-
-        // console.log(filteredTransactions); 
 
         filteredTransactions.forEach((item) => {
             const mDate = moment(Number(item.createdAt)).startOf('day');
@@ -195,7 +193,7 @@ export default function HomeScreen() {
                     </Text>
                 </View>
                 <Text style={[styles.amount, amountStyle]}>
-                    {isExpense ? '-' : isTransfer ? "" : '+'}{formatCurrency(item.amount)}
+                    {isExpense ? '-' : isTransfer ? "" : '+'} {formatCurrency(item.amount)}
                 </Text>
             </TouchableOpacity>
         );
@@ -206,7 +204,7 @@ export default function HomeScreen() {
         const amountStyle = item.total < 0 ? styles.expense : styles.income;
 
         return (
-            <View style={{ marginTop: 20 }}>
+            <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
                 <View style={styles.transactionBox}>
                     <View style={{ flexDirection: 'row', alignItems: "center" }}>
                         <Text style={[styles.dateHeader, isNew && { fontSize: 30 }]}>{item.date}</Text>
@@ -233,42 +231,22 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
-            {/* Header */}
-            <View style={styles.headercontainer}>
-                <Text style={styles.headerTitle}>Riwayat Transaksi</Text>
-                <View style={styles.headerIcons}>
-                    <MaterialCommunityIcons name="magnify" size={25} style={styles.iconSpacing} />
+            <SimpleHeader
+                title={`${category} Categories`}
+                rightComponent={
+                    <View style={styles.monthNav}>
+                        <TouchableOpacity onPress={goToPrev}>
+                            <MaterialCommunityIcons name="chevron-left" size={30} />
+                        </TouchableOpacity>
 
-                    <CustomPicker
-                        inputContainerStyle={styles.inputContainer}
-                        labelStyle={styles.label}
-                        pickerStyle={styles.picker}
-                        TouchableComponent={<MaterialCommunityIcons name="calendar-month" size={25} />}
-                        onSelect={(val) => { setViewMode(String(val.name).toLocaleLowerCase()) }}
-                        options={timePeriods}
-                        selectedComponent={(val) => {
-                            return (<>
-                                <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.color} />
-                                <Text>{val.name}</Text>
-                            </>)
-                        }}
-                    />
-                </View>
-            </View>
+                        <Text style={styles.monthText}>{getPeriodLabel()}</Text>
 
-            {/* Month Navigation */}
-            <View style={styles.monthNav}>
-                <TouchableOpacity onPress={goToPrev}>
-                    <MaterialCommunityIcons name="chevron-left" size={30} />
-                </TouchableOpacity>
-
-                <Text style={styles.monthText}>{getPeriodLabel()}</Text>
-
-                <TouchableOpacity onPress={goToNext}>
-                    <MaterialCommunityIcons name="chevron-right" size={30} />
-                </TouchableOpacity>
-
-            </View>
+                        <TouchableOpacity onPress={goToNext}>
+                            <MaterialCommunityIcons name="chevron-right" size={30} />
+                        </TouchableOpacity>
+                    </View>
+                }
+            />
 
             <FlatList
                 data={groupedTransactions}
@@ -288,15 +266,7 @@ export default function HomeScreen() {
                             <MaterialCommunityIcons name="information-outline" size={16} />
                         </View>
                         <View style={styles.row}>
-                            <Text style={styles.label}>Income</Text>
-                            <Text style={[styles.amount, { color: '#2196f3' }]}> {formatCurrency(totalOverview.income) || 0}</Text>
-                        </View>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>Expense</Text>
-                            <Text style={[styles.amount, { color: '#f44336' }]}>-  {formatCurrency(totalOverview.expense) || 0}</Text>
-                        </View>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>Total</Text>
+                            <Text style={styles.label}>{type} Total</Text>
                             <Text style={styles.amount}> {formatCurrency(totalOverview.net) || 0}</Text>
                         </View>
                     </View>
@@ -309,17 +279,13 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
         flex: 1,
         flexDirection: "column",
     },
     item: {
         flexDirection: 'row',
         paddingVertical: 12,
-        // borderBottomColor: '#ddd',
-        // borderBottomWidth: 1,
         alignItems: 'center',
-
         padding: 10,
         marginHorizontal: 4,
         marginVertical: 2,
@@ -357,23 +323,6 @@ const styles = StyleSheet.create({
     transfer: {
         color: '#7b7b7b',
     },
-    headercontainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: 60,
-    },
-    headerTitle: {
-        fontSize: 22,
-        fontWeight: 'bold',
-    },
-    headerIcons: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    iconSpacing: {
-        marginHorizontal: 10,
-    },
     monthNav: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -385,11 +334,11 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     overviewBox: {
+        paddingHorizontal: 16,
         paddingTop: 16,
     },
     overviewHeader: {
         flexDirection: 'row',
-        // justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 8,
         gap: 10
@@ -405,6 +354,7 @@ const styles = StyleSheet.create({
     },
     label: {
         color: '#555',
+        textTransform: "capitalize"
     },
     transactionBox: {
         flexDirection: 'row',
@@ -429,5 +379,8 @@ const styles = StyleSheet.create({
     },
     dateSmall: {
         color: '#666',
+    },
+    transactionRight: {
+        marginLeft: 10
     }
 });

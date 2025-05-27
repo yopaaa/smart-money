@@ -6,7 +6,7 @@ import {
     editTransaction,
     filterTransactions,
     getAccounts,
-    getTransactions,
+    getTransactionById,
     initDB,
     resetTables
 } from '../utils/db';
@@ -14,18 +14,11 @@ import {
 const TransactionContext = createContext();
 
 export const TransactionProvider = ({ children }) => {
-    const [transactions, setTransactions] = useState([]);
     const [accounts, setAccounts] = useState([]);
 
-    const refetchTransactions = () => {
+    const refetchData = () => {
         console.log("Refetching...");
-        fetchTransactions()
-    };
 
-    const fetchTransactions = () => {
-        const txs = getTransactions();
-        setTransactions(txs);
-        // console.log(txs);
         loadAccounts()
     };
 
@@ -37,20 +30,19 @@ export const TransactionProvider = ({ children }) => {
     useEffect(() => {
         initDB()
         loadAccounts()
-        fetchTransactions();
+        refetchData();
     }, []);
 
     return (
         <TransactionContext.Provider value={{
-            transactions,
             accounts,
-            refetchTransactions,
+            refetchData,
             resetTables,
             getAccounts,
             addTransaction,
             addAccount,
             editTransaction,
-            deleteTransaction,filterTransactions
+            deleteTransaction, filterTransactions, getTransactionById
         }}>
             {children}
         </TransactionContext.Provider>

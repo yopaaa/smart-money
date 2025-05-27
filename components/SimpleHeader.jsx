@@ -22,7 +22,6 @@ function Header({ style, headerTitleStyle, title, rightComponent }) {
             flexDirection: 'row',
             alignItems: 'center',
             height: 60,
-            gap: 20,
         }}>
             <Pressable onPress={() => router.back()} style={{ padding: 10 }}>
                 <Ionicons name="arrow-back" size={24} color="#000" />
