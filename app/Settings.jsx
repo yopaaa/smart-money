@@ -39,8 +39,9 @@ const navigation = useNavigation();
       }
     },
     {
-      icon: 'refresh-outline', label: 'Backup', function: function () {
-        console.log("this.label");
+      icon: 'cloud-upload-outline', label: 'Backup', function: function () {
+                router.push("settings/Backup");
+
       }
     },
     {

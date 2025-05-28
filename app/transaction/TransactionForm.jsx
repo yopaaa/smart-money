@@ -7,18 +7,18 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-    Alert,
-    Button,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Alert,
+  Button,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import ChatInput from '../ChatInput';
 import { useTransactions } from '../TransactionContext';
@@ -73,7 +73,7 @@ const TransactionForm = () => {
       Alert.alert('Error', 'Pilih akun asal');
       return;
     }
-    if (!formData.category) {
+    if (!formData.category && formData.type != 'transfer') {
       Alert.alert('Error', 'Pilih category');
       return;
     }
@@ -216,6 +216,7 @@ const TransactionForm = () => {
                   placeholder="Dinner, Gaji or Transfer"
                   value={formData.title}
                   onChangeText={(text) => handleChange('title', text)}
+                  autoFocus
                 />
               </View>
 

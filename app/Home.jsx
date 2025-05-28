@@ -237,7 +237,13 @@ export default function HomeScreen() {
             <View style={styles.headercontainer}>
                 <Text style={styles.headerTitle}>Riwayat Transaksi</Text>
                 <View style={styles.headerIcons}>
-                    <MaterialCommunityIcons name="magnify" size={25} style={styles.iconSpacing} />
+                    <TouchableOpacity
+                        onPress={() => {
+                            router.push(`/transaction/Search`);
+                        }}>
+
+                        <MaterialCommunityIcons name="magnify" size={25} style={styles.iconSpacing} />
+                    </TouchableOpacity>
 
                     <CustomPicker
                         inputContainerStyle={styles.inputContainer}

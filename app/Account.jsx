@@ -90,6 +90,7 @@ export default function AccountsScreen() {
             <View style={styles.headercontainer}>
                 <Text style={styles.header}>Accounts</Text>
             </View>
+
             <View style={styles.summary}>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Assets</Text>
@@ -114,10 +115,10 @@ export default function AccountsScreen() {
 
             </TouchableOpacity>
 
-            <View style={{ flex: 1 }}>
+            <View>
                 <SectionList
                     refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-                    style={{ flex: 1 }}
+
                     scrollEnabled
                     sections={grouped}
                     keyExtractor={(item) => item.id}
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
     summary: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20
+        marginBottom: 20,
     },
     summaryBox: { alignItems: 'center' },
     summaryLabel: { fontSize: 14, color: '#555' },
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: 'space-between',
-        backgroundColor: '#f2f2f2',
+        // backgroundColor: '#f2f2f2',
         padding: 12,
         borderRadius: 8,
         marginBottom: 8,

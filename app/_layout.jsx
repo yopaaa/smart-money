@@ -32,6 +32,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" options={{animation: "fade"}}/>
           <Stack.Screen name="transaction/[id]"  />
           <Stack.Screen name="transaction/TransactionForm" />
+          <Stack.Screen name="transaction/Search" options={{animation: "slide_from_bottom"}}/>
           <Stack.Screen name="transaction/PerCategoriesTransactions/index"  options={{animation: "flip"}}/>
           <Stack.Screen name="+not-found" /> 
         </Stack>
