@@ -1,5 +1,6 @@
 import SimpleHeader from '@/components/SimpleHeader';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { StorageAccessFramework } from 'expo-file-system';
@@ -7,8 +8,9 @@ import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const DB_NAME = 'SQLite/money_manager.db';
+const DB_NAME = 'SQLite/smart_money.db';
 const DB_PATH = `${FileSystem.documentDirectory}${DB_NAME}`;
+const BACKUP_FOLDER_URI_KEY = 'backup_folder_uri';
 
 const BackupRestoreScreen = () => {
     const [isBackingUp, setIsBackingUp] = useState(false);
@@ -37,68 +39,57 @@ const BackupRestoreScreen = () => {
             const isAvailable = await Sharing.isAvailableAsync();
 
             if (Platform.OS === 'android') {
-                try {
+                let targetFolderUri = await AsyncStorage.getItem(BACKUP_FOLDER_URI_KEY);
+
+                if (!targetFolderUri) {
                     const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync();
-
-                    if (permissions.granted) {
-                        const backupContent = await FileSystem.readAsStringAsync(backupPath, {
-                            encoding: FileSystem.EncodingType.Base64
-                        });
-
-                        const fileUri = await StorageAccessFramework.createFileAsync(
-                            permissions.directoryUri,
-                            backupName,
-                            'application/octet-stream'
-                        );
-
-                        await FileSystem.writeAsStringAsync(fileUri, backupContent, {
-                            encoding: FileSystem.EncodingType.Base64
-                        });
-
-                        if (isAvailable) {
-                            await Sharing.shareAsync(backupPath, {
-                                dialogTitle: 'Pilih aplikasi untuk menyimpan backup',
-                                mimeType: 'application/octet-stream',
-                            });
-                        }
-
-                        await FileSystem.deleteAsync(backupPath);
-
-                        Alert.alert(
-                            'Backup Berhasil',
-                            `File backup telah disimpan ke folder yang Anda pilih dengan nama: ${backupName}\n\nAnda dapat menemukan file ini di lokasi yang telah dipilih.`
-                        );
-                    } else {
+                    if (!permissions.granted) {
                         Alert.alert('Dibatalkan', 'Backup dibatalkan karena tidak ada folder yang dipilih.');
+                        return;
                     }
-                } catch (error) {
-                    console.error('Error with folder picker:', error);
-                    Alert.alert(
-                        'Error',
-                        `Gagal menyimpan ke folder pilihan: ${error.message}\n\nSilakan coba lagi atau gunakan file manager untuk memindahkan file backup.`
-                    );
+
+                    targetFolderUri = permissions.directoryUri;
+                    await AsyncStorage.setItem(BACKUP_FOLDER_URI_KEY, targetFolderUri);
                 }
-            } else if (Platform.OS === 'ios') {
-                try {
+
+                const backupContent = await FileSystem.readAsStringAsync(backupPath, {
+                    encoding: FileSystem.EncodingType.Base64
+                });
+
+                const fileUri = await StorageAccessFramework.createFileAsync(
+                    targetFolderUri,
+                    backupName,
+                    'application/octet-stream'
+                );
+
+                await FileSystem.writeAsStringAsync(fileUri, backupContent, {
+                    encoding: FileSystem.EncodingType.Base64
+                });
+
+                if (isAvailable) {
                     await Sharing.shareAsync(backupPath, {
                         dialogTitle: 'Pilih aplikasi untuk menyimpan backup',
                         mimeType: 'application/octet-stream',
                     });
-
-                    Alert.alert(
-                        'Backup Berhasil',
-                        `File backup telah dibuat dengan nama: ${backupName}\n\nAnda dapat menyimpannya ke Files, iCloud Drive, atau aplikasi lain.`
-                    );
-                } catch (error) {
-                    Alert.alert('Error', 'Gagal membuka dialog sharing.');
                 }
-            } else {
+
+                await FileSystem.deleteAsync(backupPath);
+
                 Alert.alert(
                     'Backup Berhasil',
-                    `File backup telah dibuat dengan nama: ${backupName}\n\nFile disimpan di: ${backupPath}`
+                    `Backup disimpan ke folder yang telah dipilih sebelumnya`
                 );
-            }
+            } else if (Platform.OS === 'ios') {
+                await Sharing.shareAsync(backupPath, {
+                    dialogTitle: 'Pilih aplikasi untuk menyimpan backup',
+                    mimeType: 'application/octet-stream',
+                });
 
+                Alert.alert(
+                    'Backup Berhasil',
+                    `File backup telah dibuat dengan nama: ${backupName}\n\nAnda dapat menyimpannya ke Files, iCloud Drive, atau aplikasi lain.`
+                );
+            } 
         } catch (error) {
             console.error(error);
             Alert.alert('Gagal Backup', `Terjadi kesalahan: ${error.message}`);
@@ -106,6 +97,7 @@ const BackupRestoreScreen = () => {
             setIsBackingUp(false);
         }
     };
+
 
     const handleRestore = async () => {
         Alert.alert(

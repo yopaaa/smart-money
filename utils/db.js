@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import generateId from './generateId';
-const db = SQLite.openDatabaseSync('money_manager.db');
+const db = SQLite.openDatabaseSync('smart_money.db');
 
 export const initDB = () => {
     db.execSync(`

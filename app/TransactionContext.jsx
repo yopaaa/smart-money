@@ -7,11 +7,13 @@ import {
     filterTransactions,
     getAccounts,
     getTransactionById,
+    getTransactions,
     initDB,
     resetTables
 } from '../utils/db';
 
 const TransactionContext = createContext();
+initDB()
 
 export const TransactionProvider = ({ children }) => {
     const [accounts, setAccounts] = useState([]);
@@ -24,6 +26,7 @@ export const TransactionProvider = ({ children }) => {
 
     const loadAccounts = () => {
         const rows = getAccounts();
+        // console.log(rows);
         setAccounts(rows);
     };
 
@@ -31,11 +34,14 @@ export const TransactionProvider = ({ children }) => {
         initDB()
         loadAccounts()
         refetchData();
+        console.log(getTransactions());
+        
     }, []);
 
     return (
         <TransactionContext.Provider value={{
             accounts,
+            initDB,
             refetchData,
             resetTables,
             getAccounts,

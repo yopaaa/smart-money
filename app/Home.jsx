@@ -103,7 +103,7 @@ export default function HomeScreen() {
             startDate: start.valueOf(),
             endDate: end.valueOf()
         });
-    }, [selectedDate, viewMode, filterTransactions, isRefreshing, updateTrigers]);
+    }, [selectedDate, viewMode, isRefreshing, updateTrigers]);
 
     const groupedTransactions = useMemo(() => {
         const groups = {};
