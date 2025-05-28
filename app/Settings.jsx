@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const SettingsScreen = () => {
   const router = useRouter();
-const navigation = useNavigation();
+  const navigation = useNavigation();
 
   const { resetTables } = useTransactions();
   const iconItems = [
@@ -35,12 +35,12 @@ const navigation = useNavigation();
     },
     {
       icon: 'desktop-outline', label: 'PC Manager', function: function () {
-        console.log("this.label");
+        router.push("settings/Test");
       }
     },
     {
       icon: 'cloud-upload-outline', label: 'Backup', function: function () {
-                router.push("settings/Backup");
+        router.push("settings/Json_restore");
 
       }
     },

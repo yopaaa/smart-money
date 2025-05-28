@@ -33,32 +33,32 @@ export const initDB = () => {
         FOREIGN KEY (targetAccountId) REFERENCES accounts(id)
     );`);
 
-    const existing = db.getAllSync('SELECT COUNT(*) as total FROM accounts');
-    if (existing[0]?.total === 0) {
-        console.log('⏳ Menambahkan akun default...');
-        addAccount({
-            id: 'acc-1',
-            name: "Dompet",
-            balance: 100000,
-            type: "cash",
-            isLiability: 0,
-            hidden: 0,
-            icon: "wallet",
-            iconColor: "#4caf50",
-            description: ""
-        })
-        addAccount({
-            id: 'acc-2',
-            name: 'Rekening Bank',
-            balance: 500000,
-            type: "debit",
-            isLiability: 0,
-            hidden: 0,
-            icon: "bank",
-            iconColor: "#2196f3",
-            description: ""
-        })
-    }
+    // const existing = db.getAllSync('SELECT COUNT(*) as total FROM accounts');
+    // if (existing[0]?.total === 0) {
+    //     console.log('⏳ Menambahkan akun default...');
+    //     addAccount({
+    //         id: 'acc-1',
+    //         name: "Dompet",
+    //         balance: 100000,
+    //         type: "cash",
+    //         isLiability: 0,
+    //         hidden: 0,
+    //         icon: "wallet",
+    //         iconColor: "#4caf50",
+    //         description: ""
+    //     })
+    //     addAccount({
+    //         id: 'acc-2',
+    //         name: 'Rekening Bank',
+    //         balance: 500000,
+    //         type: "debit",
+    //         isLiability: 0,
+    //         hidden: 0,
+    //         icon: "bank",
+    //         iconColor: "#2196f3",
+    //         description: ""
+    //     })
+    // }
 };
 
 /*
@@ -140,7 +140,10 @@ export const addTransaction = (
 
         // Update main account balance
         const accounts = db.getAllSync('SELECT * FROM accounts WHERE id = ?', [transaction.accountId]);
-        if (accounts.length === 0) throw new Error('Akun tidak ditemukan');
+        if (accounts.length === 0) {
+            console.log(transaction);
+            
+            throw new Error('Akun tidak ditemukan')};
         const account = accounts[0];
         let newBalance = account.balance;
 

@@ -34,8 +34,7 @@ export const TransactionProvider = ({ children }) => {
         initDB()
         loadAccounts()
         refetchData();
-        console.log(getTransactions());
-        
+        // console.log(getTransactions());
     }, []);
 
     return (
@@ -48,7 +47,10 @@ export const TransactionProvider = ({ children }) => {
             addTransaction,
             addAccount,
             editTransaction,
-            deleteTransaction, filterTransactions, getTransactionById
+            deleteTransaction,
+            filterTransactions,
+            getTransactionById,
+            getTransactions
         }}>
             {children}
         </TransactionContext.Provider>
