@@ -1,0 +1,163 @@
+[
+  {
+    "id": "27451903",
+    "name": "Makanan",
+    "icon": "silverware-fork-knife",
+    "color": "#e57373",
+    "type": "expense"
+  },
+  {
+    "id": "84970216",
+    "name": "Minuman",
+    "icon": "cup-water",
+    "color": "#64b5f6",
+    "type": "expense"
+  },
+  {
+    "id": "10387452",
+    "name": "Transportasi",
+    "icon": "bus",
+    "color": "#4db6ac",
+    "type": "expense"
+  },
+  {
+    "id": "71563049",
+    "name": "Belanja",
+    "icon": "shopping",
+    "color": "#ba68c8",
+    "type": "expense"
+  },
+  {
+    "id": "94638215",
+    "name": "Hiburan",
+    "icon": "movie",
+    "color": "#f06292",
+    "type": "expense"
+  },
+  {
+    "id": "32108794",
+    "name": "Kesehatan",
+    "icon": "heart-pulse",
+    "color": "#f44336",
+    "type": "expense"
+  },
+  {
+    "id": "58762013",
+    "name": "Pendidikan",
+    "icon": "school",
+    "color": "#7986cb",
+    "type": "expense"
+  },
+  {
+    "id": "40819376",
+    "name": "Tagihan",
+    "icon": "file-document",
+    "color": "#ffb74d",
+    "type": "expense"
+  },
+  {
+    "id": "96740128",
+    "name": "Donasi",
+    "icon": "hand-heart",
+    "color": "#81c784",
+    "type": "expense"
+  },
+  {
+    "id": "75039261",
+    "name": "Transfer Keluar",
+    "icon": "bank-transfer-out",
+    "color": "#a1887f",
+    "type": "expense"
+  },
+  {
+    "id": "63217845",
+    "name": "Biaya Admin",
+    "icon": "file-cog",
+    "color": "#90a4ae",
+    "type": "expense"
+  },
+  {
+    "id": "29680517",
+    "name": "Lainnya",
+    "icon": "dots-horizontal",
+    "color": "#b0bec5",
+    "type": "expense"
+  },
+  {
+    "id": "80317529",
+    "name": "Gaji",
+    "icon": "cash",
+    "color": "#81c784",
+    "type": "income"
+  },
+  {
+    "id": "29478136",
+    "name": "Bonus",
+    "icon": "gift",
+    "color": "#fbc02d",
+    "type": "income"
+  },
+  {
+    "id": "62749018",
+    "name": "Penjualan",
+    "icon": "cart",
+    "color": "#4db6ac",
+    "type": "income"
+  },
+  {
+    "id": "15980437",
+    "name": "Bunga Bank",
+    "icon": "bank",
+    "color": "#64b5f6",
+    "type": "income"
+  },
+  {
+    "id": "47839265",
+    "name": "Investasi",
+    "icon": "chart-line",
+    "color": "#ffb74d",
+    "type": "income"
+  },
+  {
+    "id": "31628490",
+    "name": "Hadiah",
+    "icon": "party-popper",
+    "color": "#ba68c8",
+    "type": "income"
+  },
+  {
+    "id": "54097182",
+    "name": "Uang Saku",
+    "icon": "wallet-giftcard",
+    "color": "#f06292",
+    "type": "income"
+  },
+  {
+    "id": "23058647",
+    "name": "Transfer Masuk",
+    "icon": "bank-transfer-in",
+    "color": "#a1887f",
+    "type": "income"
+  },
+  {
+    "id": "70932418",
+    "name": "Penarikan Tunai",
+    "icon": "cash-plus",
+    "color": "#4caf50",
+    "type": "income"
+  },
+  {
+    "id": "89102743",
+    "name": "Lainnya",
+    "icon": "dots-horizontal",
+    "color": "#90a4ae",
+    "type": "income"
+  },
+  {
+    "id": "52841730",
+    "name": "Transfer",
+    "icon": "bank-transfer",
+    "color": "#261e07",
+    "type": "transfer"
+  }
+]

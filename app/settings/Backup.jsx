@@ -10,6 +10,7 @@ import { ActivityIndicator, Alert, Platform, SafeAreaView, StatusBar, StyleSheet
 
 const DB_NAME = 'SQLite/smart_money.db';
 const DB_PATH = `${FileSystem.documentDirectory}${DB_NAME}`;
+const DB_PATH_MMBAK = `${FileSystem.documentDirectory}SQLite/money_manager.db`;
 const BACKUP_FOLDER_URI_KEY = 'backup_folder_uri';
 
 const BackupRestoreScreen = () => {
@@ -110,6 +111,17 @@ const BackupRestoreScreen = () => {
         );
     };
 
+    const handleRestoreMMBAK = async () => {
+        Alert.alert(
+            'Konfirmasi Restore',
+            'Restore akan mengganti semua data yang ada. Apakah Anda yakin?',
+            [
+                { text: 'Batal', style: 'cancel' },
+                { text: 'Ya, Restore', style: 'destructive', onPress: performRestoreMMBAK }
+            ]
+        );
+    };
+
     const performRestore = async () => {
         setIsRestoring(true);
         try {
@@ -147,6 +159,58 @@ const BackupRestoreScreen = () => {
             await FileSystem.copyAsync({
                 from: pickedPath,
                 to: DB_PATH,
+            });
+
+            if (currentDbExists.exists) {
+                await FileSystem.deleteAsync(tempBackupPath);
+            }
+
+            Alert.alert('Sukses', 'Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.');
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Gagal Restore', `Terjadi kesalahan: ${error.message}`);
+        } finally {
+            setIsRestoring(false);
+        }
+    };
+
+    const performRestoreMMBAK = async () => {
+        setIsRestoring(true);
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                copyToCacheDirectory: true,
+                type: '*/*',
+                multiple: false,
+            });
+
+            if (result.canceled) return;
+
+            const pickedFile = result.assets[0];
+            const pickedPath = pickedFile.uri;
+
+            if (!pickedFile.name.endsWith('.mmbak')) {
+                Alert.alert('Error', 'File harus berformat .mmbak');
+                return;
+            }
+
+            const pickedInfo = await FileSystem.getInfoAsync(pickedPath);
+            if (!pickedInfo.exists) {
+                Alert.alert('Error', 'File tidak ditemukan');
+                return;
+            }
+
+            const tempBackupPath = `${FileSystem.documentDirectory}temp_backup_${Date.now()}.db`;
+            const currentDbExists = await FileSystem.getInfoAsync(DB_PATH_MMBAK);
+            if (currentDbExists.exists) {
+                await FileSystem.copyAsync({
+                    from: DB_PATH_MMBAK,
+                    to: tempBackupPath,
+                });
+            }
+
+            await FileSystem.copyAsync({
+                from: pickedPath,
+                to: DB_PATH_MMBAK,
             });
 
             if (currentDbExists.exists) {
@@ -202,6 +266,30 @@ const BackupRestoreScreen = () => {
                     <TouchableOpacity
                         style={[styles.button, styles.restoreButton]}
                         onPress={handleRestore}
+                        disabled={isRestoring}
+                    >
+                        {isRestoring ? (
+                            <ActivityIndicator color="#fff" size="small" />
+                        ) : (
+                            <Ionicons name="cloud-download-outline" size={20} color="#fff" />
+                        )}
+                        <Text style={styles.buttonText}>
+                            {isRestoring ? 'Melakukan Restore...' : 'Restore Data'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
+                 <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Ionicons name="cloud-download-outline" size={24} color="#FF6B6B" />
+                        <Text style={styles.sectionTitle}>Restore from .mmbak file </Text>
+                    </View>
+                    <Text style={styles.sectionDescription}>
+                        Pulihkan data dari file backup (.mmbak). Ini akan mengganti semua data yang ada.
+                    </Text>
+                    <TouchableOpacity
+                        style={[styles.button, styles.restoreButton]}
+                        onPress={handleRestoreMMBAK}
                         disabled={isRestoring}
                     >
                         {isRestoring ? (

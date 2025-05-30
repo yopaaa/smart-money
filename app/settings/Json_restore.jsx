@@ -1,7 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import transactions from '../../doc/result-formated.json';
 import accounts from '../../doc/update-account.json';
 import { useTransactions } from '../TransactionContext';
+import { assetGroups, getAssets, getCategory, getTransactions } from './json_restore';
 
 const MyWebViewScreen = () => {
     const { filterTransactions, addAccount, resetTables, addTransaction } = useTransactions();
@@ -44,7 +45,57 @@ const MyWebViewScreen = () => {
                 <Text>Transaksi</Text>
 
             </TouchableOpacity>
-        </View>
+
+
+            <TouchableOpacity onPress={() => {
+                Alert.alert("data",
+                    JSON.stringify(getTransactions().slice(0, 5), " ", " ")
+                )
+            }}
+                style={styles.btn}>
+                <Text>Get Transaksi </Text>
+
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
+                Alert.alert("data",
+                    JSON.stringify(getCategory().slice(0, 5), " ", " ")
+                )
+            }}
+                style={styles.btn}>
+                <Text>Get Category </Text>
+
+            </TouchableOpacity>
+
+
+            <TouchableOpacity onPress={() => {
+                const data = getAssets()
+                const newData = data.map(val => {
+                    return ({
+                        "balance": 0,
+                        "description": "",
+                        "hidden": 0,
+                        "icon": assetGroups[val.groupUid].icon,
+                        "iconColor": assetGroups[val.groupUid].color,
+                        "id": val.uid,
+                        "isLiability": assetGroups[val.groupUid].isLiability ? 1 : 0,
+                        "name": val.NIC_NAME,
+                        "type": assetGroups[val.groupUid].key
+                    })
+                })
+                Alert.alert("data",
+                    JSON.stringify(newData, " ", " ")
+                )
+                console.log(newData);
+
+            }}
+                style={styles.btn}>
+                <Text>Get Assets </Text>
+
+            </TouchableOpacity>
+
+
+        </View >
     );
 };
 

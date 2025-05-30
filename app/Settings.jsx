@@ -35,12 +35,12 @@ const SettingsScreen = () => {
     },
     {
       icon: 'desktop-outline', label: 'PC Manager', function: function () {
-        router.push("settings/Test");
+        router.push("settings/Json_restore");
       }
     },
     {
       icon: 'cloud-upload-outline', label: 'Backup', function: function () {
-        router.push("settings/Json_restore");
+        router.push("settings/Backup");
 
       }
     },
