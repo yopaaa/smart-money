@@ -1,4 +1,6 @@
 import { db } from '../db';
+
+
 import defaultCategories from '../defaultCategories.json';
 import { addCategory } from './category';
 

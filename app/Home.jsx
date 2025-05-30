@@ -15,28 +15,26 @@ import {
 } from 'react-native';
 import CustomPicker from '../components/CustomPicker';
 import { useTransactions } from './TransactionContext';
-import expenseCategories from './json/expenseCategories.json';
-import incomeCategories from './json/incomeCategories.json';
 import timePeriods from './json/timePeriods.json';
-import transferCategories from './json/transferCategories.json';
-
-export function findCategory(categoryName) {
-    const categories = [...expenseCategories, ...incomeCategories, ...transferCategories];
-    const category = categories.find(c => c.name === categoryName);
-    return category || categories[9];
-}
-
-export function FindIcon({ name, size = 30, style }) {
-    const category = findCategory(name);
-    return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} style={style} />;
-};
 
 export default function HomeScreen() {
     const router = useRouter();
-    const { filterTransactions } = useTransactions();
+    const { filterTransactions, getCategoryById } = useTransactions();
     const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
     const [selectedDate, setSelectedDate] = useState(moment()); // bisa hari berapa pun
     const [isRefreshing, setisRefreshing] = useState(false)
+
+    function FindIcon({ id, size = 30, style }) {
+        const category = getCategoryById(id) || {
+            "id": "29680517",
+            "name": "Lainnya",
+            "icon": "dots-horizontal",
+            "color": "#b0bec5",
+            "type": "expense"
+        };
+
+        return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} style={style} />;
+    };
 
     // Auto refresh when focus
     const [updateTrigers, setupdateTrigers] = useState()
@@ -47,6 +45,7 @@ export default function HomeScreen() {
     );
 
     const handleRefresh = () => {
+
         setisRefreshing(true)
         setTimeout(() => {
             setisRefreshing(false)
@@ -183,7 +182,7 @@ export default function HomeScreen() {
                 style={styles.item}
             >
                 <View style={{ paddingHorizontal: 15 }}>
-                    <FindIcon name={item.category} />
+                    <FindIcon id={item.category} />
                 </View>
 
                 <View style={{ flex: 1 }}>

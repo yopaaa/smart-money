@@ -1,7 +1,7 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Svg, { Circle, Defs, G, Path, RadialGradient, Stop, Text as SvgText } from 'react-native-svg';
-import { FindIcon } from '../app/Home';
 import { formatCurrency } from '../utils/number';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -234,10 +234,10 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
                 }}
                 activeOpacity={0.7}
             >
-                <FindIcon name={item.category} style={{ paddingHorizontal: 10 }} />
+                <MaterialCommunityIcons name={item?.icon.icon} size={30} color={item.icon.color} style={{ paddingHorizontal: 10 }} />
 
                 <View style={styles.legendContent}>
-                    <Text style={styles.legendLabel}>{item.category}</Text>
+                    <Text style={styles.legendLabel}>{item.icon.name}</Text>
                     <Text style={styles.legendAmount}>{formatCurrency(item.amount)}</Text>
                 </View>
                 <Text style={styles.legendValue}>{item.percent}%</Text>

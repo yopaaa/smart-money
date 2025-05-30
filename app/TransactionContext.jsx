@@ -1,22 +1,26 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import {
     addAccount,
+    getAccounts,
+    resetTables
+} from '../utils/db';
+import { getAllCategories, getCategoriesByType, getCategoryById } from '../utils/fn/category';
+import { initDB } from '../utils/fn/initDB';
+import {
     addTransaction,
     deleteTransaction,
     editTransaction,
     filterTransactions,
-    getAccounts,
     getTransactionById,
     getTransactions,
-    initDB,
-    resetTables
-} from '../utils/db';
+} from '../utils/fn/transaction';
 
 const TransactionContext = createContext();
 initDB()
 
 export const TransactionProvider = ({ children }) => {
     const [accounts, setAccounts] = useState([]);
+    const [categories, setCategories] = useState([]);
 
     const refetchData = () => {
         console.log("Refetching...");
@@ -25,9 +29,13 @@ export const TransactionProvider = ({ children }) => {
     };
 
     const loadAccounts = () => {
+        initDB()
+
         const rows = getAccounts();
+        const categoryRow = getAllCategories();
         // console.log(rows);
         setAccounts(rows);
+        setCategories(categoryRow)
     };
 
     useEffect(() => {
@@ -44,13 +52,16 @@ export const TransactionProvider = ({ children }) => {
             refetchData,
             resetTables,
             getAccounts,
-            addTransaction,
             addAccount,
+            addTransaction,
             editTransaction,
             deleteTransaction,
             filterTransactions,
             getTransactionById,
-            getTransactions
+            getTransactions,
+            categories,
+            getCategoryById,
+            getCategoriesByType
         }}>
             {children}
         </TransactionContext.Provider>

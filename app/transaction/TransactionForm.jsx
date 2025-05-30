@@ -22,17 +22,20 @@ import {
 } from 'react-native';
 import ChatInput from '../ChatInput';
 import { useTransactions } from '../TransactionContext';
-import expenseCategories from '../json/expenseCategories.json';
-import incomeCategories from '../json/incomeCategories.json';
+
 
 const TransactionForm = () => {
   const router = useRouter();
-  const { refetchData, accounts, addTransaction } = useTransactions();
+  const { refetchData, accounts, addTransaction, getCategoriesByType } = useTransactions();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const [incomeCategories, setIncomeCategories] = useState();
+  const [expenseCategories, setExpenseCategories] = useState();
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -45,6 +48,15 @@ const TransactionForm = () => {
   });
 
   useEffect(() => {
+    const tempX = getCategoriesByType("income")
+    const tempY = getCategoriesByType("expense")
+    setIncomeCategories(tempX)
+    setExpenseCategories(tempY)
+
+    formData.type === "income"
+      ? handleChange('category', tempX[0])
+      : handleChange('category', tempY[0])
+
     setSelectedDate(new Date())
     setSelectedTime(new Date())
 
@@ -99,7 +111,7 @@ const TransactionForm = () => {
       accountId: formData.accountId.id,
       targetAccountId: formData.type === 'transfer' ? formData.targetAccountId.id : undefined,
       createdAt: mergedDate.getTime(),
-      category: formData.type === 'transfer' ? "Transfer" : formData.category.name,
+      category: formData.type === 'transfer' ? "52841730" : formData.category.id,
       fee: formData.type === 'transfer' ? parseInt(formData.fee || '0') : 0
     };
 
@@ -150,7 +162,6 @@ const TransactionForm = () => {
       {type == "chat" && <ChatInput />}
 
 
-
       {type == "keyboard" &&
         <>
           <View style={styles.tabContainer}>
@@ -158,7 +169,13 @@ const TransactionForm = () => {
               <Pressable
                 key={type}
                 style={[styles.tab, formData.type === type && styles.activeTab]}
-                onPress={() => handleChange('type', type)}
+                onPress={() => {
+                  handleChange('type', type)
+                  type === "income"
+                    ? handleChange('category', incomeCategories[0])
+                    : handleChange('category', expenseCategories[0])
+                }
+                }
               >
                 <Text style={[styles.tabText, formData.type === type && styles.activeTabText]}>
                   {type}

@@ -159,5 +159,12 @@
     "icon": "bank-transfer",
     "color": "#261e07",
     "type": "transfer"
+  },
+  {
+    "id": "initial-balance",
+    "name": "initial-balance",
+    "icon": "bank-transfer-in",
+    "color": "#a1887f",
+    "type": "none"
   }
 ]

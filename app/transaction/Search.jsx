@@ -16,24 +16,10 @@ import {
     View
 } from 'react-native';
 import { useTransactions } from '../TransactionContext';
-import expenseCategories from '../json/expenseCategories.json';
-import incomeCategories from '../json/incomeCategories.json';
-import transferCategories from '../json/transferCategories.json';
-
-export function findCategory(categoryName) {
-    const categories = [...expenseCategories, ...incomeCategories, ...transferCategories];
-    const category = categories.find(c => c.name === categoryName);
-    return category || categories[9];
-}
-
-export function FindIcon({ name, size = 30, style }) {
-    const category = findCategory(name);
-    return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} style={style} />;
-};
 
 export default function SearchScreen() {
     const router = useRouter();
-    const { filterTransactions, accounts } = useTransactions();
+    const { filterTransactions, accounts, getCategoryById } = useTransactions();
     const [searchQuery, setSearchQuery] = useState('');
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [updateTriggers, setUpdateTriggers] = useState();
@@ -51,6 +37,18 @@ export default function SearchScreen() {
         setTimeout(() => {
             setIsRefreshing(false);
         }, 1000);
+    };
+
+    function FindIcon({ id, size = 30, style }) {
+        const category = getCategoryById(id) || {
+            "id": "29680517",
+            "name": "Lainnya",
+            "icon": "dots-horizontal",
+            "color": "#b0bec5",
+            "type": "expense"
+        };
+
+        return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} style={style} />;
     };
 
     const filteredTransactions = useMemo(() => {
@@ -115,7 +113,7 @@ export default function SearchScreen() {
                 onPress={() => {
                     router.push({
                         pathname: '/transaction/[id]',
-                        params: { 
+                        params: {
                             id: item.id,
                             category: item.category,
                             type: item.type
@@ -125,7 +123,7 @@ export default function SearchScreen() {
                 style={styles.item}
             >
                 <View style={{ paddingHorizontal: 15 }}>
-                    <FindIcon name={item.category} />
+                    <FindIcon id={item.category} />
                 </View>
 
                 <View style={{ flex: 1 }}>
@@ -165,7 +163,7 @@ export default function SearchScreen() {
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
             <SimpleHeader title="Search Transactions" />
-            
+
             {/* Search Bar */}
             <View style={styles.searchContainer}>
                 <TextInput
@@ -180,19 +178,19 @@ export default function SearchScreen() {
 
             {/* Filter Options */}
             <View style={styles.filterContainer}>
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={[styles.filterButton, selectedType === 'income' && styles.activeFilter]}
                     onPress={() => setSelectedType(selectedType === 'income' ? null : 'income')}
                 >
                     <Text>Income</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={[styles.filterButton, selectedType === 'expense' && styles.activeFilter]}
                     onPress={() => setSelectedType(selectedType === 'expense' ? null : 'expense')}
                 >
                     <Text>Expense</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={[styles.filterButton, selectedType === 'transfer' && styles.activeFilter]}
                     onPress={() => setSelectedType(selectedType === 'transfer' ? null : 'transfer')}
                 >

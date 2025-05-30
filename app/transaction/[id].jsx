@@ -20,9 +20,6 @@ import {
     View
 } from 'react-native';
 import { useTransactions } from '../TransactionContext';
-import expenseCategories from '../json/expenseCategories.json';
-import incomeCategories from '../json/incomeCategories.json';
-import transferCategories from '../json/transferCategories.json';
 
 const TransactionForm = () => {
     const { id } = useLocalSearchParams();
@@ -31,7 +28,9 @@ const TransactionForm = () => {
         accounts,
         editTransaction,
         deleteTransaction,
-        getTransactionById
+        getTransactionById,
+        getCategoryById,
+        getCategoriesByType
     } = useTransactions();
 
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -39,6 +38,9 @@ const TransactionForm = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [isFormEditable, setIsFormEditable] = useState(true);
+
+    const [incomeCategories, setIncomeCategories] = useState();
+    const [expenseCategories, setExpenseCategories] = useState();
 
     const [formData, setFormData] = useState({
         id: "",
@@ -53,24 +55,27 @@ const TransactionForm = () => {
     });
 
     useEffect(() => {
+
         if (id) {
             const tx = getTransactionById(id); // Use the new function
 
+            const tempX = getCategoriesByType("income")
+            const tempY = getCategoriesByType("expense")
+            setIncomeCategories(tempX)
+            setExpenseCategories(tempY)
+
             if (tx) {
                 const txDate = new Date(parseInt(tx.createdAt));
-                const categories =
-                    tx.type === 'transfer'
-                        ? transferCategories
-                        : tx.type === 'income'
-                            ? incomeCategories
-                            : expenseCategories;
+
 
                 let matchedCategory
                 if (tx.category == "initial-balance" || !tx.category) {
                     matchedCategory = { "color": "#a1887f", "icon": "bank-transfer-in", "name": "initial-balance" }
                 } else {
-                    matchedCategory = categories.find(cat => cat.name.toLowerCase() === tx.category.toLowerCase());
+                    matchedCategory = getCategoryById(tx.category)
                 }
+                console.log(matchedCategory);
+
 
                 setIsFormEditable(tx.category == "Biaya Admin" ? false : true)
 

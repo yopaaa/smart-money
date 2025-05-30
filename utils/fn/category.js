@@ -36,6 +36,26 @@ export const getCategoryById = (id) => {
     }
 };
 
+export const getCategoryByName = (name) => {
+    try {
+        const result = db.getAllSync(`SELECT * FROM ${CATEGORIES_TABLE_NAME} WHERE name = ?`, [name]);
+        return result.length > 0 ? result[0] : null;
+    } catch (e) {
+        console.error('Gagal mengambil kategori:', e.message);
+        throw e;
+    }
+};
+
+export const getCategoriesByType = (type) => {
+    try {
+        return db.getAllSync(`SELECT * FROM ${CATEGORIES_TABLE_NAME} WHERE type = ?`, [type]);
+    } catch (e) {
+        console.error('Gagal memfilter kategori:', e.message);
+        throw e;
+    }
+};
+
+
 export const deleteCategory = (id) => {
     try {
         db.runSync(`DELETE FROM ${CATEGORIES_TABLE_NAME} WHERE id = ?`, [id]);

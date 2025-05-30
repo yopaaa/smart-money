@@ -14,42 +14,13 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { findCategory } from './Home';
 import { useTransactions } from './TransactionContext';
 import timePeriods from './json/timePeriods.json';
 
 
-function convertTransactionsByType(transactions, type = 'expense') {
-    // Filter hanya transaksi dengan tipe sesuai (income atau expense)
-    const filtered = transactions.filter(t => t.type === type);
-
-    // Hitung total nominal untuk semua kategori
-    const total = filtered.reduce((sum, t) => sum + t.amount, 0);
-
-    // Kelompokkan berdasarkan kategori 
-    const grouped = {};
-    filtered.forEach(t => {
-        const key = t.category || 'Other';
-        if (!grouped[key]) {
-            grouped[key] = 0;
-        }
-        grouped[key] += t.amount;
-    });
-
-    // Konversi ke array dengan persentase 
-    const result = Object.entries(grouped).map(([category, amount]) => {
-        const percent = total > 0 ? Math.round((amount / total) * 100) : 0;
-        const icon = findCategory(category)
-        return { category, amount, percent, icon };
-    });
-
-    // Urutkan berdasarkan amount terbesar
-    return result.sort((a, b) => b.amount - a.amount);
-}
-
 export default function HomeScreen() {
     const router = useRouter();
-    const { filterTransactions } = useTransactions();
+    const { filterTransactions, getCategoryById } = useTransactions();
     const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
     const [selectedDate, setSelectedDate] = useState(moment()); // bisa hari berapa pun
     const [isRefreshing, setisRefreshing] = useState(false)
@@ -80,6 +51,40 @@ export default function HomeScreen() {
             }
         }, [type, selectedDate, viewMode])
     );
+
+    function convertTransactionsByType(transactions, type = 'expense') {
+        // Filter hanya transaksi dengan tipe sesuai (income atau expense)
+        const filtered = transactions.filter(t => t.type === type);
+
+        // Hitung total nominal untuk semua kategori
+        const total = filtered.reduce((sum, t) => sum + t.amount, 0);
+
+        // Kelompokkan berdasarkan kategori 
+        const grouped = {};
+        filtered.forEach(t => {
+            const key = t.category || 'Other';
+            if (!grouped[key]) {
+                grouped[key] = 0;
+            }
+            grouped[key] += t.amount;
+        });
+
+        // Konversi ke array dengan persentase 
+        const result = Object.entries(grouped).map(([category, amount]) => {
+            const percent = total > 0 ? Math.round((amount / total) * 100) : 0;
+            const icon = getCategoryById(category) || {
+                "id": "29680517",
+                "name": "Lainnya",
+                "icon": "dots-horizontal",
+                "color": "#b0bec5",
+                "type": "expense"
+            }
+            return { category, amount, percent, icon };
+        });
+
+        // Urutkan berdasarkan amount terbesar
+        return result.sort((a, b) => b.amount - a.amount);
+    }
 
     const filteredTransactions = useMemo(() => {
         const start = moment(selectedDate);
@@ -219,6 +224,7 @@ export default function HomeScreen() {
                         pathname: 'transaction/PerCategoriesTransactions',
                         params: {
                             category: data.category,
+                            title: data.icon.name,
                             type: type,
                             viewMode, selectedDate
                         }
@@ -234,6 +240,7 @@ export default function HomeScreen() {
                         pathname: 'transaction/PerCategoriesTransactions',
                         params: {
                             category: data.category,
+                            title: data.icon.name,
                             type: type,
                             viewMode, selectedDate
                         }

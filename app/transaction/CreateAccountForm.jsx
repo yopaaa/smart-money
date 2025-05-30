@@ -25,7 +25,7 @@ import { useTransactions } from '../TransactionContext';
 
 const TransactionForm = () => {
   const router = useNavigation();
-  const { refetchData, addAccount, accounts } = useTransactions();
+  const { refetchData, addAccount, accounts,getCategoriesByType } = useTransactions();
   const [selectedIcon, setSelectedIcon] = useState(iconOptions[0]);
   const [selectedIconColor, setSelectedIconColor] = useState(colorOptions[0]);
   const [isVisible, setIsVisible] = useState(true);
