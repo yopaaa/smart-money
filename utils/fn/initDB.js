@@ -7,6 +7,7 @@ import { addCategory } from './category';
 export const ACCOUNT_TABLE_NAME = "accounts";
 export const TRANSACTION_TABLE_NAME = "transactions";
 export const CATEGORIES_TABLE_NAME = "categories";
+export const BALANCE_HISTORY_TABLE_NAME= "account_balance_history"
 
 export const initDB = () => {
 
@@ -39,6 +40,19 @@ export const initDB = () => {
         FOREIGN KEY (accountId) REFERENCES accounts(id),
         FOREIGN KEY (targetAccountId) REFERENCES accounts(id)
     );`);
+
+    db.execSync(`
+    CREATE TABLE IF NOT EXISTS ${BALANCE_HISTORY_TABLE_NAME} (
+        id TEXT PRIMARY KEY NOT NULL,
+        accountId TEXT NOT NULL,
+        balance INTEGER NOT NULL,
+        change INTEGER,
+        source TEXT,
+        referenceId TEXT,
+        note TEXT,
+        createdAt TEXT NOT NULL,
+        FOREIGN KEY (accountId) REFERENCES accounts(id)
+    );`)
 
     db.execSync(`
     CREATE TABLE IF NOT EXISTS ${CATEGORIES_TABLE_NAME} (
@@ -83,3 +97,24 @@ export const initDB = () => {
     //     })
     // }
 };
+
+
+export function resetTables() {
+    try {
+        db.execSync('BEGIN TRANSACTION');
+
+        // Hapus semua tabel (jika ingin bersih total)
+        db.execSync(`DROP TABLE IF EXISTS ${ACCOUNT_TABLE_NAME}`);
+        db.execSync(`DROP TABLE IF EXISTS ${TRANSACTION_TABLE_NAME}`);
+        db.execSync(`DROP TABLE IF EXISTS ${CATEGORIES_TABLE_NAME}`);
+        db.execSync(`DROP TABLE IF EXISTS ${BALANCE_HISTORY_TABLE_NAME}`);
+        // (Tambahkan CREATE TABLE lainnya jika ada, misalnya transactions atau categories)
+
+        db.execSync('COMMIT');
+        console.log('✅ Semua tabel berhasil di-reset');
+        initDB()
+    } catch (error) {
+        db.execSync('ROLLBACK');
+        console.error('❌ Gagal reset tabel:', error);
+    }
+}
