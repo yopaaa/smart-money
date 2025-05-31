@@ -7,28 +7,23 @@ const formatNumber = (value, format = 'id-ID') => {
 const unformatCurrency = (formatted, locale = 'id-ID', currency = 'IDR') => {
   if (typeof formatted !== 'string') return 0;
 
-  // Contoh angka besar untuk melihat pemisah ribuan & desimal
   const example = new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
   }).format(1234567.89);
 
-  // Ambil simbol mata uang
   const currencySymbol = example.replace(/[\d\s.,]/g, '');
 
-  // Deteksi pemisah ribuan dan desimal
   const parts = example.match(/(\d{1,3})([^0-9])(\d{3})[^0-9]+(\d{2})$/);
   const groupSeparator = parts ? parts[2] : '.';
   const decimalSeparator = parts ? example.match(/(\d+)([^0-9])(\d{2})$/)?.[2] : ',';
 
-  // Proses string
   const cleaned = formatted
     .replace(currencySymbol, '')
     .replace(/\s/g, '')
-    .replace(new RegExp(`\\${groupSeparator}`, 'g'), '') // hapus pemisah ribuan
-    .replace(decimalSeparator, '.'); // ubah pemisah desimal jadi titik
-
+    .replace(new RegExp(`\\${groupSeparator}`, 'g'), '') 
+    .replace(decimalSeparator, '.');
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? 0 : parsed;
 };
