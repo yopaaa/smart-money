@@ -67,15 +67,7 @@ const TransactionForm = () => {
             if (tx) {
                 const txDate = new Date(parseInt(tx.createdAt));
 
-
-                let matchedCategory
-                if (tx.category == "initial-balance" || !tx.category) {
-                    matchedCategory = { "color": "#a1887f", "icon": "bank-transfer-in", "name": "initial-balance" }
-                } else {
-                    matchedCategory = getCategoryById(tx.category)
-                }
-                console.log(matchedCategory);
-
+                let matchedCategory = getCategoryById(tx.category)
 
                 setIsFormEditable(tx.category == "Biaya Admin" ? false : true)
 
@@ -125,7 +117,9 @@ const TransactionForm = () => {
             selectedDate.getMonth(),
             selectedDate.getDate(),
             selectedTime.getHours(),
-            selectedTime.getMinutes()
+            selectedTime.getMinutes(),
+            selectedTime.getSeconds(),
+            selectedTime.getMilliseconds(),
         );
 
 
@@ -137,7 +131,7 @@ const TransactionForm = () => {
             accountId: formData.accountId.id,
             targetAccountId: formData.type === 'transfer' ? formData.targetAccountId.id : undefined,
             createdAt: mergedDate.getTime(),
-            category: formData.type === 'transfer' ? "Transfer" : formData.category.name,
+            category: formData.type === 'transfer' ? "52841730" : formData.category.id,
             fee: formData.type === 'transfer' ? parseInt(formData.fee || '0') : 0
         };
 

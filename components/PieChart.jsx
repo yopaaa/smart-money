@@ -23,7 +23,7 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
     useEffect(() => {
         if (data.length === 1) {
             const singleDataFormatted = [{
-                label: data[0].category,
+                label: data[0].icon.name,
                 value: 100,
                 amount: data[0].amount,
                 color: data[0].icon.color,
@@ -42,7 +42,7 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
         setIsLoaded(false);
 
         let formattedData = data.map(item => ({
-            label: item.category,
+            label: item.icon.name,
             value: item.percent,
             amount: item.amount,
             color: item.icon.color,
@@ -137,7 +137,7 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
                     stroke="#2C3E50"
                     strokeWidth={0.5}
                     onPress={() => {
-                        console.log(index);
+                        console.log(item);
 
                         if (selectedIndex === index) {
                             setSelectedIndex(null); // batal pilih
@@ -201,6 +201,7 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
                     />
 
                     {chartData.length > 0 ? chartData.map((item, index) => {
+
                         const startAngle = cumulativeAngle;
                         const sliceAngle = chartData.length === 1 ? 360 : (item.value / 100) * 360;
                         const slice = renderSlice(item, index, startAngle, startAngle + sliceAngle);

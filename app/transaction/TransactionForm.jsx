@@ -99,7 +99,9 @@ const TransactionForm = () => {
       selectedDate.getMonth(),
       selectedDate.getDate(),
       selectedTime.getHours(),
-      selectedTime.getMinutes()
+      selectedTime.getMinutes(),
+      selectedTime.getSeconds(),
+      selectedTime.getMilliseconds(),
     );
 
 
@@ -116,6 +118,8 @@ const TransactionForm = () => {
     };
 
     try {
+      // console.log(moment(mergedDate).format('MMMM Do YYYY, h:mm:ss a'));
+      
       addTransaction(transaction);
       Alert.alert('Sukses', 'Transaksi berhasil ditambahkan');
       refetchData();
