@@ -30,7 +30,10 @@ export const TransactionProvider = ({ children }) => {
 
     const refetchData = () => {
         console.log("Refetching...");
-        console.log(JSON.stringify(getBalanceHistory().slice(0,3), " ", " "));
+        const x = getBalanceHistory().map(val => {
+            return val
+        })
+        console.log(JSON.stringify(x.slice(0,6), " ", " "));
 
         loadAccounts()
     };

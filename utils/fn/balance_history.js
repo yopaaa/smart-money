@@ -4,7 +4,6 @@ import generateId from '../generateId';
 // 🔽 CREATE
 export const logBalanceHistory = ({
     accountId,
-    balance,
     change = null,
     source = null,
     referenceId = null,
@@ -14,9 +13,9 @@ export const logBalanceHistory = ({
     const id = generateId();
     db.runSync(`
         INSERT INTO account_balance_history 
-        (id, accountId, balance, change, source, referenceId, note, createdAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [id, accountId, balance, change, source, referenceId, note, createdAt]);
+        (id, accountId, change, source, referenceId, note, createdAt)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [id, accountId, change, source, referenceId, note, createdAt]);
     return id;
 };
 
@@ -31,18 +30,80 @@ export const getBalanceHistoryById = (id) => {
     return rows.length ? rows[0] : null;
 };
 
-// 🔽 READ BY ACCOUNT
-export const getBalanceHistoryByAccount = (accountId) => {
-    return db.getAllSync('SELECT * FROM account_balance_history WHERE accountId = ? ORDER BY createdAt DESC', [accountId]);
+export const getBalanceHistoryByReferenceId = (id) => {
+    const rows = db.getAllSync(
+        "SELECT * FROM account_balance_history WHERE referenceId = ? ",
+        [id]
+    );
+    return rows.length ? rows[0] : null;
 };
 
+// 🔽 READ WITH FILTER
+export const getBalanceHistoryWithFilter = ({
+    accountId = null,
+    source = null,
+    referenceId = null,
+    startDate = null,
+    endDate = null,
+    limit = null,
+    offset = null,
+} = {}) => {
+    const conditions = [];
+    const params = [];
+
+    if (accountId !== null) {
+        conditions.push('accountId = ?');
+        params.push(accountId);
+    }
+
+    if (source !== null) {
+        conditions.push('source = ?');
+        params.push(source);
+    }
+
+    if (referenceId !== null) {
+        conditions.push('referenceId = ?');
+        params.push(referenceId);
+    }
+
+    if (startDate !== null) {
+        conditions.push('createdAt >= ?');
+        params.push(startDate);
+    }
+
+    if (endDate !== null) {
+        conditions.push('createdAt <= ?');
+        params.push(endDate);
+    }
+
+    let query = 'SELECT * FROM account_balance_history';
+
+    if (conditions.length > 0) {
+        query += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    query += ' ORDER BY createdAt DESC';
+
+    if (limit !== null) {
+        query += ' LIMIT ?';
+        params.push(limit);
+    }
+
+    if (offset !== null) {
+        query += ' OFFSET ?';
+        params.push(offset);
+    }
+
+    return db.getAllSync(query, params);
+};
+
+
 // 🔽 UPDATE
-export const updateBalanceHistory = (id, updatedData) => {
-    const existing = getBalanceHistoryById(id);
+export const updateBalanceHistory = (ReferenceId, updatedData) => {
+    const existing = getBalanceHistoryByReferenceId(ReferenceId);
     if (!existing) throw new Error('Data tidak ditemukan');
 
     const {
-        balance = existing.balance,
         change = existing.change,
         source = existing.source,
         referenceId = existing.referenceId,
@@ -52,9 +113,9 @@ export const updateBalanceHistory = (id, updatedData) => {
 
     db.runSync(`
         UPDATE account_balance_history SET 
-            balance = ?, change = ?, source = ?, referenceId = ?, note = ?, createdAt = ?
-        WHERE id = ?
-    `, [balance, change, source, referenceId, note, createdAt, id]);
+            change = ?, source = ?, referenceId = ?, note = ?, createdAt = ?
+        WHERE ReferenceId = ?
+    `, [change, source, referenceId, note, createdAt, ReferenceId]);
 };
 
 // 🔽 DELETE

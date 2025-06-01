@@ -45,7 +45,6 @@ export const initDB = () => {
     CREATE TABLE IF NOT EXISTS ${BALANCE_HISTORY_TABLE_NAME} (
         id TEXT PRIMARY KEY NOT NULL,
         accountId TEXT NOT NULL,
-        balance INTEGER NOT NULL,
         change INTEGER,
         source TEXT,
         referenceId TEXT,

@@ -8,8 +8,8 @@ import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const DB_NAME = 'SQLite/smart_money.db';
-const DB_PATH = `${FileSystem.documentDirectory}${DB_NAME}`;
+const DB_NAME = 'smart_money';
+const DB_PATH = `${FileSystem.documentDirectory}SQLite/${DB_NAME}.db`;
 const DB_PATH_MMBAK = `${FileSystem.documentDirectory}SQLite/money_manager.db`;
 const BACKUP_FOLDER_URI_KEY = 'backup_folder_uri';
 
@@ -29,7 +29,7 @@ const BackupRestoreScreen = () => {
             const now = new Date();
             const dateStr = now.toISOString().split('T')[0];
             const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
-            const backupName = `money_manager_backup_${dateStr}_${timeStr}.smbak`;
+            const backupName = `${DB_NAME}_backup_${dateStr}_${timeStr}.smbak`;
             const backupPath = `${FileSystem.documentDirectory}${backupName}`;
 
             await FileSystem.copyAsync({
