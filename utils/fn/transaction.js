@@ -1,12 +1,6 @@
 import { db } from '../db';
 import generateId from '../generateId';
-import {
-    deleteBalanceHistory,
-    logBalanceHistory,
-    updateBalanceHistory
-} from './balance_history';
 import { ACCOUNT_TABLE_NAME, TRANSACTION_TABLE_NAME } from './initDB';
-
 /*
     {
         id: string,
@@ -103,14 +97,6 @@ export const addTransaction = (
             const totalDeduction = transaction.amount + (transaction.fee || 0);
             newBalance = account.balance - totalDeduction;
             db.runSync('UPDATE accounts SET balance = ? WHERE id = ?', [newBalance, transaction.accountId]);
-            logBalanceHistory({
-                accountId: transaction.accountId,
-                change: -transaction.amount,
-                source: 'transfer-out',
-                referenceId: id,
-                createdAt: transaction.createdAt,
-                note: transaction.title
-            });
 
             // Add to target account
             const targetAccounts = db.getAllSync('SELECT * FROM accounts WHERE id = ?', [transaction.targetAccountId]);
@@ -118,14 +104,6 @@ export const addTransaction = (
             const targetAccount = targetAccounts[0];
             const targetNewBalance = targetAccount.balance + transaction.amount;
             db.runSync('UPDATE accounts SET balance = ? WHERE id = ?', [targetNewBalance, transaction.targetAccountId]);
-            logBalanceHistory({
-                accountId: transaction.targetAccountId,
-                change: transaction.amount,
-                source: 'transfer-in',
-                referenceId: `${id}-target`,
-                createdAt: transaction.createdAt,
-                note: transaction.title
-            });
 
             // Record fee as separate expense if exists
             if (transaction.fee && transaction.fee > 0) {
@@ -146,14 +124,6 @@ export const addTransaction = (
                         'Biaya Admin'
                     ]
                 );
-                logBalanceHistory({
-                    accountId: transaction.accountId,
-                    change: -transaction.fee,
-                    source: 'fee',
-                    referenceId: feeTransactionId,
-                    createdAt: transaction.createdAt + 1,
-                    note: transaction.title
-                });
             }
 
             db.execSync('COMMIT;');
@@ -163,14 +133,6 @@ export const addTransaction = (
         // For regular income/expense ${TRANSACTION_TABLE_NAME}
         db.runSync('UPDATE accounts SET balance = ? WHERE id = ?', [newBalance, transaction.accountId]);
 
-        logBalanceHistory({
-            accountId: transaction.accountId,
-            change: transaction.type === 'income' ? transaction.amount : -transaction.amount,
-            source: 'transaction',
-            referenceId: id,
-            createdAt: transaction.createdAt,
-            note: transaction.title
-        });
 
         db.execSync('COMMIT;');
     } catch (e) {
@@ -256,19 +218,6 @@ export const editTransaction = (id, updatedTransaction) => {
             db.runSync('UPDATE accounts SET balance = ? WHERE id = ?', [newSourceBalance, updatedTransaction.accountId]);
             db.runSync('UPDATE accounts SET balance = ? WHERE id = ?', [newTargetBalance, updatedTransaction.targetAccountId]);
 
-            updateBalanceHistory(id,{
-                accountId: updatedTransaction.accountId,
-                change:  -updatedTransaction.amount,
-                createdAt: updatedTransaction.createdAt,
-                note: updatedTransaction.title
-            })
-
-            updateBalanceHistory(`${id}-target`,{
-                accountId: updatedTransaction.targetAccountId,
-                change: updatedTransaction.amount,
-                createdAt: updatedTransaction.createdAt,
-                note: updatedTransaction.title
-            })
 
             if (updatedTransaction.fee && updatedTransaction.fee > 0) {
                 const oldFee = db.getAllSync(
@@ -294,12 +243,6 @@ export const editTransaction = (id, updatedTransaction) => {
             return;
         }
 
-        updateBalanceHistory(id, {
-            accountId: updatedTransaction.accountId,
-            change: updatedTransaction.type === 'income' ? updatedTransaction.amount : -updatedTransaction.amount,
-            createdAt: updatedTransaction.createdAt,
-            note: updatedTransaction.title
-        })
 
         db.execSync('COMMIT;');
     } catch (e) {
@@ -334,18 +277,17 @@ export const deleteTransaction = (id) => {
             // Cek dan hapus fee transfer jika ada
             db.runSync(
                 `DELETE FROM ${TRANSACTION_TABLE_NAME} 
-         WHERE title = 'Biaya transfer' 
-         AND createdAt = ? 
-         AND accountId = ?
-         AND targetAccountId = ?`,
-                [tx.createdAt + 1, tx.accountId, tx.targetAccountId]
+                WHERE title = 'Biaya transfer' 
+                AND createdAt = ? 
+                AND accountId = ?
+                AND targetAccountId = ?`,
+                [Number(tx.createdAt) + 1, tx.accountId, tx.targetAccountId]
             );
         }
 
         // Hapus transaksi utama
         db.runSync(`DELETE FROM ${TRANSACTION_TABLE_NAME} WHERE id = ?`, [id]);
 
-        deleteBalanceHistory(id);
 
         db.execSync('COMMIT;');
     } catch (e) {

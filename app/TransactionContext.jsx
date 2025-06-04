@@ -13,9 +13,6 @@ import {
     resetTables
 } from '../utils/fn/initDB';
 import {
-    getLogHistory
-} from '../utils/fn/log_history';
-import {
     addTransaction,
     deleteTransaction,
     editTransaction,
@@ -32,10 +29,6 @@ export const TransactionProvider = ({ children }) => {
 
     const refetchData = () => {
         console.log("Refetching...");
-        const x = getLogHistory().map(val => {
-            return val
-        })
-        console.log(JSON.stringify(x.slice(0, 6), " ", " "));
 
         loadAccounts()
     };
