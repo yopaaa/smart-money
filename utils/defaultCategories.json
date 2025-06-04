@@ -166,5 +166,33 @@
     "icon": "bank-transfer-in",
     "color": "#a1887f",
     "type": "none"
+  },
+  {
+    "id": "9fd2a1a78d42",
+    "name": "Smartphone",
+    "icon": "cellphone",
+    "color": "#607d8b",
+    "type": "expense"
+  },
+  {
+    "id": "98f6-5db647f18a0a",
+    "name": "Home",
+    "icon": "home",
+    "color": "#8d6e63",
+    "type": "expense"
+  },
+  {
+    "id": "9b197a04fadc",
+    "name": "Hadiah",
+    "icon": "gift",
+    "color": "#fbc02d",
+    "type": "expense"
+  },
+  {
+    "id": "bd3e-128a6261dc2f",
+    "name": "Skincare",
+    "icon": "face-woman",
+    "color": "#f48fb1",
+    "type": "expense"
   }
 ]

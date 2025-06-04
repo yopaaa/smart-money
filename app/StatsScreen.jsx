@@ -32,6 +32,7 @@ export default function HomeScreen() {
     // Auto refresh when focus
     const [updateTrigers, setupdateTrigers] = useState()
     useEffect(() => {
+        setSelectedDate(moment())
     }, [])
 
     useFocusEffect(

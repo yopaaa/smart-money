@@ -3,7 +3,6 @@ import {
     addAccount,
     getAccounts
 } from '../utils/fn/account';
-import { getBalanceHistory } from '../utils/fn/balance_history';
 import {
     getAllCategories,
     getCategoriesByType,
@@ -13,6 +12,9 @@ import {
     initDB,
     resetTables
 } from '../utils/fn/initDB';
+import {
+    getLogHistory
+} from '../utils/fn/log_history';
 import {
     addTransaction,
     deleteTransaction,
@@ -30,10 +32,10 @@ export const TransactionProvider = ({ children }) => {
 
     const refetchData = () => {
         console.log("Refetching...");
-        const x = getBalanceHistory().map(val => {
+        const x = getLogHistory().map(val => {
             return val
         })
-        console.log(JSON.stringify(x.slice(0,6), " ", " "));
+        console.log(JSON.stringify(x.slice(0, 6), " ", " "));
 
         loadAccounts()
     };
@@ -70,7 +72,7 @@ export const TransactionProvider = ({ children }) => {
             getTransactions,
             categories,
             getCategoryById,
-            getCategoriesByType
+            getCategoriesByType,
         }}>
             {children}
         </TransactionContext.Provider>

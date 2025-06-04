@@ -46,12 +46,14 @@ const SettingsScreen = () => {
     },
     {
       icon: 'mail-outline', label: 'Feedback', function: function () {
-        console.log("this.label");
+        router.push("settings/Log");
+
       }
     },
     {
       icon: 'help-circle-outline', label: 'Help', function: function () {
-        console.log("this.label");
+        router.push("settings/Chart");
+
       }
     },
     {

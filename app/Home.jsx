@@ -2,7 +2,7 @@ import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
     FlatList,
     RefreshControl,
@@ -23,6 +23,7 @@ export default function HomeScreen() {
     const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
     const [selectedDate, setSelectedDate] = useState(moment()); // bisa hari berapa pun
     const [isRefreshing, setisRefreshing] = useState(false)
+    const scrollRef = useRef(null);
 
     function FindIcon({ id, size = 30, style }) {
         const category = getCategoryById(id) || {
@@ -45,7 +46,6 @@ export default function HomeScreen() {
     );
 
     const handleRefresh = () => {
-
         setisRefreshing(true)
         setTimeout(() => {
             setisRefreshing(false)
@@ -82,6 +82,8 @@ export default function HomeScreen() {
     const filteredTransactions = useMemo(() => {
         const start = moment(selectedDate);
         let end = moment(selectedDate);
+        console.log("Refresh riwayat transaksi...");
+        scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
 
         if (viewMode === 'week') {
             start.startOf('week');
@@ -276,6 +278,8 @@ export default function HomeScreen() {
             </View>
 
             <FlatList
+            
+                ref={scrollRef}
                 data={groupedTransactions}
                 keyExtractor={(item) => item.date}
                 renderItem={renderGroup}

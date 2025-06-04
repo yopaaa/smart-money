@@ -58,7 +58,8 @@ const TransactionForm = () => {
 
         if (id) {
             const tx = getTransactionById(id); // Use the new function
-
+            // console.log(tx);
+            
             const tempX = getCategoriesByType("income")
             const tempY = getCategoriesByType("expense")
             setIncomeCategories(tempX)
@@ -324,7 +325,7 @@ const TransactionForm = () => {
 
                     {/* Actions Button */}
                     <View style={{ flexDirection: 'row', marginTop: 16 }}>
-                        <ActionButton title="Hapus" backgroundColor="#F44336" onPress={handleDelete} />
+                        <ActionButton title="Hapus" backgroundColor="#F44336" onPress={handleDelete}  disabled={!isFormEditable}/>
                         <ActionButton title="Salin" backgroundColor="#2196F3" onPress={handleCopy} />
                         <ActionButton title="Edit" backgroundColor="#4CAF50" onPress={handleEdit} disabled={!isFormEditable} />
                     </View>
