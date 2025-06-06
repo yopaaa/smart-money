@@ -278,7 +278,6 @@ export default function HomeScreen() {
             </View>
 
             <FlatList
-            
                 ref={scrollRef}
                 data={groupedTransactions}
                 keyExtractor={(item) => item.date}

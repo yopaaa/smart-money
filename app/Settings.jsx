@@ -58,7 +58,8 @@ const SettingsScreen = () => {
     },
     {
       icon: 'thumbs-up-outline', label: 'Recommend', function: function () {
-        console.log("this.label");
+        router.push("settings/ChartT");
+
       }
     },
   ];

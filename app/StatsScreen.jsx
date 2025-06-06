@@ -17,7 +17,6 @@ import {
 import { useTransactions } from './TransactionContext';
 import timePeriods from './json/timePeriods.json';
 
-
 export default function HomeScreen() {
     const router = useRouter();
     const { filterTransactions, getCategoryById } = useTransactions();
@@ -148,27 +147,6 @@ export default function HomeScreen() {
         if (viewMode === 'year') return selectedDate.format('YYYY');
     };
 
-    const totalOverview = useMemo(() => {
-        let totalIncome = 0;
-        let totalExpense = 0;
-
-        filteredTransactions.forEach((item) => {
-            if (item.type === 'income') {
-                totalIncome += item.amount;
-            } else if (item.type === 'expense') {
-                totalExpense += item.amount;
-            }
-        });
-
-        return {
-            income: totalIncome,
-            expense: totalExpense,
-            net: totalIncome - totalExpense,
-        };
-    }, [filteredTransactions]);
-    const [selected, setSelected] = useState(null);
-
-
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
 
@@ -215,7 +193,6 @@ export default function HomeScreen() {
                 </TouchableOpacity>
 
             </View>
-
 
             {type == "income" && <PieChart
                 data={incomeCategoriesGroub}

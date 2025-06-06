@@ -11,14 +11,16 @@ import {
 } from 'react-native';
 
 import { formatCurrency } from '@/utils/number';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTransactions } from './TransactionContext';
 import groupLabels from './json/groupLabels.json';
 
 export default function AccountsScreen() {
+    const router = useRouter();
+
     const { accounts, refetchData } = useTransactions();
-    const router = useNavigation();
+    // const router = useNavigation();
 
     const [isRefreshing, setisRefreshing] = useState(false)
 
@@ -143,10 +145,8 @@ export default function AccountsScreen() {
 
                     )}
                     renderItem={({ item }) => (
-                        <View style={[styles.item, {
-                            padding: 10,
+                        <TouchableOpacity style={[styles.item, {
                             marginHorizontal: 4,
-                            marginVertical: 2,
                             borderRadius: 12,
                             backgroundColor: '#f8f9fa',
                             borderWidth: 1,
@@ -159,7 +159,20 @@ export default function AccountsScreen() {
                             shadowOpacity: 0.1,
                             shadowRadius: 1,
                             elevation: 1,
-                        }]}>
+                            borderBottomWidth: 1,
+                            padding: 15
+                        }]}
+                            onPress={() => {
+                                router.push({
+                                    pathname: 'transaction/PerAccountsTransactions',
+                                    params: {
+                                        id: item.id,
+                                        title: item.name
+                                    }
+                                });
+
+                            }}
+                        >
 
                             <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 20 }}>
                                 <MaterialCommunityIcons name={item.icon} size={24} color={item.iconColor} />
@@ -178,7 +191,7 @@ export default function AccountsScreen() {
                                 {formatCurrency(item.balance) || 0}
                             </Text>
 
-                        </View>
+                        </TouchableOpacity>
                     )}
                     ListFooterComponent={<View style={{ margin: 100, justifyContent: "center" }} />}
                 />

@@ -1,4 +1,4 @@
-import BarChart from '@/components/BarChart';
+import BarChart from '@/components/DoubleBarChart';
 import SimpleHeader from '@/components/SimpleHeader';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,8 +17,9 @@ import {
 } from 'react-native';
 import { useTransactions } from '../../TransactionContext';
 
+
 export default function HomeScreen() {
-    const { title, category, type, viewMode = "month", selectedDate: selectedDates } = useLocalSearchParams();
+    const { title, id, viewMode = "month", selectedDate: selectedDates } = useLocalSearchParams();
     const router = useRouter();
     const { filterTransactions, getCategoryById } = useTransactions();
     const [selectedDate, setSelectedDate] = useState(moment());
@@ -99,10 +100,9 @@ export default function HomeScreen() {
         return filterTransactions({
             startDate: start.valueOf(),
             endDate: end.valueOf(),
-            ...(category && { category }),
-            ...(type && { type })
+            ...(id && { id }),
         });
-    }, [selectedDate, viewMode, filterTransactions, isRefreshing, updateTriggers, category, type]);
+    }, [selectedDate, viewMode, filterTransactions, isRefreshing, updateTriggers]);
 
     const groupedTransactions = useMemo(() => {
         const groups = {};
@@ -149,7 +149,6 @@ export default function HomeScreen() {
     }, [filteredTransactions]);
 
     const totalOverview = useMemo(() => {
-        // console.log(filteredTransactions);
 
         let totalIncome = 0;
         let totalExpense = 0;
@@ -164,7 +163,7 @@ export default function HomeScreen() {
 
         return {
             income: totalIncome,
-            expense: totalExpense,
+            expense: -totalExpense,
             net: totalIncome - totalExpense,
         };
     }, [filteredTransactions]);
@@ -233,7 +232,7 @@ export default function HomeScreen() {
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
             <SimpleHeader
-                title={`${title} Categories`}
+                title={`${title}`}
                 rightComponent={
                     <View style={styles.monthNav}>
                         <TouchableOpacity onPress={goToPrev}>
@@ -264,15 +263,26 @@ export default function HomeScreen() {
                 ListHeaderComponent={
                     <View style={styles.overviewBox}>
                         <View style={styles.row}>
-                            <Text style={styles.label}>{type} Total</Text>
-                            <Text style={styles.amount}> {formatCurrency(totalOverview.net) || 0}</Text>
+                            <Text style={styles.label}>{title} Income</Text>
+                            <Text style={[styles.amount, styles.income]}> {formatCurrency(totalOverview.income) || 0}</Text>
+                        </View>
+
+                        <View style={styles.row}>
+                            <Text style={styles.label}>{title} Expense</Text>
+                            <Text style={[styles.amount, styles.expense]}> {formatCurrency(totalOverview.expense) || 0}</Text>
+                        </View>
+
+                        <View style={styles.row}>
+                            <Text style={styles.label}>{title} Total</Text>
+                            <Text style={[styles.amount, totalOverview.net > 0 ? styles.income: styles.expense]}> {formatCurrency(totalOverview.net) || 0}</Text>
                         </View>
 
                         <View style={styles.overviewHeader}>
                             <Text style={styles.overviewTitle}>Overview per {viewMode == "year" ? "Week" : "Days"}</Text>
                             <MaterialCommunityIcons name="information-outline" size={16} />
                         </View>
-                        <BarChart data={filteredTransactions} mode={viewMode} />
+                        <BarChart data={filteredTransactions.filter(val => val.type != "transfer")
+                        } mode={viewMode} />
                     </View>
                 }
                 ListFooterComponent={<View style={{ margin: 200 }} />}
