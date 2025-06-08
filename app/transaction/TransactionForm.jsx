@@ -119,7 +119,7 @@ const TransactionForm = () => {
 
     try {
       // console.log(moment(mergedDate).format('MMMM Do YYYY, h:mm:ss a'));
-      
+
       addTransaction(transaction);
       Alert.alert('Sukses', 'Transaksi berhasil ditambahkan');
       refetchData();
@@ -264,10 +264,12 @@ const TransactionForm = () => {
                   onSelect={(val) => handleChange('category', val)}
                   options={formData.type === "income" ? incomeCategories : expenseCategories}
                   selectedComponent={(val) => {
-                    return (<>
-                      <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.color} />
-                      <Text>{val.name}</Text>
-                    </>)
+                    return (
+                      <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center", flex: 1 }}>
+                        <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.color} />
+                        <Text style={{ width: "80%", textAlign: "center" }}>{`${val.name}`}</Text>
+                      </View>
+                    )
                   }}
                 />
               )}
@@ -282,10 +284,12 @@ const TransactionForm = () => {
                 onSelect={(val) => handleChange('accountId', val)}
                 options={accounts}
                 selectedComponent={(val) => {
-                  return (<>
-                    <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.iconColor} />
-                    <Text>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
-                  </>)
+                  return (
+                    <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center", flex: 1 }}>
+                      <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.iconColor} />
+                      <Text style={{ width: "80%", textAlign: "center" }}>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
+                    </View>
+                  )
                 }}
               />
 
@@ -301,11 +305,12 @@ const TransactionForm = () => {
                     onSelect={(val) => handleChange('targetAccountId', val)}
                     options={accounts}
                     selectedComponent={(val) => {
-                      return (<>
-                        <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.iconColor} />
-                        {/* <Text>{`${val.name} ( ${val.balance.toLocaleString()})`}</Text> */}
-                        <Text>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
-                      </>)
+                      return (
+                        <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center", flex: 1 }}>
+                          <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.iconColor} />
+                          <Text style={{ width: "80%", textAlign: "center" }}>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
+                        </View>
+                      )
                     }}
                   />
 
@@ -441,7 +446,8 @@ const styles = StyleSheet.create({
     padding: 12,
     marginTop: 6,
     fontSize: 16,
-    width: 250,
+    // width: 250,
+    flex: 1,
     backgroundColor: '#f9f9f9',
   },
   picker: {
@@ -449,8 +455,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    width: 250,
-    backgroundColor: '#f9f9f9',
+    // width: 250,
+    // backgroundColor: '#f9f9f9',
   },
   buttonContainer: {
     marginTop: 24,

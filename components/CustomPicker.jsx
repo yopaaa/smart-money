@@ -91,7 +91,8 @@ const styles = StyleSheet.create({
         padding: 12,
         marginTop: 6,
         fontSize: 16,
-        width: 250,
+        // width: "65%",
+        flex: 1,
         backgroundColor: '#f9f9f9',
     },
     modalOverlay: {
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.3)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
     modalBox: {
         backgroundColor: 'white',
@@ -129,19 +130,19 @@ const styles = StyleSheet.create({
         borderBottomColor: '#eee',
         borderBottomWidth: 1,
     },
-// modalContainer: {
-//   flex: 1,
-//   backgroundColor: 'rgba(0,0,0,0.5)',
-//   justifyContent: 'center',
-//   alignItems: 'center',
-// },
+    // modalContainer: {
+    //   flex: 1,
+    //   backgroundColor: 'rgba(0,0,0,0.5)',
+    //   justifyContent: 'center',
+    //   alignItems: 'center',
+    // },
 
-// modalBox: {
-//   backgroundColor: 'white',
-//   borderRadius: 10,
-//   padding: 20,
-//   maxHeight: '80%',
-//   width: '80%',
-// },
+    // modalBox: {
+    //   backgroundColor: 'white',
+    //   borderRadius: 10,
+    //   padding: 20,
+    //   maxHeight: '80%',
+    //   width: '80%',
+    // },
 
 });

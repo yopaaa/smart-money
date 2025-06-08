@@ -2,6 +2,45 @@ import { db } from '../db';
 import generateId from '../generateId';
 import { addTransaction } from './transaction';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import groupLabels from '../../app/json/groupLabels.json';
+import { SAVED_ACCOUNT_ORDER_NAME } from '../../app/settings/ModifyOrderAccounts';
+// Map dari type ke metadata grup
+
+const addAccountToSavedOrder = async (newAccount) => {
+    try {
+        const saved = await AsyncStorage.getItem(SAVED_ACCOUNT_ORDER_NAME);
+        let savedOrder = saved ? JSON.parse(saved) : [];
+
+        const type = newAccount.type || 'other';
+        const meta = groupLabels.find(val => val.key == type)
+
+        let groupIndex = savedOrder.findIndex(group => group.title === meta.name);
+
+        if (groupIndex >= 0) {
+            // Grup sudah ada, tambahkan akun ke data[]
+            savedOrder[groupIndex].data.push(newAccount);
+        } else {
+            // Grup belum ada, buat baru
+            const newGroup = {
+                title: meta.title,
+                icon: meta.icon,
+                color: meta.color,
+                balance: 0,
+                data: [newAccount],
+            };
+            savedOrder.push(newGroup);
+        }
+
+
+        await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(savedOrder));
+        console.log('✅ Akun ditambahkan ke saved order');
+    } catch (e) {
+        console.error('❌ Gagal menambahkan akun ke saved order:', e);
+    }
+};
+
+
 export const addAccount = (account) => {
     const id = account.id || generateId();
     const initialBalance = account.balance || 0;
@@ -39,6 +78,8 @@ export const addAccount = (account) => {
             fee: 0
         });
     }
+    const newData = getAccountById(id)
+    addAccountToSavedOrder(newData)
 };
 
 export const getAccounts = () => {

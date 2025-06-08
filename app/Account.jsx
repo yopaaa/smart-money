@@ -11,18 +11,116 @@ import {
 } from 'react-native';
 
 import { formatCurrency } from '@/utils/number';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { useTransactions } from './TransactionContext';
+import { useEffect, useState } from 'react';
+import ThreeDotMenu from '../components/ThreeDots';
 import groupLabels from './json/groupLabels.json';
+import { SAVED_ACCOUNT_ORDER_NAME } from './settings/ModifyOrderAccounts';
+import { useTransactions } from './TransactionContext';
+
+export const groupAccounts = (accounts) => {
+    const groups = {};
+
+    for (let acc of accounts) {
+        const key = acc.type || 'other';
+
+        if (!groups[key]) {
+            groups[key] = {
+                balance: 0,
+                accounts: []
+            };
+        }
+
+        groups[key].accounts.push(acc);
+        if (acc.hidden === 0) {
+
+            groups[key].balance += acc.balance;
+        }
+    }
+
+    // console.log(JSON.stringify(groups," ", " "));
+
+    return groupLabels
+        .filter(group => groups[group.key]) // hanya yang ada datanya
+        .map(group => ({
+            title: group.name,
+            icon: group.icon,
+            color: group.color,
+            balance: groups[group.key].balance,
+            data: groups[group.key].accounts
+        }));
+};
 
 export default function AccountsScreen() {
     const router = useRouter();
-
     const { accounts, refetchData } = useTransactions();
-    // const router = useNavigation();
-
     const [isRefreshing, setisRefreshing] = useState(false)
+    const [grouped, setgrouped] = useState([])
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                const savedData = await AsyncStorage.getItem(SAVED_ACCOUNT_ORDER_NAME);
+                const latestGrouped = groupAccounts(accounts);
+
+                if (savedData) {
+                    const savedOrder = JSON.parse(savedData);
+
+                    const groupMap = {};
+                    for (let group of latestGrouped) {
+                        groupMap[group.title] = group;
+                    }
+
+                    const ordered = [];
+
+                    for (let savedGroup of savedOrder) {
+                        const latestGroup = groupMap[savedGroup.title];
+
+                        if (latestGroup) {
+                            const accountMap = {};
+                            for (let acc of latestGroup.data) {
+                                accountMap[acc.id] = acc;
+                            }
+
+                            const orderedAccounts = [];
+
+                            for (let savedAcc of savedGroup.data) {
+                                const acc = accountMap[savedAcc.id];
+                                if (acc) {
+                                    orderedAccounts.push(acc);
+                                    delete accountMap[savedAcc.id];
+                                }
+                            }
+
+                            const newAccounts = Object.values(accountMap);
+                            const finalAccounts = [...orderedAccounts, ...newAccounts];
+
+                            ordered.push({
+                                ...latestGroup,
+                                data: finalAccounts,
+                            });
+
+                            delete groupMap[savedGroup.title];
+                        }
+                    }
+
+                    const newGroups = Object.values(groupMap);
+                    const finalGrouped = [...ordered, ...newGroups];
+
+                    setgrouped(finalGrouped);
+                } else {
+                    setgrouped(latestGrouped);
+                }
+            } catch (e) {
+                console.error('Failed to load saved order:', e);
+            }
+        };
+
+        loadData();
+
+    }, [isRefreshing]);
+
 
     const handleRefresh = () => {
         refetchData()
@@ -50,47 +148,35 @@ export default function AccountsScreen() {
         };
     };
 
-    const groupAccounts = () => {
-        const groups = {};
-
-        for (let acc of accounts) {
-            const key = acc.type || 'other';
-
-            if (!groups[key]) {
-                groups[key] = {
-                    balance: 0,
-                    accounts: []
-                };
-            }
-
-            groups[key].accounts.push(acc);
-            if (acc.hidden === 0) {
-
-                groups[key].balance += acc.balance;
-            }
-        }
-
-        // console.log(JSON.stringify(groups," ", " "));
-
-        return groupLabels
-            .filter(group => groups[group.key]) // hanya yang ada datanya
-            .map(group => ({
-                title: group.name,
-                icon: group.icon,
-                color: group.color,
-                balance: groups[group.key].balance,
-                data: groups[group.key].accounts
-            }));
-    };
-
-
     const { assets, liabilities, total } = calculateSummary();
-    const grouped = groupAccounts();
 
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
             <View style={styles.headercontainer}>
                 <Text style={styles.header}>Accounts</Text>
+
+                <ThreeDotMenu
+                    dotColor="black"
+                    menuItems={[
+                        { name: 'Add Account', fn: () => router.navigate("transaction/CreateAccountForm") },
+                        {
+                            name: 'Show/Hide', fn: () => {
+                                router.push({
+                                    pathname: 'settings/ShowAndHideAccount'
+                                });
+                            }
+                        },
+                        {
+                            name: 'Delete', fn: () => {
+                                router.push({
+                                    pathname: 'settings/DeleteAccount'
+                                });
+                            }
+                        },
+                        { name: 'Modify Orders', fn: () => router.navigate("settings/ModifyOrderAccounts") },
+                    ]}
+                />
+
             </View>
 
             <View style={styles.summary}>
@@ -112,15 +198,9 @@ export default function AccountsScreen() {
                 {JSON.stringify(grouped, " ", " ")}
             </Text> */}
 
-            <TouchableOpacity onPress={() => router.navigate("transaction/CreateAccountForm")} style={{ position: "relative" }}>
-                <Text>Add account</Text>
-
-            </TouchableOpacity>
-
             <View>
                 <SectionList
                     refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-
                     scrollEnabled
                     sections={grouped}
                     keyExtractor={(item) => item.id}
@@ -211,12 +291,14 @@ const styles = StyleSheet.create({
     },
     headercontainer: {
         height: 60,
-        justifyContent: 'center',
+        justifyContent: 'space-around',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginTop: 10,
     },
     header: {
         fontSize: 22,
         fontWeight: 'bold',
-        marginBottom: 16,
     },
     summary: {
         flexDirection: 'row',

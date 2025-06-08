@@ -50,7 +50,7 @@ const TransactionForm = () => {
   };
 
   const handleSubmit = () => {
-    if (!formData.name.trim() || !formData.balance || isNaN(formData.balance)) {
+    if (!formData.name.trim() || isNaN(formData.balance)) {
       Alert.alert('Error', 'Mohon isi semua data dengan benar');
       return;
     }
@@ -77,6 +77,7 @@ const TransactionForm = () => {
 
     try {
       addAccount(accountData)
+      
       Alert.alert('Sukses', 'Transaksi berhasil ditambahkan');
       refetchData();
 
@@ -121,7 +122,7 @@ const TransactionForm = () => {
 
           {/* Input Amount */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Jumlah ()</Text>
+            <Text style={styles.label}>Jumlah</Text>
             <TextInput
               style={styles.input}
               keyboardType="numeric"
@@ -287,7 +288,8 @@ const styles = StyleSheet.create({
     padding: 12,
     marginTop: 6,
     fontSize: 16,
-    width: 250,
+    // width: 250,
+    flex: 1,
     backgroundColor: '#f9f9f9',
   },
   picker: {
