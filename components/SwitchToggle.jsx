@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, TouchableOpacity } from 'react-native';
 
 const CustomSwitch = ({
@@ -10,8 +10,15 @@ const CustomSwitch = ({
   size = 'medium',
   disabled = false,
 }) => {
-  const [isOn, setIsOn] = useState(value);
   const [animation] = useState(new Animated.Value(value ? 1 : 0));
+
+  useEffect(() => {
+    Animated.timing(animation, {
+      toValue: value ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [value]); // 👉 Jalankan setiap kali `value` berubah dari luar
 
   // Define sizes
   const sizes = {
@@ -24,16 +31,8 @@ const CustomSwitch = ({
 
   const toggleSwitch = () => {
     if (disabled) return;
-
-    const newValue = !isOn;
-    setIsOn(newValue);
-    onValueChange?.(newValue);
-
-    Animated.timing(animation, {
-      toValue: newValue ? 1 : 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
+    const newValue = !value;
+    onValueChange?.(newValue); // Biarkan parent mengatur `value` lagi
   };
 
   const translateX = animation.interpolate({
@@ -47,11 +46,7 @@ const CustomSwitch = ({
   });
 
   return (
-    <TouchableOpacity 
-      activeOpacity={1} 
-      onPress={toggleSwitch}
-      disabled={disabled}
-    >
+    <TouchableOpacity activeOpacity={1} onPress={toggleSwitch} disabled={disabled}>
       <Animated.View
         style={[
           styles.container,

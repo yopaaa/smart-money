@@ -99,6 +99,14 @@ export const getAccountById = (id) => {
 
 export const editAccount = (id, updatedAccount) => {
     try {
+        // Ambil data lama
+        const existing = getAccountById(id);
+
+        const updated = {
+            ...existing,
+            ...updatedAccount
+        };
+
         db.runSync(`
             UPDATE accounts SET 
                 name = ?, 
@@ -110,13 +118,13 @@ export const editAccount = (id, updatedAccount) => {
                 description = ?
             WHERE id = ?;
         `, [
-            updatedAccount.name,
-            updatedAccount.type,
-            updatedAccount.isLiability ? 1 : 0,
-            updatedAccount.hidden ? 1 : 0,
-            updatedAccount.icon || 'wallet',
-            updatedAccount.iconColor || '#4caf50',
-            updatedAccount.description || '',
+            updated.name,
+            updated.type,
+            updated.isLiability ? 1 : 0,
+            updated.hidden ? 1 : 0,
+            updated.icon || 'wallet',
+            updated.iconColor || '#4caf50',
+            updated.description || '',
             id
         ]);
     } catch (e) {
@@ -124,6 +132,7 @@ export const editAccount = (id, updatedAccount) => {
         throw e;
     }
 };
+
 
 
 export const deleteAccount = (id) => {

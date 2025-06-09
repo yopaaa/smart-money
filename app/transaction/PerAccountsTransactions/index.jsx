@@ -100,7 +100,7 @@ export default function HomeScreen() {
         return filterTransactions({
             startDate: start.valueOf(),
             endDate: end.valueOf(),
-            ...(id && { id }),
+            ...(id && { accountId: id }),
         });
     }, [selectedDate, viewMode, filterTransactions, isRefreshing, updateTriggers]);
 
@@ -232,7 +232,28 @@ export default function HomeScreen() {
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
             <SimpleHeader
-                title={`${title}`}
+                // title={`${title}`}
+                headerComponent={
+                    <View style={{ flexDirection: "row", gap: 15 }}>
+                        <Text style={{
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: 'black',
+                            textTransform: 'capitalize'
+                        }}>{title}</Text>
+                        <TouchableOpacity onPress={() => {
+                            router.push({
+                                pathname: 'transaction/EditAccount',
+                                params: {
+                                    id
+                                }
+                            });
+                        }}>
+                            <MaterialCommunityIcons name="pencil-outline" size={22} color="#007AFF" />
+                        </TouchableOpacity>
+                    </View>
+
+                }
                 rightComponent={
                     <View style={styles.monthNav}>
                         <TouchableOpacity onPress={goToPrev}>
@@ -274,7 +295,7 @@ export default function HomeScreen() {
 
                         <View style={styles.row}>
                             <Text style={styles.label}>{title} Total</Text>
-                            <Text style={[styles.amount, totalOverview.net > 0 ? styles.income: styles.expense]}> {formatCurrency(totalOverview.net) || 0}</Text>
+                            <Text style={[styles.amount, totalOverview.net > 0 ? styles.income : styles.expense]}> {formatCurrency(totalOverview.net) || 0}</Text>
                         </View>
 
                         <View style={styles.overviewHeader}>

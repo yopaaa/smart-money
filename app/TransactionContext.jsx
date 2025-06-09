@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import {
     addAccount,
     deleteAccount,
+    editAccount,
+    getAccountById,
     getAccounts
 } from '../utils/fn/account';
 import {
@@ -59,6 +61,8 @@ export const TransactionProvider = ({ children }) => {
             getAccounts,
             addAccount,
             deleteAccount,
+            getAccountById,
+            editAccount,
             addTransaction,
             editTransaction,
             deleteTransaction,

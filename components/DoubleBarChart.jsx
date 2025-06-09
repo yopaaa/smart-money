@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { useMemo } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { BarChart } from 'react-native-gifted-charts';
 
 import { formatNumberShort, generateYAxisLabels, getMaxAmountWithPadding } from './BarChart';
@@ -73,14 +73,19 @@ function CustomBarChart({ data = [], title }) {
     }, [data]);
 
     const maxValue = useMemo(() => {
-        console.log(JSON.stringify(barData, " ", " "));
         return getMaxAmountWithPadding(barData);
 
     }, [barData]);
 
     if (!barData || barData.length === 0) {
-        return <Text>Memuat grafik...</Text>;
-    }
+    return (
+        <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#4CAF50" />
+            <Text style={styles.loadingText}>Memuat grafik...</Text>
+        </View>
+    );
+}
+
 
     return (
         <ScrollView contentContainerStyle={{ paddingTop: 10, padding: 10, paddingBottom: 0, flex: 1, gap: 30, flexDirection: "row" }}>
@@ -113,5 +118,20 @@ function CustomBarChart({ data = [], title }) {
         </ScrollView>
     );
 }
+
+const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 40,
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#555',
+    },
+});
+
 
 export default CustomBarChart;

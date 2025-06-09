@@ -15,25 +15,19 @@ import {
 
 import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
+import { groupAccounts } from '../Account';
 import { useTransactions } from '../TransactionContext';
 import { SAVED_ACCOUNT_ORDER_NAME } from './ModifyOrderAccounts';
 
 const DeleteAccountScreen = () => {
     const router = useRouter();
-    const { deleteAccount } = useTransactions();
+    const { deleteAccount,accounts } = useTransactions();
     const [data, setData] = useState([]);
 
     useEffect(() => {
         const loadData = async () => {
-            try {
-                const savedData = await AsyncStorage.getItem(SAVED_ACCOUNT_ORDER_NAME);
-                if (savedData) {
-                    const parsed = JSON.parse(savedData);
-                    setData(parsed);
-                }
-            } catch (e) {
-                console.error('Failed to load saved order:', e);
-            }
+            const latestGrouped = await groupAccounts(accounts)
+            setData(latestGrouped)
         };
         loadData();
     }, []);
@@ -77,7 +71,7 @@ const DeleteAccountScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                     router.push({
-                        pathname: 'settings/EditAccount',
+                        pathname: 'transaction/EditAccount',
                         params: {
                             id: account.id
                         }

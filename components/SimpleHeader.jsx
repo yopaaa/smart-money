@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 
-function Header({ style, headerTitleStyle, title, rightComponent }) {
+function Header({ style, headerTitleStyle, title, rightComponent, headerComponent }) {
     const router = useRouter();
 
     return (<View style={{
@@ -27,12 +27,13 @@ function Header({ style, headerTitleStyle, title, rightComponent }) {
                 <Ionicons name="arrow-back" size={24} color="#000" />
             </Pressable>
 
-            <Text style={{
+            {headerComponent || <Text style={{
                 fontSize: 18,
                 fontWeight: 'bold',
                 color: 'black',
                 textTransform: 'capitalize', ...headerTitleStyle
-            }}>{title}</Text>
+            }}>{title}</Text>}
+
         </View>
 
 

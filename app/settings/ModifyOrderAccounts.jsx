@@ -54,17 +54,10 @@ export default function ModifyOrderScreen() {
     const [isRefreshing, setisRefreshing] = useState(false)
     const [data, setData] = useState([]);
 
-    useEffect(() => {        
+    useEffect(() => {
         const loadData = async () => {
-            try {
-                const savedData = await AsyncStorage.getItem(SAVED_ACCOUNT_ORDER_NAME);
-                if (savedData) {
-                    const parsed = JSON.parse(savedData);
-                    setData(parsed);
-                }
-            } catch (e) {
-                console.error('Failed to load saved order:', e);
-            }
+            const latestGrouped = await groupAccounts(accounts)
+            setData(latestGrouped)
         };
         loadData();
     }, [isRefreshing]);
@@ -137,7 +130,7 @@ export default function ModifyOrderScreen() {
         </View>
     );
 
-  
+
     return (
         <GestureHandlerRootView>
             <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>

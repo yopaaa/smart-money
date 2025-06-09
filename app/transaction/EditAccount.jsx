@@ -4,7 +4,7 @@ import SimpleHeader from '@/components/SimpleHeader';
 import SwitchToggle from '@/components/SwitchToggle';
 import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -23,24 +23,44 @@ import groupLabels from '../json/groupLabels.json';
 import iconOptions from '../json/iconOptions.json';
 import { useTransactions } from '../TransactionContext';
 
-const TransactionForm = () => {
+const EditAccountForm = () => {
+  const { id } = useLocalSearchParams();
   const router = useNavigation();
-  const { refetchData, addAccount, accounts, getCategoriesByType } = useTransactions();
+  const { getAccountById, editAccount, refetchData } = useTransactions();
+
   const [selectedIcon, setSelectedIcon] = useState(iconOptions[0]);
   const [selectedIconColor, setSelectedIconColor] = useState(colorOptions[0]);
   const [isVisible, setIsVisible] = useState(true);
-
+  const [isLiability, setIsLiability] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
+    name: '',
     balance: 0,
     type: groupLabels[0],
-    description: ""
+    description: ''
   });
 
   useEffect(() => {
-    console.log("Create account form")
-  }, []);
+    const account = getAccountById(id);
+    console.log(account);
+    
+    if (account) {
+      const selectedGroup = groupLabels.find(g => g.key === account.type) || groupLabels[0];
+      const selectedIcon = iconOptions.find(i => i.icon === account.icon) || iconOptions[0];
+      const selectedColor = colorOptions.find(c => c.color === account.iconColor) || colorOptions[0];
+      setFormData({
+        name: account.name,
+        balance: account.balance,
+        type: selectedGroup,
+        description: account.description || ''
+      });
+      setSelectedIcon(selectedIcon);
+      setSelectedIconColor(selectedColor);
+      account.hidden == 0 ? setIsVisible(true) : setIsVisible(false)
+      setIsLiability(account.isLiability == 0 ? false : true)
+      
+    }
+  }, [id]);
 
   const handleChange = (name, value) => {
     setFormData(prev => ({
@@ -49,22 +69,13 @@ const TransactionForm = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name.trim() || isNaN(formData.balance)) {
       Alert.alert('Error', 'Mohon isi semua data dengan benar');
       return;
     }
-    // Validasi nama unik (case insensitive)
-    const isNameExist = accounts.some(
-      account => account.name.toLowerCase() === formData.name.trim().toLowerCase()
-    );
 
-    if (isNameExist) {
-      Alert.alert('Error', 'Nama akun sudah digunakan, silakan gunakan nama lain');
-      return;
-    }
-
-    const accountData = {
+    const updatedAccount = {
       name: formData.name.trim(),
       balance: formData.balance,
       type: formData.type.key,
@@ -73,26 +84,12 @@ const TransactionForm = () => {
       icon: selectedIcon.icon,
       iconColor: selectedIconColor.color,
       description: formData.description.trim()
-    }
+    };
 
     try {
-      addAccount(accountData)
-
-      Alert.alert('Sukses', 'Transaksi berhasil ditambahkan');
+      await editAccount(id, updatedAccount);
       refetchData();
-
-
-      // reset form
-      setFormData({
-        name: "",
-        balance: 0,
-        type: groupLabels[0],
-        description: ""
-      });
-      setSelectedIcon(iconOptions[0])
-      setSelectedIconColor(colorOptions[0])
-      setIsVisible(true)
-
+      Alert.alert('Sukses', 'Akun berhasil diperbarui');
       router.goBack();
     } catch (e) {
       Alert.alert('Error', e.message);
@@ -104,24 +101,20 @@ const TransactionForm = () => {
       style={{ flex: 1, paddingTop: StatusBar.currentHeight || 0 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <SimpleHeader title={"Buat Akun"} />
-
+      <SimpleHeader title="Edit Akun" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.formContainer}>
-
-          {/* Input Title */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Nama Akun</Text>
             <TextInput
               style={styles.input}
               placeholder="Tabungan, Bank dll"
               value={formData.name}
-              onChangeText={(text) => handleChange('name', text)}
+              onChangeText={text => handleChange('name', text)}
               autoFocus
             />
           </View>
 
-          {/* Input Amount */}
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Jumlah</Text>
             <TextInput
@@ -129,11 +122,10 @@ const TransactionForm = () => {
               keyboardType="numeric"
               placeholder="100.000"
               value={formatCurrency(formData.balance)}
-              onChangeText={(text) => handleChange('balance', unformatCurrency(text))}
+              onChangeText={text => handleChange('balance', unformatCurrency(text))}
             />
           </View>
 
-          {/* Input Category */}
           <CustomPicker
             inputContainerStyle={styles.inputContainer}
             labelStyle={styles.label}
@@ -141,32 +133,30 @@ const TransactionForm = () => {
             label="Kategori"
             selected={formData.type}
             onSelect={(val, index) => {
-              handleChange('type', val)
-              // console.log(index);
-              setSelectedIcon(iconOptions[index])
-              setSelectedIconColor(colorOptions[index])
+              handleChange('type', val);
+              setSelectedIcon(iconOptions[index]);
+              setSelectedIconColor(colorOptions[index]);
             }}
             options={groupLabels}
-            selectedComponent={(val) => {
-              return (<>
+            selectedComponent={(val) => (
+              <>
                 <MaterialCommunityIcons name={selectedIcon.icon} size={30} style={{ marginRight: 10 }} color={selectedIconColor.color} />
                 <Text>{val.name}</Text>
-              </>)
-            }}
+              </>
+            )}
           />
 
-          <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-around", margin: 15 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', margin: 15 }}>
             <CustomIconPickerGrid
-              pickerStyle={{ height: 80, justifyContent: "space-around", width: 150 }}
+              pickerStyle={{ height: 80, justifyContent: 'space-around', width: 150 }}
               label="Pilih Ikon"
               selectedIcon={selectedIcon}
               onSelect={setSelectedIcon}
               options={iconOptions}
               iconColor={selectedIconColor.color}
             />
-
             <CustomIconPickerGrid
-              pickerStyle={{ height: 80, justifyContent: "space-around", width: 150 }}
+              pickerStyle={{ height: 80, justifyContent: 'space-around', width: 150 }}
               label="Pilih Warna"
               selectedIcon={selectedIconColor}
               onSelect={setSelectedIconColor}
@@ -174,9 +164,8 @@ const TransactionForm = () => {
             />
           </View>
 
-          {/* Visibility Option */}
           <View style={{ ...styles.inputContainer, paddingVertical: 15 }}>
-            <Text style={{ ...styles.label, width: "80%", marginTop: 0 }}>Tampilkan Saldo Akun Ini ke Total</Text>
+            <Text style={{ ...styles.label, width: '80%', marginTop: 0 }}>Tampilkan Saldo Akun Ini ke Total</Text>
             <SwitchToggle
               value={isVisible}
               onValueChange={setIsVisible}
@@ -187,22 +176,32 @@ const TransactionForm = () => {
             />
           </View>
 
-          {/* Description Input */}
+          <View style={{ ...styles.inputContainer, paddingVertical: 15 }}>
+            <Text style={{ ...styles.label, width: '80%', marginTop: 0 }}>Is Liability</Text>
+            <SwitchToggle
+              value={isVisible}
+              onValueChange={setIsVisible}
+              activeColor="#34C759"
+              inactiveColor="#E5E5EA"
+              thumbColor="white"
+              size="medium"
+            />
+          </View>
+
           <Text style={{ ...styles.label, padding: 10 }}>Deskripsi</Text>
           <TextInput
-            style={[styles.input, { height: 80, width: "100%" }]}
+            style={[styles.input, { height: 80, width: '100%' }]}
             placeholder="Tambahkan deskripsi (opsional)"
             multiline
             value={formData.description}
-            onChangeText={(text) => handleChange('description', text)}
+            onChangeText={text => handleChange('description', text)}
           />
 
-          {/* Save Button */}
           <View style={styles.buttonContainer}>
             <Button
-              title="Tambah Transaksi"
+              title="Simpan Perubahan"
               onPress={handleSubmit}
-              color="#4CAF50"
+              color="#007AFF"
             />
           </View>
         </View>
@@ -308,4 +307,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransactionForm;
+export default EditAccountForm;

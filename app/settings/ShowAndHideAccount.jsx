@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { groupAccounts } from '../Account';
 
 import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
@@ -20,54 +21,49 @@ import { SAVED_ACCOUNT_ORDER_NAME } from './ModifyOrderAccounts';
 
 const DeleteAccountScreen = () => {
     const router = useRouter();
-    const { deleteAccount } = useTransactions();
+    const { editAccount, accounts } = useTransactions();
     const [data, setData] = useState([]);
 
     useEffect(() => {
         const loadData = async () => {
-            try {
-                const savedData = await AsyncStorage.getItem(SAVED_ACCOUNT_ORDER_NAME);
-                if (savedData) {
-                    const parsed = JSON.parse(savedData);
-                    setData(parsed);
-                }
-            } catch (e) {
-                console.error('Failed to load saved order:', e);
-            }
+            const latestGrouped = await groupAccounts(accounts)
+            setData(latestGrouped)
         };
         loadData();
     }, []);
 
-    const handleHide = (accountId, groupTitle) => {
-        Alert.alert('Delete Account', 'Are you sure you want to delete this account?', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Delete',
-                style: 'destructive',
-                onPress: async () => {
-                    // await deleteAccount(accountId);
+    const handleHide = async (accountId, groupTitle, isHidden) => {
+        try {
+            // Update hidden di database
+            await editAccount(accountId, { hidden: isHidden == 0 ? true : false });
 
-                    // // Perbarui SAVED_ACCOUNT_ORDER_NAME
-                    // const updatedGroups = data.map(group => {
-                    //     if (group.title === groupTitle) {
-                    //         return {
-                    //             ...group,
-                    //             data: group.data.filter(acc => acc.id !== accountId)
-                    //         };
-                    //     }
-                    //     return group;
-                    // }).filter(group => group.data.length > 0); // hilangkan grup kosong
-
-                    // setData(updatedGroups);
-                    // await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(updatedGroups));
+            // Update hidden di state dan AsyncStorage
+            const updatedGroups = data.map(group => {
+                if (group.title === groupTitle) {
+                    return {
+                        ...group,
+                        data: group.data.map(acc =>
+                            acc.id === accountId ? { ...acc, hidden: isHidden == 0 ? true : false } : acc
+                        )
+                    };
                 }
-            }
-        ]);
+                return group;
+            });
+
+            setData(updatedGroups);
+            await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(updatedGroups));
+
+            console.log(`Account ${accountId} marked as hidden.`);
+        } catch (e) {
+            console.error("Failed to hide account:", e);
+            Alert.alert("Error", "Failed to hide the account.");
+        }
     };
+
 
     const renderAccount = (account, groupTitle) => {
         // console.log(account);
-        
+
         return (
             <View style={styles.accountRow}>
                 <View style={styles.accountInfo}>
@@ -75,12 +71,12 @@ const DeleteAccountScreen = () => {
                     <Text style={styles.accountText}>{account.name}</Text>
                 </View>
                 <View style={{ flexDirection: "row", gap: 20 }}>
-                    <TouchableOpacity onPress={() => handleHide(account.id, groupTitle)}>
-                        <MaterialCommunityIcons name={account.hidden ? "eye-off": "eye"} size={22} color={account.hidden ? "brown": "green"} />
+                    <TouchableOpacity onPress={() => handleHide(account.id, groupTitle, account.hidden)}>
+                        <MaterialCommunityIcons name={account.hidden ? "eye-off" : "eye"} size={22} color={account.hidden ? "brown" : "green"} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {
                         router.push({
-                            pathname: 'settings/EditAccount',
+                            pathname: 'transaction/EditAccount',
                             params: {
                                 id: account.id
                             }
