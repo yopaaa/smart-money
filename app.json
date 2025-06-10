@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "smart-money",
+    "name": "Smart Money",
     "slug": "smart-money",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,7 +24,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.koucheng.smartmoney"
     },
     "web": {
       "bundler": "metro",
@@ -37,7 +38,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash.png",
+          "image": "./assets/images/splash-icon-light.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#40E0D0"
@@ -47,6 +48,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5a0e1649-4270-4f53-bf16-89334f8fa9fa"
+      }
+    },
+    "owner": "koucheng"
   }
 }

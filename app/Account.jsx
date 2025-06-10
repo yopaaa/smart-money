@@ -108,9 +108,12 @@ export const groupAccounts = async (accounts) => {
 };
 
 export default function AccountsScreen() {
+    const TITLE = "Buckets And Balances"
+
     const router = useRouter();
     const { accounts, refetchData } = useTransactions();
     const [isRefreshing, setisRefreshing] = useState(false)
+    const [isHideBalance, setisHideBalance] = useState(true)
     const [grouped, setgrouped] = useState([])
 
     useEffect(() => {
@@ -155,8 +158,11 @@ export default function AccountsScreen() {
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
             <View style={styles.headercontainer}>
-                <Text style={styles.header}>Accounts</Text>
-
+                <Text style={styles.header}>{TITLE}</Text>
+                <View style={{ marginHorizontal: 20 }}></View>
+                <TouchableOpacity onPress={() => setisHideBalance(!isHideBalance)}>
+                    <MaterialCommunityIcons name={isHideBalance ? "eye" : "eye-off"} size={22} color={isHideBalance ? "green" : "brown"} />
+                </TouchableOpacity>
                 <ThreeDotMenu
                     dotColor="black"
                     menuItems={[
@@ -184,15 +190,23 @@ export default function AccountsScreen() {
             <View style={styles.summary}>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Assets</Text>
-                    <Text style={[styles.summaryValue,  assets > 0 ? styles.assetBalance : styles.liabilityBalance]}>{formatCurrency(assets)}</Text>
+                    <Text style={[styles.summaryValue, assets > 0 ? styles.assetBalance : styles.liabilityBalance]}>
+                        {isHideBalance ? formatCurrency(assets) || 0 : "*****"}
+
+                    </Text>
                 </View>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Liabilities</Text>
-                    <Text style={[styles.summaryValue, styles.liabilityBalance]}>{formatCurrency(liabilities) || 0}</Text>
+                    <Text style={[styles.summaryValue, styles.liabilityBalance]}>
+                        {isHideBalance ? formatCurrency(liabilities) || 0 : "*****"}
+
+                    </Text>
                 </View>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Total</Text>
-                    <Text style={[styles.summaryValue, total > 0 ? styles.assetBalance : styles.liabilityBalance]}>{formatCurrency(total)}</Text>
+                    <Text style={[styles.summaryValue, total > 0 ? styles.assetBalance : styles.liabilityBalance]}>
+                        {isHideBalance ? formatCurrency(total) || 0 : "*****"}
+                    </Text>
                 </View>
             </View>
 
@@ -221,7 +235,7 @@ export default function AccountsScreen() {
                                     ? styles.liabilityBalance
                                     : styles.assetBalance
                             ]}>
-                                {formatCurrency(balance) || 0}
+                                {isHideBalance ? formatCurrency(balance) || 0 : "*****"}
                             </Text>
                         </View>
 
@@ -270,7 +284,7 @@ export default function AccountsScreen() {
                                         ? styles.liabilityBalance
                                         : styles.assetBalance
                             ]}>
-                                {formatCurrency(item.balance) || 0}
+                                {isHideBalance ? formatCurrency(item.balance) || 0 : "*****"}
                             </Text>
 
                         </TouchableOpacity>
@@ -293,10 +307,9 @@ const styles = StyleSheet.create({
     },
     headercontainer: {
         height: 60,
-        justifyContent: 'space-around',
         flexDirection: "row",
+        alignItems: "center",
         justifyContent: "space-between",
-        marginTop: 10,
     },
     header: {
         fontSize: 22,

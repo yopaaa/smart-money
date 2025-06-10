@@ -1,9 +1,12 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import transactions from '../../doc/result-formated.json';
-import accounts from '../../doc/update-account.json';
 import { useTransactions } from '../TransactionContext';
 import { assetGroups, getAssets, getCategory, getTransactions } from './json_restore';
 
+// import transactions from '../../doc/result-formated.json';
+// import accounts from '../../doc/update-account.json';
+
+const transactions = []
+const accounts = []
 const MyWebViewScreen = () => {
     const { filterTransactions, addAccount, resetTables, addTransaction } = useTransactions();
 

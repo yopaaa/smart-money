@@ -235,6 +235,7 @@ const TransactionForm = () => {
                 <TextInput
                   style={styles.input}
                   placeholder="Dinner, Gaji or Transfer"
+                  placeholderTextColor={"black"}
                   value={formData.title}
                   onChangeText={(text) => handleChange('title', text)}
                   autoFocus

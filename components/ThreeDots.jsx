@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
   Modal,
@@ -22,8 +23,8 @@ const ThreeDotMenu = ({ menuItems = [], dotStyle = {}, dotColor = 'black' }) => 
   return (
     <View style={{ alignItems: 'flex-end' }}>
       {/* Trigger Button (3 Dots) */}
-      <TouchableOpacity onPress={toggleMenu}>
-        <Text style={[styles.dots, { color: dotColor }, dotStyle]}>⋮</Text>
+      <TouchableOpacity onPress={toggleMenu} style={dotStyle} >
+        <MaterialCommunityIcons name={"dots-vertical"} size={22} color={"black"} />
       </TouchableOpacity>
 
       {/* Menu Modal */}
@@ -59,6 +60,8 @@ const MenuItem = ({ label, onPress }) => (
 
 const styles = StyleSheet.create({
   dots: {
+    textAlign: "center",
+    // padding: 10,
     fontSize: 22,
     paddingHorizontal: 8,
   },

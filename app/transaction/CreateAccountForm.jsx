@@ -116,6 +116,7 @@ const TransactionForm = () => {
               style={styles.input}
               placeholder="Tabungan, Bank dll"
               value={formData.name}
+              placeholderTextColor={"black"}
               onChangeText={(text) => handleChange('name', text)}
               autoFocus
             />
@@ -128,6 +129,7 @@ const TransactionForm = () => {
               style={styles.input}
               keyboardType="numeric"
               placeholder="100.000"
+              placeholderTextColor={"black"}
               value={formatCurrency(formData.balance)}
               onChangeText={(text) => handleChange('balance', unformatCurrency(text))}
             />
