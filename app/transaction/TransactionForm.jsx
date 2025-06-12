@@ -20,8 +20,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import ChatInput from '../ChatInput';
 import { useTransactions } from '../TransactionContext';
+import ChatInput from './ChatInput';
 
 
 const TransactionForm = () => {

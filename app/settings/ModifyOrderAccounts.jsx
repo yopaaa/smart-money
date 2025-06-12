@@ -5,18 +5,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-    Alert,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  Alert,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { groupAccounts } from '../(home)/Account';
 import ThreeDotMenu from '../../components/ThreeDots';
-import { groupAccounts } from '../Account';
 import { useTransactions } from '../TransactionContext';
 
 export const SAVED_ACCOUNT_ORDER_NAME = "@modified_account_order"

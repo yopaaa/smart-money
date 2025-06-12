@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Dimensions, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTransactions } from './TransactionContext';
+import { useTransactions } from '../TransactionContext';
 
 
 import { useNavigation } from '@react-navigation/native';
@@ -52,8 +52,7 @@ const SettingsScreen = () => {
     },
     {
       icon: 'help-circle-outline', label: 'Help', function: function () {
-        router.push("settings/Chart");
-
+        router.push("transaction/WebView");
       }
     },
     {
@@ -79,10 +78,6 @@ const SettingsScreen = () => {
         </View>
       </View>
       <View style={styles.longBar} />
-
-      <TouchableOpacity onPress={() => resetTables()}>
-        <Text>Reset Db</Text>
-      </TouchableOpacity>
 
       {/* Grid Menu */}
       <ScrollView contentContainerStyle={styles.grid}>

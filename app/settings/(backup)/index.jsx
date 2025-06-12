@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTransactions } from '../../TransactionContext';
 import ProgressModal from './ProgressModal';
 
 const DB_NAME = 'smart_money';
@@ -17,12 +18,14 @@ const BACKUP_FOLDER_URI_KEY = 'backup_folder_uri';
 
 const BackupRestoreScreen = () => {
     const router = useRouter();
+    const { resetTables } = useTransactions();
 
     const [isBackingUp, setIsBackingUp] = useState(false);
     const [isRestoring, setIsRestoring] = useState(false);
 
     const [visible, setVisible] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [alertText, setalertText] = useState('Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.');
 
     useEffect(() => {
         let timer;
@@ -37,7 +40,7 @@ const BackupRestoreScreen = () => {
     useEffect(() => {
         if (progress === 99) {
             setVisible(false);
-            Alert.alert('Sukses', 'Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.');
+            Alert.alert('Sukses', alertText);
         }
     }, [progress])
 
@@ -177,6 +180,7 @@ const BackupRestoreScreen = () => {
                 await FileSystem.deleteAsync(tempBackupPath);
             }
 
+            setalertText('Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.')
             setProgress(0);
             setVisible(true);
         } catch (error) {
@@ -194,6 +198,14 @@ const BackupRestoreScreen = () => {
                     dotColor="black"
                     menuItems={[
                         { name: 'Restore from .mmbak file', fn: () => router.navigate("settings/(backup)/MMBAK_Restore") },
+                        {
+                            name: 'Reset app data', fn: () => {
+                                resetTables()
+                                setalertText(" Data Aplikasi telah di reset sepenuhnya")
+                                setProgress(0);
+                                setVisible(true);
+                            }
+                        },
                     ]}
                 />
             } />

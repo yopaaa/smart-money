@@ -4,18 +4,18 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
-    FlatList,
-    RefreshControl,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  RefreshControl,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import CustomPicker from '../components/CustomPicker';
-import { useTransactions } from './TransactionContext';
-import timePeriods from './json/timePeriods.json';
+import CustomPicker from '../../components/CustomPicker';
+import { useTransactions } from '../TransactionContext';
+import timePeriods from '../json/timePeriods.json';
 
 export default function HomeScreen() {
     const router = useRouter();

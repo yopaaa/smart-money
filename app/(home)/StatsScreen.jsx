@@ -6,16 +6,16 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-    RefreshControl,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  RefreshControl,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { useTransactions } from './TransactionContext';
-import timePeriods from './json/timePeriods.json';
+import { useTransactions } from '../TransactionContext';
+import timePeriods from '../json/timePeriods.json';
 
 export default function HomeScreen() {
     const router = useRouter();

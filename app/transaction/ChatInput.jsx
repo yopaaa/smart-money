@@ -9,7 +9,7 @@ import {
   TextInput,
   View
 } from 'react-native';
-import { parseTransaction } from '../utils/parser';
+import { parseTransaction } from '../../utils/parser';
 
 export default function HomeScreen() {
   const [transactions, setTransactions] = useState([]);

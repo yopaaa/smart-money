@@ -15,7 +15,7 @@ import {
 
 import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
-import { groupAccounts } from '../Account';
+import { groupAccounts } from '../(home)/Account';
 import { useTransactions } from '../TransactionContext';
 import { SAVED_ACCOUNT_ORDER_NAME } from './ModifyOrderAccounts';
 

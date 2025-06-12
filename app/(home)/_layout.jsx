@@ -5,7 +5,6 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
- 
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -14,9 +13,6 @@ export default function RootLayout() {
       }}
       >
         <Stack.Screen name="index" options={{ animation: "fade" }} />
-        <Stack.Screen name="Account" options={{ animation: "slide_from_right" }} />
-        <Stack.Screen name="Currency" options={{ animation: "slide_from_right" }} />
-        <Stack.Screen name="Balance" options={{ animation: "slide_from_right" }} />
       </Stack>
     </ThemeProvider>
   );

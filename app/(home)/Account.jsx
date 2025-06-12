@@ -1,23 +1,23 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
-    RefreshControl,
-    SafeAreaView,
-    SectionList,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  RefreshControl,
+  SafeAreaView,
+  SectionList,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 import { formatCurrency } from '@/utils/number';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import ThreeDotMenu from '../components/ThreeDots';
-import groupLabels from './json/groupLabels.json';
-import { SAVED_ACCOUNT_ORDER_NAME } from './settings/ModifyOrderAccounts';
-import { useTransactions } from './TransactionContext';
+import ThreeDotMenu from '../../components/ThreeDots';
+import groupLabels from '../json/groupLabels.json';
+import { SAVED_ACCOUNT_ORDER_NAME } from '../settings/ModifyOrderAccounts';
+import { useTransactions } from '../TransactionContext';
 
 export const groupAccounts = async (accounts) => {
     try {
