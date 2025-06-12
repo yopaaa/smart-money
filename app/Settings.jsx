@@ -40,7 +40,7 @@ const SettingsScreen = () => {
     },
     {
       icon: 'cloud-upload-outline', label: 'Backup', function: function () {
-        router.push("settings/Backup");
+        router.push("settings/(backup)");
 
       }
     },

@@ -1,46 +1,6 @@
 import * as SQLite from 'expo-sqlite';
-// import generateId from './generateId';
 const db = SQLite.openDatabaseSync('money_manager.db');
 
-/*
-CREATE TABLE INOUTCOME (
-  AID INTEGER PRIMARY KEY,
-  uid TEXT,
-  assetUid TEXT,
-  CARDDIVIDMONTH VARCHAR,
-  ctgUid TEXT,
-  toAssetUid TEXT,
-  ZCONTENT VARCHAR,
-  ZDATE VARCHAR,
-  WDATE VARCHAR,
-  wtime TEXT,
-  paid TEXT,
-  DO_TYPE VARCHAR,
-  ZMONEY VARCHAR,
-  txUidTrans TEXT,
-  ZDATA VARCHAR,
-  SMS_RDATE VARCHAR,
-  IN_ZMONEY VARCHAR,
-  ASSET_NIC VARCHAR,
-  CATEGORY_NAME VARCHAR,
-  cardDivideUid TEXT,
-  CARD_DIVIDE_MONTH_STR VARCHAR,
-  MARK INTEGER,
-  txUidFee TEXT,
-  SMS_ORIGIN VARCHAR,
-  SMS_PARSE_CONTENT VARCHAR,
-  IS_DEL INTEGER,
-  UTIME INTEGER,
-  currencyUid TEXT,
-  AMOUNT_ACCOUNT REAL,
-  lat TEXT,
-  lng TEXT,
-  gstd TEXT,
-  isSynced integer,
-  syncTime real,
-  syncVersion integer
-)
-*/
 export const getTransactions = () => {
   return db.getAllSync(`SELECT * FROM INOUTCOME ORDER BY AID DESC`);
 };

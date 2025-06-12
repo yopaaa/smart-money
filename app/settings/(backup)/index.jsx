@@ -1,21 +1,45 @@
 import SimpleHeader from '@/components/SimpleHeader';
+import ThreeDotMenu from '@/components/ThreeDots';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { StorageAccessFramework } from 'expo-file-system';
+import { useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import ProgressModal from './ProgressModal';
 
 const DB_NAME = 'smart_money';
 const DB_PATH = `${FileSystem.documentDirectory}SQLite/${DB_NAME}.db`;
-const DB_PATH_MMBAK = `${FileSystem.documentDirectory}SQLite/money_manager.db`;
 const BACKUP_FOLDER_URI_KEY = 'backup_folder_uri';
 
 const BackupRestoreScreen = () => {
+    const router = useRouter();
+
     const [isBackingUp, setIsBackingUp] = useState(false);
     const [isRestoring, setIsRestoring] = useState(false);
+
+    const [visible, setVisible] = useState(false);
+    const [progress, setProgress] = useState(0);
+
+    useEffect(() => {
+        let timer;
+        if (visible && progress < 100) {
+            timer = setInterval(() => {
+                setProgress((prev) => Math.min(prev + 1, 100));
+            }, 50);
+        }
+        return () => clearInterval(timer);
+    }, [visible, progress]);
+
+    useEffect(() => {
+        if (progress === 99) {
+            setVisible(false);
+            Alert.alert('Sukses', 'Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.');
+        }
+    }, [progress])
 
     const handleBackup = async () => {
         setIsBackingUp(true);
@@ -90,7 +114,7 @@ const BackupRestoreScreen = () => {
                     'Backup Berhasil',
                     `File backup telah dibuat dengan nama: ${backupName}\n\nAnda dapat menyimpannya ke Files, iCloud Drive, atau aplikasi lain.`
                 );
-            } 
+            }
         } catch (error) {
             console.error(error);
             Alert.alert('Gagal Backup', `Terjadi kesalahan: ${error.message}`);
@@ -99,7 +123,6 @@ const BackupRestoreScreen = () => {
         }
     };
 
-
     const handleRestore = async () => {
         Alert.alert(
             'Konfirmasi Restore',
@@ -107,17 +130,6 @@ const BackupRestoreScreen = () => {
             [
                 { text: 'Batal', style: 'cancel' },
                 { text: 'Ya, Restore', style: 'destructive', onPress: performRestore }
-            ]
-        );
-    };
-
-    const handleRestoreMMBAK = async () => {
-        Alert.alert(
-            'Konfirmasi Restore',
-            'Restore akan mengganti semua data yang ada. Apakah Anda yakin?',
-            [
-                { text: 'Batal', style: 'cancel' },
-                { text: 'Ya, Restore', style: 'destructive', onPress: performRestoreMMBAK }
             ]
         );
     };
@@ -165,59 +177,8 @@ const BackupRestoreScreen = () => {
                 await FileSystem.deleteAsync(tempBackupPath);
             }
 
-            Alert.alert('Sukses', 'Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.');
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Gagal Restore', `Terjadi kesalahan: ${error.message}`);
-        } finally {
-            setIsRestoring(false);
-        }
-    };
-
-    const performRestoreMMBAK = async () => {
-        setIsRestoring(true);
-        try {
-            const result = await DocumentPicker.getDocumentAsync({
-                copyToCacheDirectory: true,
-                type: '*/*',
-                multiple: false,
-            });
-
-            if (result.canceled) return;
-
-            const pickedFile = result.assets[0];
-            const pickedPath = pickedFile.uri;
-
-            if (!pickedFile.name.endsWith('.mmbak')) {
-                Alert.alert('Error', 'File harus berformat .mmbak');
-                return;
-            }
-
-            const pickedInfo = await FileSystem.getInfoAsync(pickedPath);
-            if (!pickedInfo.exists) {
-                Alert.alert('Error', 'File tidak ditemukan');
-                return;
-            }
-
-            const tempBackupPath = `${FileSystem.documentDirectory}temp_backup_${Date.now()}.db`;
-            const currentDbExists = await FileSystem.getInfoAsync(DB_PATH_MMBAK);
-            if (currentDbExists.exists) {
-                await FileSystem.copyAsync({
-                    from: DB_PATH_MMBAK,
-                    to: tempBackupPath,
-                });
-            }
-
-            await FileSystem.copyAsync({
-                from: pickedPath,
-                to: DB_PATH_MMBAK,
-            });
-
-            if (currentDbExists.exists) {
-                await FileSystem.deleteAsync(tempBackupPath);
-            }
-
-            Alert.alert('Sukses', 'Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.');
+            setProgress(0);
+            setVisible(true);
         } catch (error) {
             console.error(error);
             Alert.alert('Gagal Restore', `Terjadi kesalahan: ${error.message}`);
@@ -228,7 +189,15 @@ const BackupRestoreScreen = () => {
 
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
-            <SimpleHeader title="Backup" />
+            <SimpleHeader title="Backup" rightComponent={
+                <ThreeDotMenu
+                    dotColor="black"
+                    menuItems={[
+                        { name: 'Restore from .mmbak file', fn: () => router.navigate("settings/(backup)/MMBAK_Restore") },
+                    ]}
+                />
+            } />
+            <ProgressModal visible={visible} progress={progress} />
 
             <View style={styles.content}>
                 <View style={styles.section}>
@@ -266,30 +235,6 @@ const BackupRestoreScreen = () => {
                     <TouchableOpacity
                         style={[styles.button, styles.restoreButton]}
                         onPress={handleRestore}
-                        disabled={isRestoring}
-                    >
-                        {isRestoring ? (
-                            <ActivityIndicator color="#fff" size="small" />
-                        ) : (
-                            <Ionicons name="cloud-download-outline" size={20} color="#fff" />
-                        )}
-                        <Text style={styles.buttonText}>
-                            {isRestoring ? 'Melakukan Restore...' : 'Restore Data'}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-                 <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Ionicons name="cloud-download-outline" size={24} color="#FF6B6B" />
-                        <Text style={styles.sectionTitle}>Restore from .mmbak file </Text>
-                    </View>
-                    <Text style={styles.sectionDescription}>
-                        Pulihkan data dari file backup (.mmbak). Ini akan mengganti semua data yang ada.
-                    </Text>
-                    <TouchableOpacity
-                        style={[styles.button, styles.restoreButton]}
-                        onPress={handleRestoreMMBAK}
                         disabled={isRestoring}
                     >
                         {isRestoring ? (
