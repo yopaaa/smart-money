@@ -160,13 +160,13 @@ export default function AccountsScreen() {
             <View style={styles.headercontainer}>
                 <Text style={styles.header}>{TITLE}</Text>
                 <View style={{ marginHorizontal: 20 }}></View>
-                <TouchableOpacity onPress={() => setisHideBalance(!isHideBalance)}>
+                <TouchableOpacity onPress={() => setisHideBalance(!isHideBalance)} style={{ paddingHorizontal: 15 }}>
                     <MaterialCommunityIcons name={isHideBalance ? "eye" : "eye-off"} size={22} color={isHideBalance ? "green" : "brown"} />
                 </TouchableOpacity>
                 <ThreeDotMenu
                     dotColor="black"
                     menuItems={[
-                        { name: 'Add Account', fn: () => router.navigate("transaction/CreateAccountForm") },
+                        { name: 'Add Bucket', fn: () => router.navigate("transaction/CreateAccountForm") },
                         {
                             name: 'Show/Hide', fn: () => {
                                 router.push({

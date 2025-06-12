@@ -2,21 +2,24 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { CurvedBottomBarExpo } from 'react-native-curved-bottom-bar';
-// import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Account from './Account';
 import Home from './Home';
 import Settings from './Settings';
 import StatsScreen from './StatsScreen';
 
-const renderTabBar = ({ routeName, selectedTab, navigate }) => {
-  // const insets = useSafeAreaInsets();
+export default function App() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+
+  const renderTabBar = ({ routeName, selectedTab, navigate }) => {
 
   return (
     <TouchableOpacity
       onPress={() => navigate(routeName)}
 
-      style={[styles.tabbarItem]}
-      // style={[styles.tabbarItem, { marginBottom: insets.bottom / 2 }]}
+      // style={[styles.tabbarItem]}
+      style={[styles.tabbarItem, { marginBottom: insets.bottom / 2 }]}
     >
       <Ionicons
         name={routeName}
@@ -27,8 +30,7 @@ const renderTabBar = ({ routeName, selectedTab, navigate }) => {
     </TouchableOpacity>
   );
 };
-export default function App() {
-  const router = useRouter();
+
   return (
     <CurvedBottomBarExpo.Navigator
       screenOptions={{ headerShown: false }}

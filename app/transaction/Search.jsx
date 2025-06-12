@@ -52,11 +52,17 @@ export default function SearchScreen() {
     };
 
     const filteredTransactions = useMemo(() => {
-        return filterTransactions({
+        const filteredData =  filterTransactions({
             search: searchQuery,
             ...(selectedType && { type: selectedType }),
             ...(selectedCategory && { category: selectedCategory.name })
         });
+
+        if (!searchQuery) {
+            return filteredData.slice(0, 15)
+        }
+
+        return filteredData
     }, [searchQuery, selectedType, selectedCategory, updateTriggers, filterTransactions]);
 
     const groupedTransactions = useMemo(() => {

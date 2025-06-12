@@ -29,6 +29,7 @@ export default function RootLayout() {
           headerTitleAlign: 'center',
         }}
         >
+          {/* <Stack.Screen name="(welcome)" options={{animation: "fade"}}/> */}
           <Stack.Screen name="index" options={{animation: "fade"}}/>
           <Stack.Screen name="transaction/[id]"  />
           <Stack.Screen name="transaction/TransactionForm" />
