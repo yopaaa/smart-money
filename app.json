@@ -2,7 +2,7 @@
   "expo": {
     "name": "Smart Money",
     "slug": "smart-money",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "smartmoney",
@@ -41,7 +41,7 @@
           "image": "./assets/images/splash-icon-light.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#40E0D0"
+          "backgroundColor": "#33c3c2"
         }
       ],
       "expo-sqlite"
