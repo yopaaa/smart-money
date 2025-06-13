@@ -59,7 +59,7 @@ const TransactionForm = () => {
         if (id) {
             const tx = getTransactionById(id); // Use the new function
             // console.log(tx);
-            
+
             const tempX = getCategoriesByType("income")
             const tempY = getCategoriesByType("expense")
             setIncomeCategories(tempX)
@@ -156,7 +156,14 @@ const TransactionForm = () => {
             Alert.alert('Error', e.message);
         }
     }
-    const handleCopy = () => { }
+    const handleCopy = () => {        
+        router.push({
+            pathname: 'transaction/TransactionForm',
+            params: {
+                id: formData.id,
+            }
+        });
+    }
 
     return (
         <KeyboardAvoidingView
@@ -274,10 +281,10 @@ const TransactionForm = () => {
                         onSelect={(val) => handleChange('accountId', val)}
                         options={accounts}
                         selectedComponent={(val) => {
-                            return (<>
+                            return (<View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center", flex: 1 }}>
                                 <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.iconColor} />
-                                <Text>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
-                            </>)
+                                <Text style={{ width: "80%", textAlign: "center" }}>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
+                            </View>)
                         }}
                     />
 
@@ -293,10 +300,10 @@ const TransactionForm = () => {
                                 onSelect={(val) => handleChange('targetAccountId', val)}
                                 options={accounts}
                                 selectedComponent={(val) => {
-                                    return (<>
+                                    return (<View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center", flex: 1 }}>
                                         <MaterialCommunityIcons name={val.icon} size={20} style={{ marginRight: 10 }} color={val.iconColor} />
-                                        <Text>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
-                                    </>)
+                                        <Text style={{ width: "80%", textAlign: "center" }}>{`${val.name} ( ${formatCurrency(val.balance)})`}</Text>
+                                    </View>)
                                 }}
                             />
 
@@ -325,7 +332,7 @@ const TransactionForm = () => {
 
                     {/* Actions Button */}
                     <View style={{ flexDirection: 'row', marginTop: 16 }}>
-                        <ActionButton title="Hapus" backgroundColor="#F44336" onPress={handleDelete}  disabled={!isFormEditable}/>
+                        <ActionButton title="Hapus" backgroundColor="#F44336" onPress={handleDelete} disabled={!isFormEditable} />
                         <ActionButton title="Salin" backgroundColor="#2196F3" onPress={handleCopy} />
                         <ActionButton title="Edit" backgroundColor="#4CAF50" onPress={handleEdit} disabled={!isFormEditable} />
                     </View>

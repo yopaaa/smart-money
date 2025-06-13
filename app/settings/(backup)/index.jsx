@@ -15,10 +15,11 @@ import ProgressModal from './ProgressModal';
 const DB_NAME = 'smart_money';
 const DB_PATH = `${FileSystem.documentDirectory}SQLite/${DB_NAME}.db`;
 const BACKUP_FOLDER_URI_KEY = 'backup_folder_uri';
+const TITLE = "Backup & Restore"
 
 const BackupRestoreScreen = () => {
     const router = useRouter();
-    const { resetTables } = useTransactions();
+    const { resetTables, refetchData } = useTransactions();
 
     const [isBackingUp, setIsBackingUp] = useState(false);
     const [isRestoring, setIsRestoring] = useState(false);
@@ -40,7 +41,15 @@ const BackupRestoreScreen = () => {
     useEffect(() => {
         if (progress === 99) {
             setVisible(false);
-            Alert.alert('Sukses', alertText);
+            Alert.alert('Sukses', alertText, [
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        router.replace("/")
+                        refetchData()
+                    }
+                }
+            ]);
         }
     }, [progress])
 
@@ -193,7 +202,7 @@ const BackupRestoreScreen = () => {
 
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
-            <SimpleHeader title="Backup" rightComponent={
+            <SimpleHeader title={TITLE} rightComponent={
                 <ThreeDotMenu
                     dotColor="black"
                     menuItems={[

@@ -4,14 +4,14 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
-  FlatList,
-  RefreshControl,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    FlatList,
+    RefreshControl,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import CustomPicker from '../../components/CustomPicker';
 import { useTransactions } from '../TransactionContext';
@@ -297,15 +297,15 @@ export default function HomeScreen() {
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Income</Text>
-                            <Text style={[styles.amount, { color: '#2196f3' }]}> {formatCurrency(totalOverview.income) || 0}</Text>
+                            <Text style={[styles.amount, styles.income ]}> {formatCurrency(totalOverview.income) || 0}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Expense</Text>
-                            <Text style={[styles.amount, { color: '#f44336' }]}>-  {formatCurrency(totalOverview.expense) || 0}</Text>
+                            <Text style={[styles.amount, styles.expense]}>{formatCurrency(0 - totalOverview.expense) || 0}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={styles.label}>Total</Text>
-                            <Text style={styles.amount}> {formatCurrency(totalOverview.net) || 0}</Text>
+                            <Text style={[styles.amount, totalOverview.net < 0 ? styles.expense : styles.income]}> {formatCurrency(totalOverview.net) || 0}</Text>
                         </View>
                     </View>
                 }

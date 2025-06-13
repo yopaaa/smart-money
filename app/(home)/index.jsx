@@ -21,22 +21,22 @@ export default function App() {
 
   const renderTabBar = ({ routeName, selectedTab, navigate }) => {
 
-  return (
-    <TouchableOpacity
-      onPress={() => navigate(routeName)}
-
-      // style={[styles.tabbarItem]}
-      style={[styles.tabbarItem, { marginBottom: insets.bottom / 2 }]}
-    >
-      <Ionicons
-        name={routeName}
-        size={28}
-        color={routeName === selectedTab ? '#00BFFF' : 'gray'}
+    return (
+      <TouchableOpacity
         onPress={() => navigate(routeName)}
-      />
-    </TouchableOpacity>
-  );
-};
+
+        // style={[styles.tabbarItem]}
+        style={[styles.tabbarItem, { marginBottom: insets.bottom / 2 }]}
+      >
+        <Ionicons
+          name={routeName}
+          size={28}
+          color={routeName === selectedTab ? '#00BFFF' : 'gray'}
+          onPress={() => navigate(routeName)}
+        />
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <CurvedBottomBarExpo.Navigator
@@ -64,10 +64,10 @@ export default function App() {
       )}
       tabBar={renderTabBar}
     >
-      <CurvedBottomBarExpo.Screen name="home" position="LEFT" component={()=> screens.home} />
-      <CurvedBottomBarExpo.Screen name="analytics" position="LEFT" component={()=> screens.analytics} />
-      <CurvedBottomBarExpo.Screen name="albums" position="RIGHT" component={()=> screens.albums} />
-      <CurvedBottomBarExpo.Screen name="settings" position="RIGHT" component={()=> screens.settings} />
+      <CurvedBottomBarExpo.Screen name="home" position="LEFT" component={() => screens.home} />
+      <CurvedBottomBarExpo.Screen name="analytics" position="LEFT" component={() => screens.analytics} />
+      <CurvedBottomBarExpo.Screen name="albums" position="RIGHT" component={() => screens.albums} />
+      <CurvedBottomBarExpo.Screen name="settings" position="RIGHT" component={() => screens.settings} />
     </CurvedBottomBarExpo.Navigator>
   );
 }

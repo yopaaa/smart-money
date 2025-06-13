@@ -33,15 +33,23 @@ const BackupRestoreScreen = () => {
             timer = setInterval(() => {
                 setProgress((prev) => Math.min(prev + 1, 100));
             }, 50);
-        } 
+        }
         if (progress === 99) {
             setVisible(false);
-            Alert.alert('Sukses', 'Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.');
+            Alert.alert('Sukses', 'Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.', [
+                {
+                    text: 'OK',
+                    onPress: () => {
+                        refetchData()
+                        router.replace("/")
+                    }
+                }
+            ]);
         }
         return () => clearInterval(timer);
     }, [visible, progress]);
 
-  
+
     async function fetchDb() {
         try {
             const newData = getAssets().map(val => ({

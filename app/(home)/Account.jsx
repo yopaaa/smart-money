@@ -106,10 +106,9 @@ export const groupAccounts = async (accounts) => {
         throw e
     }
 };
+const TITLE = "Buckets And Balances"
 
 export default function AccountsScreen() {
-    const TITLE = "Buckets And Balances"
-
     const router = useRouter();
     const { accounts, accountsGrouped, refetchData } = useTransactions();
     const [isRefreshing, setisRefreshing] = useState(false)

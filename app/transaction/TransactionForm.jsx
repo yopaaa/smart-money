@@ -4,7 +4,7 @@ import SlideSelect from '@/components/SlideSelect';
 import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
@@ -26,7 +26,8 @@ import ChatInput from './ChatInput';
 
 const TransactionForm = () => {
   const router = useRouter();
-  const { refetchData, accounts, addTransaction, getCategoriesByType } = useTransactions();
+  const { id: copyDataId } = useLocalSearchParams();
+  const { refetchData, accounts, addTransaction, getCategoriesByType, getTransactionById, getCategoryById } = useTransactions();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
@@ -48,19 +49,44 @@ const TransactionForm = () => {
   });
 
   useEffect(() => {
+    if (copyDataId) {
+      const tx = getTransactionById(copyDataId);
+      if (tx) {
+        let matchedCategory = getCategoryById(tx.category)
+        console.log(matchedCategory);
+
+        setFormData({
+          title: tx.title,
+          description: tx.description || "",
+          amount: tx.amount,
+          type: tx.type,
+          accountId: accounts.find(acc => acc.id === tx.accountId) || accounts[0],
+          targetAccountId: accounts.find(acc => acc.id === tx.targetAccountId) || "",
+          category: matchedCategory,
+          fee: tx.fee
+        });
+      } else {
+        router.back();
+      }
+    }
+  }, [copyDataId, accounts]);
+
+  useEffect(() => {
     const tempX = getCategoriesByType("income")
     const tempY = getCategoriesByType("expense")
     setIncomeCategories(tempX)
     setExpenseCategories(tempY)
 
-    formData.type === "income"
-      ? handleChange('category', tempX[0])
-      : handleChange('category', tempY[0])
+    if (!copyDataId) {
+      formData.type === "income"
+        ? handleChange('category', tempX[0])
+        : handleChange('category', tempY[0])
+    }
 
     setSelectedDate(new Date())
     setSelectedTime(new Date())
 
-    if (accounts.length > 0) {
+    if (accounts.length > 0 && !copyDataId) {
       setFormData(prev => ({
         ...prev,
         accountId: accounts[0],
