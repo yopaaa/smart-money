@@ -1,13 +1,16 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useData } from './NewAccountProvider';
 
 export default function AddAccountScreen() {
+  const { handleChange } = useData()
   const [accountName, setAccountName] = useState('');
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const router = useRouter();
 
   const handleNameChange = (text) => {
+    handleChange("name", text)
     setAccountName(text);
   };
 
@@ -28,8 +31,8 @@ export default function AddAccountScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Add Account</Text>
-          <Text style={styles.subtitle}>Choose a name for your account.</Text>
+          <Text style={styles.title}>Add Bucket</Text>
+          <Text style={styles.subtitle}>Choose a name for your new bucket.</Text>
         </View>
 
         {/* Form */}
@@ -38,7 +41,7 @@ export default function AddAccountScreen() {
           <TextInput
             value={accountName}
             onChangeText={handleNameChange}
-            placeholder="Enter account name"
+            placeholder="wallet, dompet, etc"
             placeholderTextColor="#A0A0A0"
             style={styles.input}
           />
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonEnabled: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#3B82F6',
   },
   buttonDisabled: {
     backgroundColor: '#E5E5E5',

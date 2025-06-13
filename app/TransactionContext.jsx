@@ -31,6 +31,7 @@ export const TransactionProvider = ({ children }) => {
     const [accounts, setAccounts] = useState([]);
     const [accountsGrouped, setAccountsGrouped] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [isNewUser, setIsNewUser] = useState(false);
 
     const refetchData = () => {
         console.log("Refetching...");
@@ -47,8 +48,11 @@ export const TransactionProvider = ({ children }) => {
         // setAccounts(rows);
         setCategories(categoryRow)
         
+       // console.log(rows.length);
+        
+        rows.length == 0 ? setIsNewUser(true) :  setIsNewUser(false)
+
         const latestGrouped = await groupAccounts(rows)
-        // console.log(latestGrouped);
         const accountSorted = []
         latestGrouped.map(val => {
             val.data.map(val => accountSorted.push(val))
@@ -67,6 +71,7 @@ export const TransactionProvider = ({ children }) => {
         <TransactionContext.Provider value={{
             accounts,
             accountsGrouped,
+            isNewUser,
             initDB,
             refetchData,
             resetTables,

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -16,30 +16,71 @@ const slides = [
     illustration: 'analytics',
   },
   {
-    title: 'Secure Payments',
-    description: 'Safe and encrypted transactions',
+    title: 'Your Data is Safe',
+    description: 'You store your own data localy. You can backup and restore anytime.',
     illustration: 'security',
   },
 ];
+
+import { Image } from 'react-native';
+
+const renderIllustration = (type) => {
+  let source;
+
+  switch (type) {
+    case 'financial':
+      source = require('@/assets/illustrations/financial.jpg');
+      break;
+    case 'analytics':
+      source = require('@/assets/illustrations/Analytics.jpg');
+
+      break;
+    case 'security':
+      source = require('@/assets/illustrations/security.jpg');
+
+      break;
+    default:
+      return null;
+  }
+
+  return (
+    <View style={styles.illustrationBox}>
+      <Image
+        source={source}
+        style={{ width: 340, height: 340, resizeMode: 'contain', borderRadius: 20 }}
+      />
+    </View>
+  );
+};
+
 
 export default function FinancialOnboardingScreen() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const scrollRef = useRef(null);
   const router = useRouter();
 
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      nextSlide(); // advance to next slide
+    }, 5000); // setiap 3 detik
+
+    return () => clearInterval(intervalRef.current); // clear saat unmount
+  }, [currentSlide]);
+
+  const handleScrollBegin = () => {
+    clearInterval(intervalRef.current);
+  };
+
   const goToSlide = (index) => {
-    scrollRef.current.scrollTo({ x: index * width, animated: true });
+    scrollRef.current.scrollTo({ x: index * (width - 40), animated: true });
     setCurrentSlide(index);
   };
 
   const nextSlide = () => {
-    const nextIndex = (currentSlide + 1) % slides.length;
+    const nextIndex = currentSlide === slides.length - 1 ? 0 : currentSlide + 1;
     goToSlide(nextIndex);
-  };
-
-  const prevSlide = () => {
-    const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
-    goToSlide(prevIndex);
   };
 
   const handleScroll = (event) => {
@@ -47,28 +88,16 @@ export default function FinancialOnboardingScreen() {
     setCurrentSlide(index);
   };
 
-  const renderIllustration = (type) => {
-    switch (type) {
-      case 'financial':
-        return <View style={styles.illustrationBox}><Text>📊 Financial Chart</Text></View>;
-      case 'analytics':
-        return <View style={styles.illustrationBox}><Text>📈 Analytics</Text></View>;
-      case 'security':
-        return <View style={styles.illustrationBox}><Text>🔐 Security Lock</Text></View>;
-      default:
-        return null;
-    }
-  };
-
   return (
     <View style={styles.container}>
+      <View style={{justifyContent: "center", alignItems: "center"}}>
+
+      <Text style={{fontSize: 30, fontWeight: "800"}}>Herzlich willkommen</Text>
+      </View>
       {/* Swiper area */}
       <View style={styles.sliderContainer}>
-        <TouchableOpacity style={styles.arrowButton} onPress={prevSlide}>
-          <Text style={styles.arrowText}>←</Text>
-        </TouchableOpacity>
-
         <ScrollView
+          onScrollBeginDrag={handleScrollBegin} // tambahkan ini
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
@@ -82,10 +111,6 @@ export default function FinancialOnboardingScreen() {
             </View>
           ))}
         </ScrollView>
-
-        <TouchableOpacity style={[styles.arrowButton, { right: 0 }]} onPress={nextSlide}>
-          <Text style={styles.arrowText}>→</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Title and description */}
@@ -115,7 +140,9 @@ export default function FinancialOnboardingScreen() {
         }}>
           <Text style={styles.getStartedText}>GET STARTED</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => {
+          router.push("settings/(backup)")
+        }}>
           <Text style={styles.restoreText}>RESTORE DATA</Text>
         </TouchableOpacity>
       </View>
@@ -134,12 +161,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 30,
+    // backgroundColor: "red",
+    height: 400
   },
   slide: {
-    width: width - 80,
+    width: width - 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10,
+    // marginHorizontal: 10,
   },
   arrowButton: {
     position: 'absolute',
@@ -158,8 +187,9 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   illustrationBox: {
-    width: 200,
-    height: 200,
+    // margin: 50,
+    width: 350,
+    height: 350,
     borderWidth: 2,
     borderColor: '#ccc',
     borderRadius: 20,
@@ -171,6 +201,9 @@ const styles = StyleSheet.create({
   textContainer: {
     alignItems: 'center',
     marginBottom: 30,
+    // backgroundColor: "blue",
+    height: 100,
+    justifyContent: "center"
   },
   title: {
     fontSize: 24,

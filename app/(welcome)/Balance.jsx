@@ -1,21 +1,42 @@
+import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useTransactions } from '../TransactionContext';
+import { useData } from './NewAccountProvider';
 
 export default function AddAccountScreen() {
-  const [accountName, setAccountName] = useState('');
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const { addAccount } = useTransactions();
+  const { formData, handleChange } = useData()
+  const [balance, setAccountName] = useState('');
   const router = useRouter();
 
   const handleNameChange = (text) => {
-    setAccountName(text);
+    handleChange("balance", unformatCurrency(text, formData.currency))
+    setAccountName(unformatCurrency(text, formData.currency));
   };
 
   const handleNext = () => {
-    if (accountName.trim()) {
-      console.log('Account name:', accountName);
-      // Lanjutkan ke langkah berikutnya
-      router.push("/index")
+    handleSubmit()
+    router.push("/Success")
+  };
+
+  const handleSubmit = () => {
+    const accountData = {
+      name: formData.name.trim(),
+      balance: formData.balance,
+      type: "cash",
+      isLiability: 0,
+      hidden: 0,
+      icon: "cash",
+      iconColor: "#81c784",
+      description: "Initial Bucket"
+    }
+
+    try {
+      addAccount(accountData)
+    } catch (e) {
+      Alert.alert('Error', e.message);
     }
   };
 
@@ -28,18 +49,18 @@ export default function AddAccountScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Add Account</Text>
-          <Text style={styles.subtitle}>Choose a name for your account.</Text>
+          <Text style={styles.title}>Add Initial Balance</Text>
+          <Text style={styles.subtitle}>Choose a initial balance for new bucket.</Text>
         </View>
 
         {/* Form */}
         <View style={styles.form}>
-          <Text style={styles.label}>Name</Text>
+          <Text style={styles.label}>Balance</Text>
           <TextInput
-            value={accountName}
+            value={formatCurrency(balance, formData.currency)}
             inputMode='numeric'
             onChangeText={handleNameChange}
-            placeholder="Enter account name"
+            placeholder="100.000"
             placeholderTextColor="#A0A0A0"
             style={styles.input}
           />
@@ -47,10 +68,10 @@ export default function AddAccountScreen() {
           {/* Next Button */}
           <TouchableOpacity
             onPress={handleNext}
-            disabled={!accountName.trim()}
+            disabled={!balance}
             style={[
               styles.button,
-              accountName.trim() ? styles.buttonEnabled : styles.buttonDisabled,
+              balance ? styles.buttonEnabled : styles.buttonDisabled,
             ]}
           >
             <Text style={styles.buttonText}>NEXT</Text>
@@ -58,7 +79,7 @@ export default function AddAccountScreen() {
         </View>
       </ScrollView>
 
-      
+
     </View>
   );
 }
@@ -113,7 +134,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonEnabled: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#3B82F6',
   },
   buttonDisabled: {
     backgroundColor: '#E5E5E5',

@@ -1,10 +1,16 @@
 const formatNumber = (value, format = 'id-ID') => {
-    if (!value) return '';
-    const number = parseInt(`${value}`.replace(/[^0-9]/g, ''));
-    return isNaN(number) ? '' : number.toLocaleString(format);
+  if (!value) return '';
+  const number = parseInt(`${value}`.replace(/[^0-9]/g, ''));
+  return isNaN(number) ? '' : number.toLocaleString(format);
 };
 
-const unformatCurrency = (formatted, locale = 'id-ID', currency = 'IDR') => {
+const unformatCurrency = (formatted,
+  {
+    locale = 'id-ID',
+    currency = 'IDR',
+    minimumFractionDigits = 0,
+    maximumFractionDigits = 0,
+  } = {}) => {
   if (typeof formatted !== 'string') return 0;
 
   const example = new Intl.NumberFormat(locale, {
@@ -22,7 +28,7 @@ const unformatCurrency = (formatted, locale = 'id-ID', currency = 'IDR') => {
   const cleaned = formatted
     .replace(currencySymbol, '')
     .replace(/\s/g, '')
-    .replace(new RegExp(`\\${groupSeparator}`, 'g'), '') 
+    .replace(new RegExp(`\\${groupSeparator}`, 'g'), '')
     .replace(decimalSeparator, '.');
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? 0 : parsed;
@@ -31,26 +37,26 @@ const unformatCurrency = (formatted, locale = 'id-ID', currency = 'IDR') => {
 
 
 const formatCurrency = (
-    amount,
-    {
-        locale = 'id-ID',
-        currency = 'IDR',
-        minimumFractionDigits = 0,
-        maximumFractionDigits = 0,
-    } = {}
+  amount,
+  {
+    locale = 'id-ID',
+    currency = 'IDR',
+    minimumFractionDigits = 0,
+    maximumFractionDigits = 0,
+  } = {}
 ) => {
-    if (typeof amount !== 'number') {
-        amount = Number(amount);
-    }
+  if (typeof amount !== 'number') {
+    amount = Number(amount);
+  }
 
-    if (isNaN(amount)) return '';
+  if (isNaN(amount)) return '';
 
-    return new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency,
-        minimumFractionDigits,
-        maximumFractionDigits,
-    }).format(amount);
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits,
+    maximumFractionDigits,
+  }).format(amount);
 };
 
 
