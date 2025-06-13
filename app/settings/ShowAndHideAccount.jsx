@@ -14,7 +14,7 @@ import {
 
 import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTransactions } from '../TransactionContext';
 import { SAVED_ACCOUNT_ORDER_NAME } from './ModifyOrderAccounts';
 
@@ -22,6 +22,10 @@ const DeleteAccountScreen = () => {
     const router = useRouter();
     const { editAccount, accountsGrouped, refetchData } = useTransactions();
     const [data, setData] = useState(accountsGrouped);
+
+    useEffect(() => {
+        setData(accountsGrouped);
+    }, [accountsGrouped]);
 
     const handleHide = async (accountId, groupTitle, isHidden) => {
         try {
@@ -90,6 +94,9 @@ const DeleteAccountScreen = () => {
             <SimpleHeader title="Show And Hide Settings" style={{ paddingHorizontal: 15 }} />
 
             <FlatList
+                initialNumToRender={1}
+                windowSize={10}
+                removeClippedSubviews={true}
                 data={data}
                 keyExtractor={(item) => item.title}
                 renderItem={({ item }) => {

@@ -205,6 +205,9 @@ export default function AccountsScreen() {
             <View>
                 <SectionList
                     refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+                    initialNumToRender={3}
+                    windowSize={10}
+                    removeClippedSubviews={true}
                     scrollEnabled
                     sections={accountsGrouped}
                     keyExtractor={(item) => item.id}

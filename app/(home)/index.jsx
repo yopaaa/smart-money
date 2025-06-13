@@ -8,6 +8,13 @@ import Home from './Home';
 import Settings from './Settings';
 import StatsScreen from './StatsScreen';
 
+const screens = {
+  home: <Home />,
+  analytics: <StatsScreen />,
+  albums: <Account />,
+  settings: <Settings />,
+};
+
 export default function App() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -57,10 +64,10 @@ export default function App() {
       )}
       tabBar={renderTabBar}
     >
-      <CurvedBottomBarExpo.Screen name="home" position="LEFT" component={Home} />
-      <CurvedBottomBarExpo.Screen name="analytics" position="LEFT" component={StatsScreen} />
-      <CurvedBottomBarExpo.Screen name="albums" position="RIGHT" component={Account} />
-      <CurvedBottomBarExpo.Screen name="settings" position="RIGHT" component={Settings} />
+      <CurvedBottomBarExpo.Screen name="home" position="LEFT" component={()=> screens.home} />
+      <CurvedBottomBarExpo.Screen name="analytics" position="LEFT" component={()=> screens.analytics} />
+      <CurvedBottomBarExpo.Screen name="albums" position="RIGHT" component={()=> screens.albums} />
+      <CurvedBottomBarExpo.Screen name="settings" position="RIGHT" component={()=> screens.settings} />
     </CurvedBottomBarExpo.Navigator>
   );
 }

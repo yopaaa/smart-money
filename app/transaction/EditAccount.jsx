@@ -31,8 +31,6 @@ const EditAccountForm = () => {
   const [selectedIcon, setSelectedIcon] = useState(iconOptions[0]);
   const [selectedIconColor, setSelectedIconColor] = useState(colorOptions[0]);
   const [isVisible, setIsVisible] = useState(true);
-  const [isLiability, setIsLiability] = useState(false);
-
   const [formData, setFormData] = useState({
     name: '',
     balance: 0,
@@ -56,9 +54,7 @@ const EditAccountForm = () => {
       });
       setSelectedIcon(selectedIcon);
       setSelectedIconColor(selectedColor);
-      account.hidden == 0 ? setIsVisible(true) : setIsVisible(false)
-      setIsLiability(account.isLiability == 0 ? false : true)
-      
+      account.hidden == 0 ? setIsVisible(true) : setIsVisible(false)      
     }
   }, [id]);
 
@@ -176,17 +172,7 @@ const EditAccountForm = () => {
             />
           </View>
 
-          <View style={{ ...styles.inputContainer, paddingVertical: 15 }}>
-            <Text style={{ ...styles.label, width: '80%', marginTop: 0 }}>Is Liability</Text>
-            <SwitchToggle
-              value={isVisible}
-              onValueChange={setIsVisible}
-              activeColor="#34C759"
-              inactiveColor="#E5E5EA"
-              thumbColor="white"
-              size="medium"
-            />
-          </View>
+          
 
           <Text style={{ ...styles.label, padding: 10 }}>Deskripsi</Text>
           <TextInput

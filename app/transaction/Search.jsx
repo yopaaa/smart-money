@@ -52,7 +52,7 @@ export default function SearchScreen() {
     };
 
     const filteredTransactions = useMemo(() => {
-        const filteredData =  filterTransactions({
+        const filteredData = filterTransactions({
             search: searchQuery,
             ...(selectedType && { type: selectedType }),
             ...(selectedCategory && { category: selectedCategory.name })
@@ -205,6 +205,9 @@ export default function SearchScreen() {
             </View>
 
             <FlatList
+                initialNumToRender={3}
+                windowSize={10}
+                removeClippedSubviews={true}
                 data={groupedTransactions}
                 keyExtractor={(item) => item.date}
                 renderItem={renderGroup}

@@ -6,13 +6,13 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  RefreshControl,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    RefreshControl,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { useTransactions } from '../TransactionContext';
 import timePeriods from '../json/timePeriods.json';
@@ -53,13 +53,10 @@ export default function HomeScreen() {
     );
 
     function convertTransactionsByType(transactions, type = 'expense') {
-        // Filter hanya transaksi dengan tipe sesuai (income atau expense)
         const filtered = transactions.filter(t => t.type === type);
 
-        // Hitung total nominal untuk semua kategori
         const total = filtered.reduce((sum, t) => sum + t.amount, 0);
 
-        // Kelompokkan berdasarkan kategori 
         const grouped = {};
         filtered.forEach(t => {
             const key = t.category || 'Other';
@@ -69,7 +66,6 @@ export default function HomeScreen() {
             grouped[key] += t.amount;
         });
 
-        // Konversi ke array dengan persentase 
         const result = Object.entries(grouped).map(([category, amount]) => {
             const percent = total > 0 ? Math.round((amount / total) * 100) : 0;
             const icon = getCategoryById(category) || {
