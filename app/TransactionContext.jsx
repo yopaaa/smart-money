@@ -23,11 +23,13 @@ import {
     getTransactionById,
     getTransactions,
 } from '../utils/fn/transaction';
+import { groupAccounts } from './(home)/Account';
 const TransactionContext = createContext();
 initDB()
 
 export const TransactionProvider = ({ children }) => {
     const [accounts, setAccounts] = useState([]);
+    const [accountsGrouped, setAccountsGrouped] = useState([]);
     const [categories, setCategories] = useState([]);
 
     const refetchData = () => {
@@ -36,14 +38,23 @@ export const TransactionProvider = ({ children }) => {
         loadAccounts()
     };
 
-    const loadAccounts = () => {
+    const loadAccounts = async () => {
         initDB()
 
         const rows = getAccounts();
         const categoryRow = getAllCategories();
         // console.log(rows);
-        setAccounts(rows);
+        // setAccounts(rows);
         setCategories(categoryRow)
+        
+        const latestGrouped = await groupAccounts(rows)
+        // console.log(latestGrouped);
+        const accountSorted = []
+        latestGrouped.map(val => {
+            val.data.map(val => accountSorted.push(val))
+        })
+        setAccounts(accountSorted)
+        setAccountsGrouped(latestGrouped)
     };
 
     useEffect(() => {
@@ -55,6 +66,7 @@ export const TransactionProvider = ({ children }) => {
     return (
         <TransactionContext.Provider value={{
             accounts,
+            accountsGrouped,
             initDB,
             refetchData,
             resetTables,

@@ -3,19 +3,18 @@ import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
-  Alert,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    Alert,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { groupAccounts } from '../(home)/Account';
 import ThreeDotMenu from '../../components/ThreeDots';
 import { useTransactions } from '../TransactionContext';
 
@@ -50,18 +49,8 @@ export default function ModifyOrderScreen() {
     const router = useRouter();
     const [showList, setShowList] = useState(null);
     const [isModified, setIsModified] = useState(false);
-    const { accounts } = useTransactions();
-    const [isRefreshing, setisRefreshing] = useState(false)
-    const [data, setData] = useState([]);
-
-    useEffect(() => {
-        const loadData = async () => {
-            const latestGrouped = await groupAccounts(accounts)
-            setData(latestGrouped)
-        };
-        loadData();
-    }, [isRefreshing]);
-
+    const { accountsGrouped, refetchData } = useTransactions();
+    const [data, setData] = useState(accountsGrouped);
 
     const replaceAccountData = (groupTitle, newData) => {
         setData(prevGroups =>
@@ -81,6 +70,7 @@ export default function ModifyOrderScreen() {
                         const jsonValue = JSON.stringify(data);
                         await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, jsonValue);
                         console.log('Saving new accounts order to AsyncStorage');
+                        refetchData()
                         router.back();
                     } catch (e) {
                         console.error('Failed to save order:', e);
@@ -142,16 +132,8 @@ export default function ModifyOrderScreen() {
                         menuItems={[
                             {
                                 name: 'Reset Ordered', fn: async () => {
-                                    try {
-                                        const jsonValue = groupAccounts(accounts);
-                                        await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(jsonValue));
-                                        console.log('Saving new accounts order to AsyncStorage');
-                                    } catch (e) {
-                                        console.error('Failed to save order:', e);
-                                        Alert.alert('Error', 'Failed to save the new order.');
-                                    } finally {
-                                        setisRefreshing(Date.now())
-                                    }
+                                    setData(accountsGrouped)
+                                    console.log('Saving new accounts order to AsyncStorage');
                                 }
                             }
                         ]}

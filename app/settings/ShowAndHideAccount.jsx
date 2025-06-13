@@ -1,7 +1,6 @@
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -15,27 +14,18 @@ import {
 
 import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
-import { groupAccounts } from '../(home)/Account';
+import { useState } from 'react';
 import { useTransactions } from '../TransactionContext';
 import { SAVED_ACCOUNT_ORDER_NAME } from './ModifyOrderAccounts';
 
 const DeleteAccountScreen = () => {
     const router = useRouter();
-    const { editAccount, accounts } = useTransactions();
-    const [data, setData] = useState([]);
-
-    useEffect(() => {
-        const loadData = async () => {
-            const latestGrouped = await groupAccounts(accounts)
-            setData(latestGrouped)
-        };
-        loadData();
-    }, []);
+    const { editAccount, accountsGrouped, refetchData } = useTransactions();
+    const [data, setData] = useState(accountsGrouped);
 
     const handleHide = async (accountId, groupTitle, isHidden) => {
         try {
-            // Update hidden di database
-            await editAccount(accountId, { hidden: isHidden == 0 ? true : false });
+
 
             // Update hidden di state dan AsyncStorage
             const updatedGroups = data.map(group => {
@@ -51,7 +41,10 @@ const DeleteAccountScreen = () => {
             });
 
             setData(updatedGroups);
+            // Update hidden di database
+            await editAccount(accountId, { hidden: isHidden == 0 ? true : false });
             await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(updatedGroups));
+            refetchData()
 
             console.log(`Account ${accountId} marked as hidden.`);
         } catch (e) {
@@ -70,8 +63,10 @@ const DeleteAccountScreen = () => {
                     <MaterialCommunityIcons name={account.icon || 'wallet'} size={20} color={account.iconColor || '#333'} />
                     <Text style={styles.accountText}>{account.name}</Text>
                 </View>
-                <View style={{ flexDirection: "row", gap: 20 }}>
-                    <TouchableOpacity onPress={() => handleHide(account.id, groupTitle, account.hidden)}>
+                <View style={{ flexDirection: "row", gap: 0 }}>
+                    <TouchableOpacity
+                        onPress={() => handleHide(account.id, groupTitle, account.hidden)}
+                        style={{ paddingHorizontal: 15 }}>
                         <MaterialCommunityIcons name={account.hidden ? "eye-off" : "eye"} size={22} color={account.hidden ? "brown" : "green"} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {
@@ -97,7 +92,6 @@ const DeleteAccountScreen = () => {
             <FlatList
                 data={data}
                 keyExtractor={(item) => item.title}
-
                 renderItem={({ item }) => {
                     const { title, balance, icon, color } = item;
 

@@ -142,7 +142,7 @@ export const deleteAccount = (id) => {
         // Hapus semua transaksi terkait akun ini
         // db.runSync('DELETE FROM transactions WHERE accountId = ? OR targetAccountId = ?', [id, id]);
 
-        db.runSync('DELETE FROM account_balance_history WHERE accountId = ?', [id]);
+        // db.runSync('DELETE FROM account_balance_history WHERE accountId = ?', [id]);
 
         // Hapus akun
         db.runSync('DELETE FROM accounts WHERE id = ?', [id]);

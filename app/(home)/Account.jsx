@@ -1,19 +1,19 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
-  RefreshControl,
-  SafeAreaView,
-  SectionList,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    RefreshControl,
+    SafeAreaView,
+    SectionList,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 import { formatCurrency } from '@/utils/number';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ThreeDotMenu from '../../components/ThreeDots';
 import groupLabels from '../json/groupLabels.json';
 import { SAVED_ACCOUNT_ORDER_NAME } from '../settings/ModifyOrderAccounts';
@@ -111,21 +111,9 @@ export default function AccountsScreen() {
     const TITLE = "Buckets And Balances"
 
     const router = useRouter();
-    const { accounts, refetchData } = useTransactions();
+    const { accounts, accountsGrouped, refetchData } = useTransactions();
     const [isRefreshing, setisRefreshing] = useState(false)
     const [isHideBalance, setisHideBalance] = useState(true)
-    const [grouped, setgrouped] = useState([])
-
-    useEffect(() => {
-        const loadData = async () => {
-            const latestGrouped = await groupAccounts(accounts)
-            setgrouped(latestGrouped)
-        };
-
-        loadData();
-
-    }, [isRefreshing]);
-
 
     const handleRefresh = () => {
         refetchData()
@@ -190,7 +178,7 @@ export default function AccountsScreen() {
             <View style={styles.summary}>
                 <View style={styles.summaryBox}>
                     <Text style={styles.summaryLabel}>Assets</Text>
-                    <Text style={[styles.summaryValue, assets > 0 ? styles.assetBalance : styles.liabilityBalance]}>
+                    <Text style={[styles.summaryValue, assets >= 0 ? styles.assetBalance : styles.liabilityBalance]}>
                         {isHideBalance ? formatCurrency(assets) || 0 : "*****"}
 
                     </Text>
@@ -218,7 +206,7 @@ export default function AccountsScreen() {
                 <SectionList
                     refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
                     scrollEnabled
-                    sections={grouped}
+                    sections={accountsGrouped}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{ paddingBottom: 100 }}
                     showsVerticalScrollIndicator={false}

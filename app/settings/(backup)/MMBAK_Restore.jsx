@@ -22,8 +22,6 @@ const DB_PATH_MMBAK = `${FileSystem.documentDirectory}SQLite/money_manager.db`;
 
 const BackupRestoreScreen = () => {
     const { addAccount, resetTables, addTransaction } = useTransactions();
-    const [oldAccounts, setoldAccounts] = useState([])
-    const [oldTransactions, setOldTransactions] = useState([])
     const [isRestoringMMBAK, setIsRestoringMMBAK] = useState(false);
 
     const [visible, setVisible] = useState(false);
@@ -35,21 +33,18 @@ const BackupRestoreScreen = () => {
             timer = setInterval(() => {
                 setProgress((prev) => Math.min(prev + 1, 100));
             }, 50);
-        }
-        return () => clearInterval(timer);
-    }, [visible, progress]);
-
-    useEffect(() => {
+        } 
         if (progress === 99) {
             setVisible(false);
             Alert.alert('Sukses', 'Database berhasil direstore!\n\nSilakan restart aplikasi untuk memastikan semua data terupdate.');
         }
-    }, [progress]);
+        return () => clearInterval(timer);
+    }, [visible, progress]);
 
-
-    useEffect(() => {
-        const newData = getAssets().map(val => {
-            return ({
+  
+    async function fetchDb() {
+        try {
+            const newData = getAssets().map(val => ({
                 "balance": 0,
                 "description": "",
                 "hidden": 0,
@@ -59,34 +54,51 @@ const BackupRestoreScreen = () => {
                 "isLiability": assetGroups[val.groupUid].isLiability ? 1 : 0,
                 "name": val.NIC_NAME,
                 "type": assetGroups[val.groupUid].key
+            }));
+
+            const transactions = convertTransferFormat(convertTransactions(getTransactions(), newData));
+
+            // Return data yang akan digunakan
+            return {
+                accounts: newData,
+                transactions: transactions
+            };
+        } catch (error) {
+            console.error("Error in fetchDb:", error);
+            throw error; // Reject promise secara otomatis
+        }
+    }
+
+    async function transaksi() {
+        try {
+            setProgress(0);
+            setVisible(true);
+
+            const { accounts, transactions } = await fetchDb();
+            resetTables();
+
+            accounts.map(val => {
+                addAccount(val)
             })
-        })
-        const transactions = convertTransferFormat(convertTransactions(getTransactions(), newData))
-        setOldTransactions(transactions)
-        setoldAccounts(newData)
-    }, [])
 
-    function transaksi() {
-        resetTables()
-        oldAccounts.map(val => {
-            addAccount(val)
-        })
-
-        oldTransactions.map(val => {
-            addTransaction(
-                {
-                    title: val.title,
-                    description: val.description,
-                    amount: Number(val.amount),
-                    type: val.type,
-                    accountId: val.accountId,
-                    targetAccountId: val.targetAccountId,
-                    createdAt: Number(val.createdAt),
-                    category: val.category,
-                    fee: Number(val.fee)
-                }
-            )
-        })
+            transactions.map(val => {
+                addTransaction(
+                    {
+                        title: val.title,
+                        description: val.description,
+                        amount: Number(val.amount),
+                        type: val.type,
+                        accountId: val.accountId,
+                        targetAccountId: val.targetAccountId,
+                        createdAt: Number(val.createdAt),
+                        category: val.category,
+                        fee: Number(val.fee)
+                    }
+                )
+            })
+        } catch (error) {
+            console.error("Error in transaksi:", error);
+        }
     }
 
     const handleRestoreMMBAK = async () => {
@@ -102,6 +114,7 @@ const BackupRestoreScreen = () => {
 
     const performRestoreMMBAK = async () => {
         setIsRestoringMMBAK(true);
+
         try {
             const result = await DocumentPicker.getDocumentAsync({
                 copyToCacheDirectory: true,
@@ -143,9 +156,8 @@ const BackupRestoreScreen = () => {
                 await FileSystem.deleteAsync(tempBackupPath);
             }
 
-            setProgress(0);
-            setVisible(true);
-            transaksi()
+
+            await transaksi()
         } catch (error) {
             console.error(error);
             Alert.alert('Gagal Restore', `Terjadi kesalahan: ${error.message}`);

@@ -1,7 +1,7 @@
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -15,22 +15,13 @@ import {
 
 import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
-import { groupAccounts } from '../(home)/Account';
 import { useTransactions } from '../TransactionContext';
 import { SAVED_ACCOUNT_ORDER_NAME } from './ModifyOrderAccounts';
 
 const DeleteAccountScreen = () => {
     const router = useRouter();
-    const { deleteAccount,accounts } = useTransactions();
-    const [data, setData] = useState([]);
-
-    useEffect(() => {
-        const loadData = async () => {
-            const latestGrouped = await groupAccounts(accounts)
-            setData(latestGrouped)
-        };
-        loadData();
-    }, []);
+    const { deleteAccount, accounts, accountsGrouped, refetchData } = useTransactions();
+    const [data, setData] = useState(accountsGrouped);
 
     const handleDelete = (accountId, groupTitle) => {
         Alert.alert('Delete Account', 'Are you sure you want to delete this account?', [
@@ -53,6 +44,7 @@ const DeleteAccountScreen = () => {
                     }).filter(group => group.data.length > 0); // hilangkan grup kosong
 
                     setData(updatedGroups);
+                    refetchData()
                     await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(updatedGroups));
                 }
             }
