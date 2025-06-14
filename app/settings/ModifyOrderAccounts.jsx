@@ -66,7 +66,6 @@ export default function ModifyOrderScreen() {
                 onPress: async () => {
                     try {
                         await saveSetting("@modified_account_order", data)
-                        console.log('Saving new accounts order to AsyncStorage');
                         refetchData()
                         router.back();
                     } catch (e) {
@@ -130,7 +129,6 @@ export default function ModifyOrderScreen() {
                             {
                                 name: 'Reset Ordered', fn: async () => {
                                     setData(accountsGrouped)
-                                    console.log('Saving new accounts order to AsyncStorage');
                                 }
                             }
                         ]}
