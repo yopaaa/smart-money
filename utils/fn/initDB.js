@@ -7,6 +7,7 @@ import { addCategory } from './category';
 export const ACCOUNT_TABLE_NAME = "accounts";
 export const TRANSACTION_TABLE_NAME = "transactions";
 export const CATEGORIES_TABLE_NAME = "categories";
+export const SETTINGS_TABLE_NAME = "settings";
 
 export const initDB = () => {
 
@@ -49,39 +50,20 @@ export const initDB = () => {
         type TEXT NOT NULL
     );`);
 
+    db.execSync(`
+    CREATE TABLE IF NOT EXISTS ${SETTINGS_TABLE_NAME} (
+        id TEXT PRIMARY KEY NOT NULL,
+        key TEXT UNIQUE NOT NULL,
+        value TEXT
+    );`);
+
     const existing = db.getAllSync(`SELECT COUNT(*) as total FROM ${CATEGORIES_TABLE_NAME}`);
     if (existing[0]?.total === 0) {
+        console.log('⏳ Menambahkan category default...');
         defaultCategories.map(val => {
-            console.log('⏳ Menambahkan category default...');
             addCategory(val)
         })
     }
-    // const existing = db.getAllSync('SELECT COUNT(*) as total FROM accounts');
-    // if (existing[0]?.total === 0) {
-    //     console.log('⏳ Menambahkan akun default...');
-    //     addAccount({
-    //         id: 'acc-1',
-    //         name: "Dompet",
-    //         balance: 100000,
-    //         type: "cash",
-    //         isLiability: 0,
-    //         hidden: 0,
-    //         icon: "wallet",
-    //         iconColor: "#4caf50",
-    //         description: ""
-    //     })
-    //     addAccount({
-    //         id: 'acc-2',
-    //         name: 'Rekening Bank',
-    //         balance: 500000,
-    //         type: "debit",
-    //         isLiability: 0,
-    //         hidden: 0,
-    //         icon: "bank",
-    //         iconColor: "#2196f3",
-    //         description: ""
-    //     })
-    // }
 };
 
 
@@ -93,6 +75,7 @@ export function resetTables() {
         db.execSync(`DROP TABLE IF EXISTS ${ACCOUNT_TABLE_NAME}`);
         db.execSync(`DROP TABLE IF EXISTS ${TRANSACTION_TABLE_NAME}`);
         db.execSync(`DROP TABLE IF EXISTS ${CATEGORIES_TABLE_NAME}`);
+        db.execSync(`DROP TABLE IF EXISTS ${SETTINGS_TABLE_NAME}`);
         // (Tambahkan CREATE TABLE lainnya jika ada, misalnya transactions atau categories)
 
         db.execSync('COMMIT');
