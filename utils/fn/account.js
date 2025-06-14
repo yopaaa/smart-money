@@ -2,14 +2,13 @@ import { db } from '../db';
 import generateId from '../generateId';
 import { addTransaction } from './transaction';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import groupLabels from '../../app/json/groupLabels.json';
-import { SAVED_ACCOUNT_ORDER_NAME } from '../../app/settings/ModifyOrderAccounts';
+import { getSetting, saveSetting } from './settings';
 // Map dari type ke metadata grup
 
 const addAccountToSavedOrder = async (newAccount) => {
     try {
-        const saved = await AsyncStorage.getItem(SAVED_ACCOUNT_ORDER_NAME);
+        const saved = getSetting("@modified_account_order");
         let savedOrder = saved ? JSON.parse(saved) : [];
 
         const type = newAccount.type || 'other';
@@ -32,8 +31,7 @@ const addAccountToSavedOrder = async (newAccount) => {
             savedOrder.push(newGroup);
         }
 
-
-        await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(savedOrder));
+        saveSetting("@modified_account_order", savedOrder)
         console.log('✅ Akun ditambahkan ke saved order');
     } catch (e) {
         console.error('❌ Gagal menambahkan akun ke saved order:', e);

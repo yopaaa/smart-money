@@ -1,7 +1,6 @@
 import SimpleHeader from '@/components/SimpleHeader';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -18,7 +17,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ThreeDotMenu from '../../components/ThreeDots';
 import { useTransactions } from '../TransactionContext';
 
-export const SAVED_ACCOUNT_ORDER_NAME = "@modified_account_order"
 function AlertComponent({ text = "any" }) {
     return (
         <View style={{
@@ -49,7 +47,7 @@ export default function ModifyOrderScreen() {
     const router = useRouter();
     const [showList, setShowList] = useState(null);
     const [isModified, setIsModified] = useState(false);
-    const { accountsGrouped, refetchData } = useTransactions();
+    const { accountsGrouped, refetchData, saveSetting } = useTransactions();
     const [data, setData] = useState(accountsGrouped);
 
     const replaceAccountData = (groupTitle, newData) => {
@@ -67,8 +65,7 @@ export default function ModifyOrderScreen() {
                 text: 'Save',
                 onPress: async () => {
                     try {
-                        const jsonValue = JSON.stringify(data);
-                        await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, jsonValue);
+                        await saveSetting("@modified_account_order", data)
                         console.log('Saving new accounts order to AsyncStorage');
                         refetchData()
                         router.back();

@@ -1,6 +1,5 @@
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState } from 'react';
 import {
     Alert,
@@ -16,11 +15,10 @@ import {
 import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
 import { useTransactions } from '../TransactionContext';
-import { SAVED_ACCOUNT_ORDER_NAME } from './ModifyOrderAccounts';
 
 const DeleteAccountScreen = () => {
     const router = useRouter();
-    const { deleteAccount, accounts, accountsGrouped, refetchData } = useTransactions();
+    const { deleteAccount, accounts, accountsGrouped, refetchData, saveSetting } = useTransactions();
     const [data, setData] = useState(accountsGrouped);
 
     const handleDelete = (accountId, groupTitle) => {
@@ -45,7 +43,7 @@ const DeleteAccountScreen = () => {
 
                     setData(updatedGroups);
                     refetchData()
-                    await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(updatedGroups));
+                    await saveSetting("@modified_account_order", updatedGroups)
                 }
             }
         ]);

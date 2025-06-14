@@ -11,101 +11,11 @@ import {
 } from 'react-native';
 
 import { formatCurrency } from '@/utils/number';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import ThreeDotMenu from '../../components/ThreeDots';
-import groupLabels from '../json/groupLabels.json';
-import { SAVED_ACCOUNT_ORDER_NAME } from '../settings/ModifyOrderAccounts';
 import { useTransactions } from '../TransactionContext';
 
-export const groupAccounts = async (accounts) => {
-    try {
-        const groups = {};
-
-        for (let acc of accounts) {
-            const key = acc.type || 'other';
-
-            if (!groups[key]) {
-                groups[key] = {
-                    balance: 0,
-                    accounts: []
-                };
-            }
-
-            groups[key].accounts.push(acc);
-            if (acc.hidden === 0) {
-
-                groups[key].balance += acc.balance;
-            }
-        }
-
-        const latestGrouped = groupLabels
-            .filter(group => groups[group.key]) // hanya yang ada datanya
-            .map(group => ({
-                title: group.name,
-                icon: group.icon,
-                color: group.color,
-                balance: groups[group.key].balance,
-                data: groups[group.key].accounts
-            }));
-
-
-        const savedData = await AsyncStorage.getItem(SAVED_ACCOUNT_ORDER_NAME);
-
-        if (savedData) {
-            const savedOrder = JSON.parse(savedData);
-
-            const groupMap = {};
-            for (let group of latestGrouped) {
-                groupMap[group.title] = group;
-            }
-
-            const ordered = [];
-
-            for (let savedGroup of savedOrder) {
-                const latestGroup = groupMap[savedGroup.title];
-
-                if (latestGroup) {
-                    const accountMap = {};
-                    for (let acc of latestGroup.data) {
-                        accountMap[acc.id] = acc;
-                    }
-
-                    const orderedAccounts = [];
-
-                    for (let savedAcc of savedGroup.data) {
-                        const acc = accountMap[savedAcc.id];
-                        if (acc) {
-                            orderedAccounts.push(acc);
-                            delete accountMap[savedAcc.id];
-                        }
-                    }
-
-                    const newAccounts = Object.values(accountMap);
-                    const finalAccounts = [...orderedAccounts, ...newAccounts];
-
-                    ordered.push({
-                        ...latestGroup,
-                        data: finalAccounts,
-                    });
-
-                    delete groupMap[savedGroup.title];
-                }
-            }
-
-            const newGroups = Object.values(groupMap);
-            const finalGrouped = [...ordered, ...newGroups];
-
-            return finalGrouped
-        } else {
-            return latestGrouped
-        }
-    } catch (e) {
-        console.error('Failed to load saved order:', e);
-        throw e
-    }
-};
 const TITLE = "Buckets And Balances"
 
 export default function AccountsScreen() {

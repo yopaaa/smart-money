@@ -1,4 +1,4 @@
-import { formatCurrency, unformatCurrency } from '@/utils/number';
+import { formatCurrency, reloadCurrencySetting, unformatCurrency } from '@/utils/number';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -6,7 +6,7 @@ import { useTransactions } from '../TransactionContext';
 import { useData } from './NewAccountProvider';
 
 export default function AddAccountScreen() {
-  const { addAccount } = useTransactions();
+  const { addAccount, saveSetting } = useTransactions();
   const { formData, handleChange } = useData()
   const [balance, setAccountName] = useState('');
   const router = useRouter();
@@ -32,9 +32,10 @@ export default function AddAccountScreen() {
       iconColor: "#81c784",
       description: "Initial Bucket"
     }
-
+    saveSetting("currency", formData.currency)
     try {
       addAccount(accountData)
+      reloadCurrencySetting()
     } catch (e) {
       Alert.alert('Error', e.message);
     }

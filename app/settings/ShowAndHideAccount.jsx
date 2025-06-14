@@ -1,6 +1,5 @@
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     Alert,
     FlatList,
@@ -16,11 +15,10 @@ import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTransactions } from '../TransactionContext';
-import { SAVED_ACCOUNT_ORDER_NAME } from './ModifyOrderAccounts';
 
 const DeleteAccountScreen = () => {
     const router = useRouter();
-    const { editAccount, accountsGrouped, refetchData } = useTransactions();
+    const { editAccount, accountsGrouped, refetchData, saveSetting } = useTransactions();
     const [data, setData] = useState(accountsGrouped);
 
     useEffect(() => {
@@ -29,9 +27,6 @@ const DeleteAccountScreen = () => {
 
     const handleHide = async (accountId, groupTitle, isHidden) => {
         try {
-
-
-            // Update hidden di state dan AsyncStorage
             const updatedGroups = data.map(group => {
                 if (group.title === groupTitle) {
                     return {
@@ -47,7 +42,7 @@ const DeleteAccountScreen = () => {
             setData(updatedGroups);
             // Update hidden di database
             await editAccount(accountId, { hidden: isHidden == 0 ? true : false });
-            await AsyncStorage.setItem(SAVED_ACCOUNT_ORDER_NAME, JSON.stringify(updatedGroups));
+            await saveSetting("@modified_account_order", updatedGroups)
             refetchData()
 
             console.log(`Account ${accountId} marked as hidden.`);

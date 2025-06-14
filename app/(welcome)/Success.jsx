@@ -20,7 +20,7 @@ export default function Success() {
                 resizeMode="contain"
             />
 
-            <Text style={styles.title}>Akun Berhasil Dibuat</Text>
+            <Text style={styles.title}>Bucket Berhasil Dibuat</Text>
             <Text style={styles.subtitle}>Sekarang kamu siap untuk mulai mencatat keuanganmu!</Text>
 
             {/* Tombol */}
