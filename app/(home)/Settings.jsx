@@ -122,7 +122,9 @@ export default function SettingsScreen() {
           <SettingItem
             title="Account Information"
             subtitle="Update your personal details"
-            onPress={() => console.log('Account info pressed')}
+            onPress={() => {
+              router.push("settings/test/One");
+            }}
           />
           {/* <SettingItem
             title="Change Password"

@@ -245,6 +245,14 @@ export default function HomeScreen() {
                 <View style={styles.headerIcons}>
                     <TouchableOpacity
                         onPress={() => {
+                            router.push(`(home)/Account`);
+                        }}>
+
+                        <MaterialCommunityIcons name="account-box" size={25} style={styles.iconSpacing} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => {
                             router.push(`/transaction/Search`);
                         }}>
 
