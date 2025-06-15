@@ -176,7 +176,12 @@ export default function HomeScreen() {
         return (
             <TouchableOpacity
                 onPress={() => {
-                    router.push(`/transaction/${item.id}`);
+                    router.push({
+                        pathname: 'transaction/TransactionDetails/',
+                        params: {
+                            id: item.id
+                        }
+                    });
                 }}
                 style={styles.item}
             >

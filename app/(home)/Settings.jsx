@@ -124,15 +124,17 @@ export default function SettingsScreen() {
             subtitle="Update your personal details"
             onPress={() => console.log('Account info pressed')}
           />
-          <SettingItem
+          {/* <SettingItem
             title="Change Password"
             subtitle="Update your password"
             onPress={() => console.log('Change password pressed')}
-          />
+          /> */}
           <SettingItem
             title="Backup & Restore"
             subtitle="Manage your data backup"
-            onPress={() => console.log('Backup pressed')}
+            onPress={() => {
+              router.push("settings/(backup)");
+            }}
           />
         </SettingSection>
 

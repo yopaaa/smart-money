@@ -118,7 +118,7 @@ export default function SearchScreen() {
             <TouchableOpacity
                 onPress={() => {
                     router.push({
-                        pathname: '/transaction/[id]',
+                        pathname: '/transaction/TransactionDetails',
                         params: {
                             id: item.id,
                             category: item.category,
