@@ -1,4 +1,6 @@
+import { useTransactions } from '@/app/TransactionContext';
 import SimpleHeader from '@/components/SimpleHeader';
+import ThreeDotMenu from '@/components/ThreeDots';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -14,8 +16,6 @@ import {
 } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import ThreeDotMenu from '../../components/ThreeDots';
-import { useTransactions } from '../TransactionContext';
 
 function AlertComponent({ text = "any" }) {
     return (

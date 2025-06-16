@@ -93,3 +93,5 @@ export const assetGroups = {
   }
 
 };
+
+export default assetGroups

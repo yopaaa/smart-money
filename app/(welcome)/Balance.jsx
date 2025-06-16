@@ -32,7 +32,7 @@ export default function AddAccountScreen() {
       iconColor: "#81c784",
       description: "Initial Bucket"
     }
-    saveSetting("currency", formData.currency)
+    saveSetting("@currency", formData.currency)
     try {
       addAccount(accountData)
       reloadCurrencySetting()

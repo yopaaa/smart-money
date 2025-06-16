@@ -1,3 +1,4 @@
+import { useTransactions } from '@/app/TransactionContext';
 import SimpleHeader from '@/components/SimpleHeader';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
@@ -13,7 +14,6 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { useTransactions } from '../../TransactionContext';
 import { convertTransactions, convertTransferFormat } from './convert';
 import { assetGroups, getAssets, getTransactions } from './json_restore';
 import ProgressModal from './ProgressModal';

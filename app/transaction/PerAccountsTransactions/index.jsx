@@ -7,13 +7,13 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import moment from 'moment';
 import { useCallback, useMemo, useState } from 'react';
 import {
-    RefreshControl,
-    SafeAreaView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  RefreshControl,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import TransactionFlashList from '../../(home)/TransactionFlashList';
 import { useTransactions } from '../../TransactionContext';
@@ -178,7 +178,7 @@ export default function HomeScreen() {
                         }}>{title}</Text>
                         <TouchableOpacity onPress={() => {
                             router.push({
-                                pathname: 'transaction/EditAccount',
+                                pathname: '(home)/(accounts)/EditAccount',
                                 params: {
                                     id
                                 }

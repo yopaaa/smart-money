@@ -201,24 +201,4 @@ export function convertTransferFormat(transactions) {
   return convertedTransactions;
 }
 
-
-
-
-// Example usage with your full data:
-// const convertedData = convertTransactions(originalData);
-// console.log(convertedData[5]);
-
-// const fs = require('fs');
-
-// function writeToFile(filePath, data) {
-//     fs.writeFile(filePath, data, 'utf8', (err) => {
-//         if (err) {
-//             console.error('Gagal menulis file:', err);
-//         } else {
-//             console.log('File berhasil ditulis:', filePath);
-//         }
-//     });
-// }
-
-// writeToFile("./doc/result.json", JSON.stringify(convertedData, " ", " "));
-
+export default convertTransferFormat

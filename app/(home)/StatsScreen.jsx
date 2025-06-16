@@ -14,10 +14,13 @@ import {
     Text,
     View
 } from 'react-native';
+import { ThemedText } from '../../components/ThemedText';
+import { useTheme } from '../../hooks/ThemeContext';
 import { useTransactions } from '../TransactionContext';
 import timePeriods from '../json/timePeriods.json';
 
 export default function HomeScreen() {
+    const { theme, toggleTheme } = useTheme();
     const router = useRouter();
     const { filterTransactions, getCategoryById } = useTransactions();
     const [viewMode, setViewMode] = useState('month'); // 'week' | 'month' | 'quarter' | 'year'
@@ -129,14 +132,13 @@ export default function HomeScreen() {
                         { key: 'expense', label: 'Expense', icon: 'arrow-up-circle' },
                     ]}
                 />
-                <Text style={styles.headerTitle}>Statistics</Text>
+                <ThemedText style={styles.headerTitle}>Statistics</ThemedText>
                 <View style={styles.headerIcons}>
-
                     <CustomPicker
                         inputContainerStyle={styles.inputContainer}
                         labelStyle={styles.label}
                         pickerStyle={styles.picker}
-                        TouchableComponent={<MaterialCommunityIcons name="calendar-month" size={25} />}
+                        TouchableComponent={<MaterialCommunityIcons name="calendar-month" size={25} color={theme.colors.text}/>}
                         onSelect={(val) => { setViewMode(String(val.name).toLocaleLowerCase()) }}
                         options={timePeriods}
                         selectedComponent={(val) => {
@@ -153,6 +155,7 @@ export default function HomeScreen() {
                 selectedDate={selectedDate}
                 viewMode={viewMode}
                 onDateChange={setSelectedDate}
+                theme={theme}
             />
 
             {type == "income" && <PieChart

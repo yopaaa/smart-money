@@ -86,7 +86,7 @@ export default function SettingsScreen() {
             title="Backup & Restore"
             subtitle="Manage your data backup"
             onPress={() => {
-              router.push("settings/(backup)");
+              router.push("(home)/(settings)/(backup)");
             }}
           />
         </SettingSection>
@@ -153,7 +153,9 @@ export default function SettingsScreen() {
           <SettingItem
             title="Language"
             subtitle="English"
-            onPress={() => console.log('Language pressed')}
+            onPress={() => {
+              router.push("(home)/(settings)/Language");
+            }}
           />
           <SettingItem
             title="Currency"
@@ -183,7 +185,7 @@ export default function SettingsScreen() {
             title="Export Data"
             subtitle="Export your data to file"
             onPress={() => {
-              router.push("settings/(backup)");
+              router.push("/(home)/(settings)/FileExport");
             }}
           />
           <SettingItem
@@ -208,12 +210,16 @@ export default function SettingsScreen() {
           <SettingItem
             title="Rate App"
             subtitle="Rate us on the app store"
-            onPress={() => console.log('Rate app pressed')}
+            onPress={() => {
+              router.push("(home)/(settings)/WebView");
+            }}
           />
           <SettingItem
             title="About"
             subtitle="App version and information"
-            onPress={() => console.log('About pressed')}
+            onPress={() => {
+              router.push("(home)/(settings)/AppInfoScreen");
+            }}
           />
         </SettingSection>
 

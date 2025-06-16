@@ -130,8 +130,6 @@ export const TransactionProvider = ({ children }) => {
 
     const refetchData = () => {
         console.log("Refetching...");
-        // console.log(getSetting("currency"));
-
         loadAccounts()
     };
 

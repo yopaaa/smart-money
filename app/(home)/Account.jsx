@@ -126,22 +126,22 @@ export default function AccountsScreen() {
 
     // Optimasi: Memoize menu items
     const menuItems = useMemo(() => [
-        { name: 'Add Bucket', fn: () => router.navigate("transaction/CreateAccountForm") },
+        { name: 'Add Bucket', fn: () => router.navigate("(home)/(accounts)/CreateAccountForm") },
         {
             name: 'Show/Hide', fn: () => {
                 router.push({
-                    pathname: 'settings/ShowAndHideAccount'
+                    pathname: '(home)/(accounts)/ShowAndHideAccount'
                 });
             }
         },
         {
             name: 'Delete', fn: () => {
                 router.push({
-                    pathname: 'settings/DeleteAccount'
+                    pathname: '(home)/(accounts)/DeleteAccount'
                 });
             }
         },
-        { name: 'Modify Orders', fn: () => router.navigate("settings/ModifyOrderAccounts") },
+        { name: 'Modify Orders', fn: () => router.navigate("(home)/(accounts)/ModifyOrderAccounts") },
     ], [router]);
 
     // Konversi data section menjadi flat list untuk FlashList

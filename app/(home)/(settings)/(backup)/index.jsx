@@ -1,3 +1,4 @@
+import { useTransactions } from '@/app/TransactionContext';
 import SimpleHeader from '@/components/SimpleHeader';
 import ThreeDotMenu from '@/components/ThreeDots';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,7 +10,6 @@ import { useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTransactions } from '../../TransactionContext';
 import ProgressModal from './ProgressModal';
 
 const DB_NAME = 'smart_money';
@@ -206,7 +206,7 @@ const BackupRestoreScreen = () => {
                 <ThreeDotMenu
                     dotColor="black"
                     menuItems={[
-                        { name: 'Restore from .mmbak file', fn: () => router.navigate("settings/(backup)/MMBAK_Restore") },
+                        { name: 'Restore from .mmbak file', fn: () => router.navigate("(home)/(settings)/(backup)/MMBAK_Restore") },
                         {
                             name: 'Reset app data', fn: () => {
                                 resetTables()

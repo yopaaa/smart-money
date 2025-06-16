@@ -1,6 +1,6 @@
+import appJson from '@/app.json';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import appJson from '../../app.json';
 
 export default function AppInfoScreen() {
   const info = appJson.expo;

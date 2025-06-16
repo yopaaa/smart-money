@@ -6,7 +6,7 @@ function reloadCurrencySetting() {
   console.info("Currency setting loaded.");
 
   try {
-    currencySetting = getSetting("currency") || { currency: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', locale: 'id-ID' }
+    currencySetting = getSetting("@currency") || { currency: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', locale: 'id-ID' }
   } catch (error) {
     console.info(error)
   }  

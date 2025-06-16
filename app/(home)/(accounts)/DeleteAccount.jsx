@@ -12,9 +12,9 @@ import {
     View
 } from 'react-native';
 
+import { useTransactions } from '@/app/TransactionContext';
 import SimpleHeader from '@/components/SimpleHeader';
 import { useRouter } from 'expo-router';
-import { useTransactions } from '../TransactionContext';
 
 const DeleteAccountScreen = () => {
     const router = useRouter();
@@ -61,7 +61,7 @@ const DeleteAccountScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => {
                     router.push({
-                        pathname: 'transaction/EditAccount',
+                        pathname: '(home)/(accounts)/EditAccount',
                         params: {
                             id: account.id
                         }

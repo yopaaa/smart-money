@@ -36,7 +36,7 @@ export default function AddAccountScreen() {
     if (selectedCurrency) {
       // console.log('Selected currency:', selectedCurrency);
       // handleChange("currency", selectedCurrency)
-      saveSetting("currency", selectedCurrency)
+      saveSetting("@currency", selectedCurrency)
       reloadCurrencySetting()
       router.push("/")
     }
