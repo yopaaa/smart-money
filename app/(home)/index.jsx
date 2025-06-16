@@ -3,10 +3,12 @@ import { useRouter } from 'expo-router';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { CurvedBottomBarExpo } from 'react-native-curved-bottom-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTheme } from '../../hooks/ThemeContext';
 import Account from './Account';
 import Home from './Home';
 import Settings from './Settings';
 import StatsScreen from './StatsScreen';
+
 
 const screens = {
   home: <Home />,
@@ -18,20 +20,19 @@ const screens = {
 export default function App() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
 
   const renderTabBar = ({ routeName, selectedTab, navigate }) => {
 
     return (
       <TouchableOpacity
         onPress={() => navigate(routeName)}
-
-        // style={[styles.tabbarItem]}
         style={[styles.tabbarItem, { marginBottom: insets.bottom / 2 }]}
       >
         <Ionicons
           name={routeName}
           size={28}
-          color={routeName === selectedTab ? '#00BFFF' : 'gray'}
+          color={routeName === selectedTab ? theme.colors.primary : theme.colors.inactive}
           onPress={() => navigate(routeName)}
         />
       </TouchableOpacity>
@@ -44,7 +45,7 @@ export default function App() {
       type="DOWN"
       height={100}
       circleWidth={60}
-      bgColor="white"
+      bgColor={theme.colors.border}
       initialRouteName="home"
       renderCircle={({ selectedTab, navigate }) => (
         <TouchableOpacity
@@ -52,14 +53,14 @@ export default function App() {
             width: 60,
             height: 60,
             borderRadius: "50%",
-            backgroundColor: '#00BFFF',
+            backgroundColor: theme.colors.primary,
             justifyContent: 'center',
             alignItems: 'center',
             bottom: 15,
           }}
           onPress={() => router.navigate("transaction/TransactionForm")}
         >
-          <Ionicons name="add" size={24} color="#FFF" />
+          <Ionicons name="add" size={24} color={theme.colors.background} />
         </TouchableOpacity>
       )}
       tabBar={renderTabBar}

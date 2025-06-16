@@ -7,9 +7,10 @@ import React from 'react';
 import {
     StyleSheet,
     Text,
-    TouchableOpacity,
     View
 } from 'react-native';
+import { ThemedText } from '../../components/ThemedText';
+import { ThemedTouchableOpacity } from '../../components/ThemedTouchableOpacity';
 import { useTransactions } from '../TransactionContext';
 
 export const FindIcon = React.memo(({ id, size = 30, style }) => {
@@ -31,26 +32,26 @@ const TransactionItem = React.memo(({ item, onPress }) => {
     const amountStyle = isExpense ? styles.expense : isTransfer ? styles.transfer : styles.income;
 
     return (
-        <TouchableOpacity
+        <ThemedTouchableOpacity
             onPress={() => onPress(item)}
             style={styles.item}
         >
             <View style={{ paddingHorizontal: 15 }}>
-                <FindIcon id={item.category}/>
+                <FindIcon id={item.category} />
             </View>
 
             <View style={{ flex: 1 }}>
-                <Text style={styles.title}>{item.title}</Text>
-                <Text style={styles.date}>
+                <ThemedText style={styles.title}>{item.title}</ThemedText>
+                <ThemedText style={styles.date} type="description">
                     {moment().diff(moment(Number(item.createdAt)), 'days') > 3
                         ? moment(Number(item.createdAt)).format('HH:mm, DD MMM YYYY')
                         : moment(Number(item.createdAt)).fromNow()}
-                </Text>
+                </ThemedText>
             </View>
-            <Text style={[styles.amount, amountStyle]}>
+            <ThemedText style={[styles.amount, amountStyle]}>
                 {isExpense ? '-' : isTransfer ? "" : '+'}{formatCurrency(item.amount)}
-            </Text>
-        </TouchableOpacity>
+            </ThemedText>
+        </ThemedTouchableOpacity>
     );
 });
 
@@ -64,7 +65,6 @@ function detectDateFormat(str) {
     }
 }
 
-
 const TransactionGroup = React.memo(({ item, onTransactionPress }) => {
     const isNew = item.date !== "Today" && item.date !== "Yesterday";
     const amountStyle = item.total < 0 ? styles.expense : styles.income;
@@ -75,11 +75,11 @@ const TransactionGroup = React.memo(({ item, onTransactionPress }) => {
             <View style={styles.transactionBox}>
                 <View style={{ flexDirection: 'row', alignItems: "center" }}>
                     {isShortDate == "short_date" ? <>
-                        <Text style={[styles.dateHeader, isNew && { fontSize: 30 }]}>{item.date}</Text>
+                        <ThemedText style={[styles.dateHeader, isNew && { fontSize: 30 }]}>{item.date}</ThemedText>
                         {isNew && (
                             <View style={styles.transactionRight}>
-                                <Text style={styles.day}>{moment(item.timestamp).format('dddd')}</Text>
-                                <Text style={styles.dateSmall}>{moment(item.timestamp).format("MMM YYYY")}</Text>
+                                <ThemedText style={styles.day}>{moment(item.timestamp).format('dddd')}</ThemedText>
+                                <ThemedText style={styles.dateSmall}>{moment(item.timestamp).format("MMM YYYY")}</ThemedText>
                             </View>
                         )}
                     </> :
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 4,
         marginVertical: 2,
         borderRadius: 12,
-        backgroundColor: '#f8f9fa',
+        // backgroundColor: '#f8f9fa',
         borderWidth: 1,
         borderColor: 'transparent',
         shadowColor: '#000',
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     },
     date: {
         fontSize: 12,
-        color: '#666',
+        // color: '#666',
     },
     amount: {
         fontSize: 16,

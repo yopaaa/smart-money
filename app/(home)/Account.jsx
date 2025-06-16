@@ -12,7 +12,10 @@ import {
 import { formatCurrency } from '@/utils/number';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
+import { ThemedText } from '../../components/ThemedText';
+import { ThemedView } from '../../components/ThemedView';
 import ThreeDotMenu from '../../components/ThreeDots';
+import { useTheme } from '../../hooks/ThemeContext';
 import { useTransactions } from '../TransactionContext';
 
 const TITLE = "Buckets And Balances"
@@ -20,7 +23,7 @@ const TITLE = "Buckets And Balances"
 // Komponen SummaryCard dimemoized
 const SummaryCard = React.memo(({ title, value, isHideBalance }) => (
     <View style={styles.summaryCard}>
-        <Text style={styles.summaryLabel}>{title}</Text>
+        <ThemedText style={styles.summaryLabel} type="description">{title}</ThemedText>
         <Text style={[
             styles.summaryValue,
             value > 0 ? styles.assetBalance : styles.liabilityBalance
@@ -32,7 +35,7 @@ const SummaryCard = React.memo(({ title, value, isHideBalance }) => (
 
 // Komponen AccountItem dimemoized
 const AccountItem = React.memo(({ item, isHideBalance, onPress }) => (
-    <View style={styles.accountCard}>
+    <ThemedView style={styles.accountCard}>
         <TouchableOpacity
             style={styles.accountItem}
             onPress={onPress}
@@ -47,7 +50,7 @@ const AccountItem = React.memo(({ item, isHideBalance, onPress }) => (
                     />
                 </View>
                 <View style={styles.accountInfo}>
-                    <Text style={styles.accountName}>{item.name}</Text>
+                    <ThemedText style={styles.accountName}>{item.name}</ThemedText>
                 </View>
             </View>
             <View style={styles.accountRight}>
@@ -64,7 +67,7 @@ const AccountItem = React.memo(({ item, isHideBalance, onPress }) => (
                 <MaterialCommunityIcons name="chevron-right" size={24} color="#999" style={styles.arrow} />
             </View>
         </TouchableOpacity>
-    </View>
+    </ThemedView>
 ));
 
 // Komponen SectionHeader dimemoized
@@ -81,6 +84,8 @@ const SectionHeader = React.memo(({ title, balance, isHideBalance }) => (
 ));
 
 export default function AccountsScreen() {
+        const { theme } = useTheme();
+    
     const router = useRouter();
     const { accounts, accountsGrouped, refetchData } = useTransactions();
     const [isRefreshing, setisRefreshing] = useState(false)
@@ -207,7 +212,7 @@ export default function AccountsScreen() {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>{TITLE}</Text>
+                <ThemedText style={styles.headerTitle}>{TITLE}</ThemedText>
                 <View style={styles.headerActions}>
                     <TouchableOpacity
                         onPress={toggleBalanceVisibility}
@@ -293,7 +298,6 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#111',
         flex: 1,
     },
     headerActions: {
@@ -321,7 +325,6 @@ const styles = StyleSheet.create({
     },
     summaryLabel: {
         fontSize: 13,
-        color: '#666',
         marginBottom: 4,
         fontWeight: '500',
     },
@@ -374,14 +377,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     accountCard: {
-        backgroundColor: '#FFFFFF',
+        // backgroundColor: '#FFFFFF',
         borderRadius: 12,
         marginBottom: 8,
         overflow: 'hidden',
         marginHorizontal: 4,
         marginVertical: 2,
         borderRadius: 12,
-        backgroundColor: '#f8f9fa',
+        // backgroundColor: '#f8f9fa',
         borderWidth: 1,
         borderColor: 'transparent',
         shadowColor: '#000',
@@ -420,7 +423,6 @@ const styles = StyleSheet.create({
     accountName: {
         fontSize: 16,
         fontWeight: '500',
-        color: '#111',
         marginBottom: 2,
     },
     hiddenLabel: {

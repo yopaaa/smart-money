@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function PeriodNavigator({ selectedDate, viewMode, onDateChange }) {
+export default function PeriodNavigator({ selectedDate, viewMode, onDateChange, theme }) {
   const getPeriodLabel = () => {
     if (viewMode === 'week') {
       const start = selectedDate.clone().startOf('week');
@@ -32,13 +32,13 @@ export default function PeriodNavigator({ selectedDate, viewMode, onDateChange }
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={goToPrev}>
-        <MaterialCommunityIcons name="chevron-left" size={30} />
+        <MaterialCommunityIcons name="chevron-left" size={30} color={theme ? theme.colors.text : null} />
       </TouchableOpacity>
 
-      <Text style={styles.label}>{getPeriodLabel()}</Text>
+      <Text style={[styles.label, { color: theme ? theme.colors.text : null }]}>{getPeriodLabel()}</Text>
 
       <TouchableOpacity onPress={goToNext}>
-        <MaterialCommunityIcons name="chevron-right" size={30} />
+        <MaterialCommunityIcons name="chevron-right" size={30} color={theme ? theme.colors.text : null} />
       </TouchableOpacity>
     </View>
   );

@@ -14,26 +14,28 @@ import {
 } from 'react-native';
 import CustomPicker from '../../components/CustomPicker';
 import PeriodNavigator from '../../components/PeriodNavigator';
+import { ThemedText } from '../../components/ThemedText';
+import { useTheme } from '../../hooks/ThemeContext';
 import { useTransactions } from '../TransactionContext';
 import timePeriods from '../json/timePeriods.json';
 import TransactionFlashList from './TransactionFlashList';
 
-const OverviewHeader = React.memo(({ totalOverview }) => (
+const OverviewHeader = React.memo(({ totalOverview, theme }) => (
     <View style={styles.overviewBox}>
         <View style={styles.overviewHeader}>
-            <Text style={styles.overviewTitle}>Overview</Text>
-            <MaterialCommunityIcons name="information-outline" size={16} />
+            <ThemedText style={styles.overviewTitle}>Overview</ThemedText>
+            <MaterialCommunityIcons name="information-outline" size={16} color={theme.colors.text} />
         </View>
         <View style={styles.row}>
-            <Text style={styles.label}>Income</Text>
+            <ThemedText type="description">Income</ThemedText>
             <Text style={[styles.amount, styles.income]}>{formatCurrency(totalOverview.income) || 0}</Text>
         </View>
         <View style={styles.row}>
-            <Text style={styles.label}>Expense</Text>
+            <ThemedText type="description">Expense</ThemedText>
             <Text style={[styles.amount, styles.expense]}>{formatCurrency(0 - totalOverview.expense) || 0}</Text>
         </View>
         <View style={styles.row}>
-            <Text style={styles.label}>Total</Text>
+            <ThemedText type="description">Total</ThemedText>
             <Text style={[styles.amount, totalOverview.net < 0 ? styles.expense : styles.income]}>{formatCurrency(totalOverview.net) || 0}</Text>
         </View>
     </View>
@@ -41,22 +43,23 @@ const OverviewHeader = React.memo(({ totalOverview }) => (
 
 const NavigationHeader = React.memo(({
     setViewMode,
-    router
+    router,
+    theme
 }) => (
     <View>
         <View style={styles.headercontainer}>
-            <Text style={styles.headerTitle}>Riwayat Transaksi</Text>
+            <ThemedText style={styles.headerTitle}>Riwayat Transaksi</ThemedText>
             <View style={styles.headerIcons}>
                 <TouchableOpacity
                     onPress={() => router.push(`/transaction/Search`)}>
-                    <MaterialCommunityIcons name="magnify" size={25} style={styles.iconSpacing} />
+                    <MaterialCommunityIcons name="magnify" size={25} style={styles.iconSpacing} color={theme.colors.text} />
                 </TouchableOpacity>
 
                 <CustomPicker
                     inputContainerStyle={styles.inputContainer}
                     labelStyle={styles.label}
                     pickerStyle={styles.picker}
-                    TouchableComponent={<MaterialCommunityIcons name="calendar-month" size={25} />}
+                    TouchableComponent={<MaterialCommunityIcons name="calendar-month" size={25} color={theme.colors.text} />}
                     onSelect={(val) => { setViewMode(String(val.name).toLocaleLowerCase()) }}
                     options={timePeriods}
                     selectedComponent={(val) => (
@@ -72,6 +75,8 @@ const NavigationHeader = React.memo(({
 ));
 
 export default function HomeScreen() {
+    const { theme } = useTheme();
+
     const router = useRouter();
     const { filterTransactions } = useTransactions();
     const [viewMode, setViewMode] = useState('month');
@@ -195,12 +200,14 @@ export default function HomeScreen() {
             <NavigationHeader
                 setViewMode={setViewMode}
                 router={router}
+                theme={theme}
             />
 
             <PeriodNavigator
                 selectedDate={selectedDate}
                 viewMode={viewMode}
                 onDateChange={setSelectedDate}
+                theme={theme}
             />
 
             <TransactionFlashList
@@ -212,7 +219,7 @@ export default function HomeScreen() {
                         onRefresh={handleRefresh}
                     />
                 }
-                ListHeaderComponent={<OverviewHeader totalOverview={totalOverview} />}
+                ListHeaderComponent={<OverviewHeader totalOverview={totalOverview} theme={theme} />}
                 ListEmptyComponent={
                     <View style={{ justifyContent: "center", alignItems: "center", height: 300 }}>
                         <Text>Tidak ada transaksi</Text>
@@ -273,9 +280,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 4,
-    },
-    label: {
-        color: '#555',
     },
     amount: {
         fontSize: 16,

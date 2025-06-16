@@ -1,15 +1,20 @@
+import { expo } from '@/app.json';
 import { currencySetting } from '@/utils/number';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
-import { expo } from '../../app.json';
-import { colorTheme, toogleTheme } from '../../hooks/useColorScheme';
+import { Alert, ScrollView, StatusBar, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import { ThemedText } from '../../components/ThemedText';
+import { ThemedView } from '../../components/ThemedView';
+import { useTheme } from '../../hooks/ThemeContext';
+
 export default function SettingsScreen() {
+  const { theme, toggleTheme } = useTheme();
+
   const router = useRouter();
   const [notifications, setNotifications] = useState(true);
   const [biometric, setBiometric] = useState(false);
   const [autoBackup, setAutoBackup] = useState(true);
-  const [darkMode, setDarkMode] = useState(colorTheme == "dark");
+  const [darkMode, setDarkMode] = useState(theme.mode == "dark");
 
   const handleLogout = () => {
     Alert.alert(
@@ -34,32 +39,32 @@ export default function SettingsScreen() {
   };
 
   const SettingItem = ({ title, subtitle, onPress, rightComponent, showArrow = true }) => (
-    <TouchableOpacity style={styles.settingItem} onPress={onPress}>
+    <TouchableOpacity style={[styles.settingItem, { borderBottomColor: theme.colors.border }]} onPress={onPress}>
       <View style={styles.settingContent}>
-        <Text style={styles.settingTitle}>{title}</Text>
-        {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+        <ThemedText style={styles.settingTitle}>{title}</ThemedText>
+        {subtitle && <ThemedText style={styles.settingSubtitle} type={"description"}>{subtitle}</ThemedText>}
       </View>
       <View style={styles.settingRight}>
         {rightComponent}
-        {showArrow && !rightComponent && <Text style={styles.arrow}>›</Text>}
+        {showArrow && !rightComponent && <ThemedText style={styles.arrow} type={"description"}>›</ThemedText>}
       </View>
     </TouchableOpacity>
   );
 
   const SettingSection = ({ title, children }) => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <View style={styles.sectionContent}>
+      <ThemedText style={styles.sectionTitle}>{title}</ThemedText>
+      <ThemedView style={styles.sectionContent}>
         {children}
-      </View>
+      </ThemedView>
     </View>
   );
 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Settings</Text>
+      <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
+        <ThemedText style={styles.headerTitle}>Settings</ThemedText>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -137,7 +142,7 @@ export default function SettingsScreen() {
                 onValueChange={(value) => {
                   // console.log(value);
                   setDarkMode(value)
-                  toogleTheme()
+                  toggleTheme()
                 }}
                 trackColor={{ false: '#E5E5E5', true: '#2563EB' }}
                 thumbColor={darkMode ? '#FFFFFF' : '#FFFFFF'}
@@ -154,7 +159,7 @@ export default function SettingsScreen() {
             title="Currency"
             subtitle={`${currencySetting.name} (${currencySetting.currency})`}
             onPress={() => {
-              router.push("settings/Currency");
+              router.push("(home)/(settings)/Currency");
             }}
           />
         </SettingSection>
@@ -221,17 +226,17 @@ export default function SettingsScreen() {
           />
           <TouchableOpacity style={styles.dangerItem} onPress={handleDeleteAccount}>
             <View style={styles.settingContent}>
-              <Text style={styles.dangerTitle}>Delete Account</Text>
-              <Text style={styles.settingSubtitle}>Permanently delete your account</Text>
+              <ThemedText style={styles.dangerTitle}>Delete Account</ThemedText>
+              <ThemedText style={styles.settingSubtitle} type={"description"}>Permanently delete your account</ThemedText>
             </View>
-            <Text style={styles.arrow}>›</Text>
+            <ThemedText style={styles.arrow} type={"description"}>›</ThemedText>
           </TouchableOpacity>
         </SettingSection>
 
         {/* Version Info */}
         <View style={styles.versionInfo}>
-          <Text style={styles.versionText}>Version {expo.version}</Text>
-          <Text style={styles.versionSubtext}>© 2025 {expo.name}</Text>
+          <ThemedText style={styles.versionText} type={"description"}>Version {expo.version}</ThemedText>
+          <ThemedText style={styles.versionSubtext} type={"description"}>© 2025 {expo.name}</ThemedText>
         </View>
       </ScrollView>
     </View>
@@ -250,9 +255,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 25,
     paddingBottom: 25,
-    // backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E5E5',
   },
   backButton: {
     padding: 8,
@@ -265,7 +268,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#111',
   },
   headerRight: {
     width: 40,
@@ -287,7 +289,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   sectionContent: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     overflow: 'hidden',
   },
@@ -297,7 +298,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
   },
   settingContent: {
     flex: 1,
@@ -305,12 +305,10 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#111',
     marginBottom: 2,
   },
   settingSubtitle: {
     fontSize: 13,
-    color: '#777',
   },
   settingRight: {
     flexDirection: 'row',
@@ -318,7 +316,6 @@ const styles = StyleSheet.create({
   },
   arrow: {
     fontSize: 18,
-    color: '#CCC',
     marginLeft: 8,
   },
   dangerItem: {
@@ -326,8 +323,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
   },
   dangerTitle: {
     fontSize: 16,
@@ -343,11 +338,9 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: 14,
-    color: '#777',
     marginBottom: 4,
   },
   versionSubtext: {
     fontSize: 12,
-    color: '#999',
   },
 });
