@@ -1,69 +1,15 @@
-import { useNavigation } from '@react-navigation/native';
+import { currencySetting } from '@/utils/number';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, ScrollView, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { expo } from '../../app.json';
-
+import { colorTheme, toogleTheme } from '../../hooks/useColorScheme';
 export default function SettingsScreen() {
   const router = useRouter();
-  const navigation = useNavigation();
-
-  const iconItems = [
-    {
-      icon: 'settings-outline', label: 'Configuration', function: function () {
-        router.push("settings");
-      }
-    },
-    {
-      icon: 'wallet-outline', label: 'Accounts', function: function () {
-        // console.log("albums");
-        navigation.goBack()
-      }
-    },
-    {
-      icon: 'lock-open-outline', label: 'Passcode', function: function () {
-        console.log("this.label");
-      }
-    },
-    {
-      icon: 'calculator-outline', label: 'CalcBox', function: function () {
-        console.log("this.label");
-      }
-    },
-    {
-      icon: 'desktop-outline', label: 'PC Manager', function: function () {
-        router.push("settings/Json_restore");
-      }
-    },
-    {
-      icon: 'cloud-upload-outline', label: 'Backup', function: function () {
-
-
-      }
-    },
-    {
-      icon: 'mail-outline', label: 'Feedback', function: function () {
-        router.push("settings/Log");
-
-      }
-    },
-    {
-      icon: 'help-circle-outline', label: 'Help', function: function () {
-        router.push("transaction/WebView");
-      }
-    },
-    {
-      icon: 'thumbs-up-outline', label: 'Recommend', function: function () {
-        router.push("settings/AppInfoScreen");
-
-      }
-    },
-  ];
-
   const [notifications, setNotifications] = useState(true);
   const [biometric, setBiometric] = useState(false);
   const [autoBackup, setAutoBackup] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(colorTheme == "dark");
 
   const handleLogout = () => {
     Alert.alert(
@@ -188,7 +134,11 @@ export default function SettingsScreen() {
             rightComponent={
               <Switch
                 value={darkMode}
-                onValueChange={setDarkMode}
+                onValueChange={(value) => {
+                  // console.log(value);
+                  setDarkMode(value)
+                  toogleTheme()
+                }}
                 trackColor={{ false: '#E5E5E5', true: '#2563EB' }}
                 thumbColor={darkMode ? '#FFFFFF' : '#FFFFFF'}
               />
@@ -202,8 +152,10 @@ export default function SettingsScreen() {
           />
           <SettingItem
             title="Currency"
-            subtitle="Indonesian Rupiah (IDR)"
-            onPress={() => console.log('Currency pressed')}
+            subtitle={`${currencySetting.name} (${currencySetting.currency})`}
+            onPress={() => {
+              router.push("settings/Currency");
+            }}
           />
         </SettingSection>
 

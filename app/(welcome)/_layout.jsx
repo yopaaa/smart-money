@@ -1,12 +1,12 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Redirect, Stack } from 'expo-router';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { colorTheme } from '@/hooks/useColorScheme';
+
 import { useTransactions } from '../TransactionContext';
 import NewAccountProvider from './NewAccountProvider';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const { isNewUser } = useTransactions();
 
   if (!isNewUser) {
@@ -15,7 +15,7 @@ export default function RootLayout() {
 
   return (
     <NewAccountProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{
           headerShown: false,
         }}

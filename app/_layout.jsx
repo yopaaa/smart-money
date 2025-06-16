@@ -4,23 +4,21 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { colorTheme } from '@/hooks/useColorScheme';
 import { TransactionProvider } from './TransactionContext';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   if (!loaded) {
-    // Async font loading only occurs in development.
     return null;
   }
 
   return (
     <TransactionProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{
           animation: "fade_from_bottom",
           headerShown: false,
