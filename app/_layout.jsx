@@ -1,13 +1,15 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { ThemeProvider as NavThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
-import { colorTheme } from '@/hooks/useColorScheme';
+import { CustomDarkTheme, CustomLightTheme, ThemeProvider, useTheme } from '@/hooks/ThemeContext';
 import { TransactionProvider } from './TransactionContext';
 
-export default function RootLayout() {
+function InnerLayout() {
+  const { theme } = useTheme();
+
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -18,7 +20,7 @@ export default function RootLayout() {
 
   return (
     <TransactionProvider>
-      <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <NavThemeProvider value={theme.mode === 'dark' ? CustomDarkTheme : CustomLightTheme}>
         <Stack screenOptions={{
           animation: "fade_from_bottom",
           headerShown: false,
@@ -27,15 +29,24 @@ export default function RootLayout() {
           headerTitleAlign: 'center',
         }}
         >
-          <Stack.Screen name="(home)" options={{animation: "none"}}/>
-          <Stack.Screen name="(welcome)" options={{animation: "fade"}}/>
+          <Stack.Screen name="(home)" options={{ animation: "none" }} />
+          <Stack.Screen name="(welcome)" options={{ animation: "fade" }} />
           <Stack.Screen name="transaction/TransactionForm" />
-          <Stack.Screen name="transaction/Search" options={{animation: "slide_from_bottom"}}/>
-          <Stack.Screen name="transaction/PerCategoriesTransactions/index"  options={{animation: "flip"}}/>
-          <Stack.Screen name="+not-found" /> 
+          <Stack.Screen name="transaction/Search" options={{ animation: "slide_from_bottom" }} />
+          <Stack.Screen name="transaction/PerCategoriesTransactions/index" options={{ animation: "flip" }} />
+          <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />
-      </ThemeProvider>
+      </NavThemeProvider>
     </TransactionProvider>
+  );
+}
+
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <InnerLayout />
+    </ThemeProvider>
   );
 }

@@ -1,7 +1,5 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Redirect, Stack } from 'expo-router';
 
-import { colorTheme } from '@/hooks/useColorScheme';
 
 import { useTransactions } from '../TransactionContext';
 
@@ -13,18 +11,16 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorTheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{
         headerShown: false,
-        animation: "none"
       }}
       >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="Home" />
-        <Stack.Screen name="Account" />
-        <Stack.Screen name="Settings" />
-        <Stack.Screen name="StatsScreen" />
+        <Stack.Screen name="index"  options={{ animation: "none" }}  />
+        <Stack.Screen name="Home" options={{ animation: "none" }} />
+        <Stack.Screen name="Account"  options={{ animation: "none" }} />
+        <Stack.Screen name="Settings"  options={{ animation: "none" }} />
+        <Stack.Screen name="(settings)"  options={{ animation: "slide_from_right" }} />
+        <Stack.Screen name="StatsScreen"  options={{ animation: "none" }} />
       </Stack>
-    </ThemeProvider>
   );
 }
