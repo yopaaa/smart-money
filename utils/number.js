@@ -1,6 +1,6 @@
 import { getSetting } from "./fn/settings";
 
-let currencySetting = null
+export let currencySetting = null
 
 function reloadCurrencySetting() {
   console.info("Currency setting loaded.");
@@ -9,7 +9,7 @@ function reloadCurrencySetting() {
     currencySetting = getSetting("currency") || { currency: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', locale: 'id-ID' }
   } catch (error) {
     console.info(error)
-  }
+  }  
 }
 reloadCurrencySetting()
 

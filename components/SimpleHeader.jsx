@@ -1,13 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React from 'react';
 import {
     Pressable,
     Text,
     View
 } from 'react-native';
 
-
-function Header({ style, headerTitleStyle, title, rightComponent, headerComponent }) {
+const Header = React.memo((
+    { style,
+        headerTitleStyle,
+        title,
+        rightComponent,
+        headerComponent
+    }) => {
     const router = useRouter();
 
     return (<View style={{
@@ -39,6 +45,6 @@ function Header({ style, headerTitleStyle, title, rightComponent, headerComponen
 
         {rightComponent}
     </View>)
-}
+})
 
 export default Header

@@ -1,13 +1,57 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FlashList } from '@shopify/flash-list';
 import { useEffect, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Dimensions, Easing, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Svg, { Circle, Defs, G, Path, RadialGradient, Stop, Text as SvgText } from 'react-native-svg';
 import { formatCurrency } from '../utils/number';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get('window');
 
+const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
+    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
+    return {
+        x: centerX + radius * Math.cos(angleInRadians),
+        y: centerY + radius * Math.sin(angleInRadians),
+    };
+};
 
-const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { } }) => {
+const createArcPath = (centerX, centerY, radius, startAngle, endAngle, isExpanded = false) => {
+    const expandOffset = isExpanded ? 20 : 0;
+    const actualRadius = radius + expandOffset;
+    const midAngle = (startAngle + endAngle) / 2;
+    const offsetX = isExpanded ? Math.cos((midAngle - 90) * Math.PI / 180) * 12 : 0;
+    const offsetY = isExpanded ? Math.sin((midAngle - 90) * Math.PI / 180) * 12 : 0;
+    const adjustedCenterX = centerX + offsetX;
+    const adjustedCenterY = centerY + offsetY;
+
+    if (endAngle - startAngle >= 360) {
+        const midAngle = startAngle + 180;
+        const start1 = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle);
+        const mid = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, midAngle);
+        const end1 = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle + 359.9);
+
+        return [
+            'M', adjustedCenterX, adjustedCenterY,
+            'L', start1.x, start1.y,
+            'A', actualRadius, actualRadius, 0, '0', 1, mid.x, mid.y,
+            'A', actualRadius, actualRadius, 0, '0', 1, end1.x, end1.y,
+            'Z',
+        ].join(' ');
+    }
+
+    const start = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, endAngle);
+    const end = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle);
+    const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
+
+    return [
+        'M', adjustedCenterX, adjustedCenterY,
+        'L', start.x, start.y,
+        'A', actualRadius, actualRadius, 0, largeArcFlag, 0, end.x, end.y,
+        'Z',
+    ].join(' ');
+};
+
+const AnimatedPieChart = ({ data, refreshControl, legendOnPress = () => { } }) => {
     const [animatedValues, setAnimatedValues] = useState();
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -29,9 +73,8 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
                 color: data[0].icon.color,
                 icon: data[0].icon.icon
             }];
-
             setchartData(singleDataFormatted);
-            setAnimatedValues([360]); // Set langsung ke 360
+            setAnimatedValues([360]);
             setIsLoaded(true);
             setSelectedIndex(null);
             return;
@@ -41,7 +84,7 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
         setSelectedIndex(null);
         setIsLoaded(false);
 
-        let formattedData = data.map(item => ({
+        const formattedData = data.map(item => ({
             label: item.icon.name,
             value: item.percent,
             amount: item.amount,
@@ -61,58 +104,11 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
             }, index * 150);
         });
 
-        setTimeout(() => setIsLoaded(true), formattedData.length * 150 + 300);
+        setTimeout(() => {
+            setIsLoaded(true);
+        }, formattedData.length * 150 + 300);
+
     }, [data]);
-
-    const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
-        const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
-        return {
-            x: centerX + radius * Math.cos(angleInRadians),
-            y: centerY + radius * Math.sin(angleInRadians),
-        };
-    };
-
-    const createArcPath = (centerX, centerY, radius, startAngle, endAngle, isExpanded = false) => {
-        const expandOffset = isExpanded ? 20 : 0;
-        const actualRadius = radius + expandOffset;
-
-        // Offset center untuk efek expand
-        const midAngle = (startAngle + endAngle) / 2;
-        const offsetX = isExpanded ? Math.cos((midAngle - 90) * Math.PI / 180) * 12 : 0;
-        const offsetY = isExpanded ? Math.sin((midAngle - 90) * Math.PI / 180) * 12 : 0;
-
-        const adjustedCenterX = centerX + offsetX;
-        const adjustedCenterY = centerY + offsetY;
-
-        // Handle lingkaran penuh (360 derajat)
-        if (endAngle - startAngle >= 360) {
-            // Untuk lingkaran penuh, buat 2 arc yang masing-masing 180 derajat
-            const midAngle = startAngle + 180;
-            const start1 = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle);
-            const mid = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, midAngle);
-            const end1 = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle + 359.9); // Sedikit kurang dari 360
-
-            return [
-                'M', adjustedCenterX, adjustedCenterY,
-                'L', start1.x, start1.y,
-                'A', actualRadius, actualRadius, 0, '0', 1, mid.x, mid.y,
-                'A', actualRadius, actualRadius, 0, '0', 1, end1.x, end1.y,
-                'Z',
-            ].join(' ');
-        }
-
-        // Path normal untuk arc biasa
-        const start = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, endAngle);
-        const end = polarToCartesian(adjustedCenterX, adjustedCenterY, actualRadius, startAngle);
-        const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-
-        return [
-            'M', adjustedCenterX, adjustedCenterY,
-            'L', start.x, start.y,
-            'A', actualRadius, actualRadius, 0, largeArcFlag, 0, end.x, end.y,
-            'Z',
-        ].join(' ');
-    };
 
     const renderSlice = (item, index, startAngle, endAngle) => {
         const isSelected = selectedIndex === index;
@@ -123,7 +119,6 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
 
         const path = createArcPath(centerX, centerY, radius, startAngle, currentEndAngle, isSelected);
 
-        // Calculate label position
         const midAngle = (startAngle + currentEndAngle) / 2;
         const labelRadius = radius + (isSelected ? 45 : 35);
         const labelX = centerX + Math.cos((midAngle - 90) * Math.PI / 180) * labelRadius + (isSelected ? Math.cos((midAngle - 90) * Math.PI / 180) * 12 : 0);
@@ -137,80 +132,41 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
                     stroke="#2C3E50"
                     strokeWidth={0.5}
                     onPress={() => {
-                        console.log(item);
-
-                        if (selectedIndex === index) {
-                            setSelectedIndex(null); // batal pilih
-                        } else {
-                            setSelectedIndex(index); // pilih baru
-                        }
+                        setSelectedIndex(selectedIndex === index ? null : index);
                     }}
                 />
-
-
-                {/* Label */}
                 {animatedAngle > 15 && (
                     <G>
-                        <SvgText
-                            x={labelX}
-                            y={labelY - 5}
-                            textAnchor="middle"
-                            fill="black"
-                            fontSize={isSelected ? "13" : "12"}
-                            fontWeight="bold"
-                        >
-                            {item.label}
-                        </SvgText>
-                        <SvgText
-                            x={labelX}
-                            y={labelY + 12}
-                            textAnchor="middle"
-                            fill="black"
-                            fontSize={isSelected ? "11" : "10"}
-                        >
-                            {item.value}%
-                        </SvgText>
+                        <SvgText x={labelX} y={labelY - 5} textAnchor="middle" fill="black" fontSize={isSelected ? "13" : "12"} fontWeight="bold">{item.label}</SvgText>
+                        <SvgText x={labelX} y={labelY + 12} textAnchor="middle" fill="black" fontSize={isSelected ? "11" : "10"}>{item.value}%</SvgText>
                     </G>
                 )}
             </G>
         );
     };
 
-
     const renderPieChart = () => {
         let cumulativeAngle = 0;
-
         return (
             <View style={styles.chartContainer}>
-                <Svg width={size} height={size} style={styles.svg}>
-                    <Defs>
-                        <RadialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
-                            <Stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
-                            <Stop offset="100%" stopColor="rgba(255,255,255,0.05)" />
-                        </RadialGradient>
-                    </Defs>
+                
+                    <Svg width={size} height={size} style={styles.svg}>
+                        <Defs>
+                            <RadialGradient id="centerGradient" cx="50%" cy="50%" r="50%">
+                                <Stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
+                                <Stop offset="100%" stopColor="rgba(255,255,255,0.05)" />
+                            </RadialGradient>
+                        </Defs>
+                        <Circle cx={centerX} cy={centerY} r={radius - 20} fill="url(#centerGradient)" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+                        {chartData.map((item, index) => {
+                            const startAngle = cumulativeAngle;
+                            const sliceAngle = chartData.length === 1 ? 360 : (item.value / 100) * 360;
+                            const slice = renderSlice(item, index, startAngle, startAngle + sliceAngle);
+                            cumulativeAngle += sliceAngle;
+                            return slice;
+                        })}
+                    </Svg>
 
-                    {/* Background circle */}
-                    <Circle
-                        cx={centerX}
-                        cy={centerY}
-                        r={radius - 20}
-                        fill="url(#centerGradient)"
-                        stroke="rgba(255,255,255,0.1)"
-                        strokeWidth="1"
-                    />
-
-                    {chartData.length > 0 ? chartData.map((item, index) => {
-
-                        const startAngle = cumulativeAngle;
-                        const sliceAngle = chartData.length === 1 ? 360 : (item.value / 100) * 360;
-                        const slice = renderSlice(item, index, startAngle, startAngle + sliceAngle);
-                        cumulativeAngle += sliceAngle;
-                        return slice;
-                    }) : null}
-                </Svg>
-
-                {/* Center Content */}
                 <View style={styles.centerContent}>
                     <Text style={styles.centerTitle}>Total</Text>
                     <Text style={styles.centerValue}>{formatCurrency(total)}</Text>
@@ -220,103 +176,54 @@ const AnimatedPieChart = ({ data, refreshControl, legendOnPress = function () { 
         );
     };
 
-    const renderLegendItem = ({ item, index }) => {
-        const isSelected = selectedIndex === index;
-
-        return (
-            <TouchableOpacity
-                style={[
-                    styles.legendItem,
-                    isSelected && styles.selectedLegendItem
-                ]}
-                onPress={() => {
-                    setSelectedIndex(index)
-                    legendOnPress(item)
-                }}
-                activeOpacity={0.7}
-            >
-                <MaterialCommunityIcons name={item?.icon.icon} size={30} color={item.icon.color} style={{ paddingHorizontal: 10 }} />
-
-                <View style={styles.legendContent}>
-                    <Text style={styles.legendLabel}>{item.icon.name}</Text>
-                    <Text style={styles.legendAmount}>{formatCurrency(item.amount)}</Text>
-                </View>
-                <Text style={styles.legendValue}>{item.percent}%</Text>
-            </TouchableOpacity>
-        );
-    };
-
     if (!data || data.length === 0) {
-
         return (
-            <ScrollView
+            <FlashList
                 refreshControl={refreshControl}
-                contentContainerStyle={styles.container}
-                showsVerticalScrollIndicator={false}
-            >
-
-                <View style={[styles.headerStyle]}>
-                    <View style={[styles.headerStyle,
-                    {
-                        backgroundColor: '#ccc',
-                        height: "90%",
-                        width: "90%",
-                        borderBottomWidth: 0,
-                        borderRadius: 10
-                    }]}>
-
-                        <Text>Belum atau tidak ada data</Text>
+                estimatedItemSize={100}
+                data={[0, 1, 2, 3]}
+                ListHeaderComponent={() => (
+                    <View style={[styles.headerStyle]}>
+                        <View style={[styles.headerStyle, { backgroundColor: '#ccc', height: "90%", width: "90%", borderBottomWidth: 0, borderRadius: 10 }]}>
+                            <Text>Belum atau tidak ada data</Text>
+                        </View>
                     </View>
-                </View>
-
-
-                <View >
-                    {[0, 1, 2, 3].map((x) => {
-                        return (<View
-                            key={x}
-                            style={[
-                                styles.legendItem,
-                                {
-                                    backgroundColor: '#ccc',
-                                }
-                            ]}
-                            activeOpacity={0.7}
-                        >
-
-                            <View style={styles.legendContent}>
-                                <Text style={styles.legendLabel}></Text>
-                                <Text style={styles.legendAmount}></Text>
-                            </View>
-                            <Text style={styles.legendValue}></Text>
-                        </View>)
-                    })}
-                </View>
-
-                <View style={{ margin: 200 }} />
-            </ScrollView>
+                )}
+                renderItem={({ item }) => (
+                    <View key={item} style={[styles.legendItem, { backgroundColor: '#ccc' }]} />
+                )}
+                ListFooterComponent={<View style={{ margin: 200 }} />}
+            />
         );
     }
 
     return (
-        <ScrollView
-            refreshControl={refreshControl}
-            contentContainerStyle={styles.container}
+        <FlashList
             showsVerticalScrollIndicator={false}
-        >
-            <View style={styles.headerStyle}>
-                {renderPieChart()}
-            </View>
-
-            {data.map((item, index) => (
-                <View key={index.toString()}>
-                    {renderLegendItem({ item, index })}
-                </View>
-            ))}
-
-            <View style={{ margin: 200 }} />
-        </ScrollView>
+            refreshControl={refreshControl}
+            estimatedItemSize={100}
+            data={data}
+            ListHeaderComponent={() => <View style={styles.headerStyle}>{renderPieChart()}</View>}
+            renderItem={({ item, index }) => (
+                <TouchableOpacity
+                    style={[styles.legendItem, selectedIndex === index && styles.selectedLegendItem]}
+                    onPress={() => {
+                        setSelectedIndex(index);
+                        legendOnPress(item);
+                    }}
+                    activeOpacity={0.7}
+                >
+                    <MaterialCommunityIcons name={item.icon.icon} size={30} color={item.icon.color} style={{ paddingHorizontal: 10 }} />
+                    <View style={styles.legendContent}>
+                        <Text style={styles.legendLabel}>{item.icon.name}</Text>
+                        <Text style={styles.legendAmount}>{formatCurrency(item.amount)}</Text>
+                    </View>
+                    <Text style={styles.legendValue}>{item.percent}%</Text>
+                </TouchableOpacity>
+            )}
+            ListFooterComponent={<View style={{ margin: 200 }} />}
+        />
     );
-
 };
 
 const styles = StyleSheet.create({
@@ -325,20 +232,8 @@ const styles = StyleSheet.create({
         width: "100%",
         flexGrow: 1,
     },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-    },
-    emptyText: {
-        fontSize: 16,
-        color: '#666',
-        textAlign: 'center',
-    },
     headerStyle: {
         marginBottom: 20,
-        // backgroundColor: "red",
         height: 400,
         justifyContent: "center",
         alignItems: "center",
@@ -351,15 +246,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginVertical: 40,
         zIndex: 99
-
     },
     svg: {
         backgroundColor: 'transparent',
-        // backgroundColor: 'red',
-        // width: "100%"
     },
     centerContent: {
-        // position: 'absolute',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -409,12 +300,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
-    },
-    legendColor: {
-        width: 16,
-        height: 16,
-        borderRadius: 8,
-        marginRight: 12,
     },
     legendContent: {
         flex: 1,

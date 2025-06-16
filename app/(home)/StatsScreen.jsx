@@ -1,4 +1,5 @@
 import CustomPicker from '@/components/CustomPicker';
+import PeriodNavigator from '@/components/PeriodNavigator';
 import PieChart from '@/components/PieChart';
 import SlideSelect from '@/components/SlideSelect';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,7 +12,6 @@ import {
     StatusBar,
     StyleSheet,
     Text,
-    TouchableOpacity,
     View
 } from 'react-native';
 import { useTransactions } from '../TransactionContext';
@@ -116,33 +116,6 @@ export default function HomeScreen() {
         }, 1000);
     }
 
-    const goToPrev = () => {
-        const newDate = moment(selectedDate);
-        if (viewMode === 'week') setSelectedDate(newDate.subtract(1, 'week'));
-        if (viewMode === 'month') setSelectedDate(newDate.subtract(1, 'month'));
-        if (viewMode === 'quarter') setSelectedDate(newDate.subtract(1, 'quarter'));
-        if (viewMode === 'year') setSelectedDate(newDate.subtract(1, 'year'));
-    };
-
-    const goToNext = () => {
-        const newDate = moment(selectedDate);
-        if (viewMode === 'week') setSelectedDate(newDate.add(1, 'week'));
-        if (viewMode === 'month') setSelectedDate(newDate.add(1, 'month'));
-        if (viewMode === 'quarter') setSelectedDate(newDate.add(1, 'quarter'));
-        if (viewMode === 'year') setSelectedDate(newDate.add(1, 'year'));
-    };
-
-    const getPeriodLabel = () => {
-        if (viewMode === 'week') {
-            const start = moment(selectedDate).startOf('week');
-            const end = moment(selectedDate).endOf('week');
-            return `${start.format('D MMM')} - ${end.format('D MMM YYYY')}`;
-        }
-        if (viewMode === 'month') return selectedDate.format('MMMM YYYY');
-        if (viewMode === 'quarter') return `Q${selectedDate.quarter()} ${selectedDate.year()}`;
-        if (viewMode === 'year') return selectedDate.format('YYYY');
-    };
-
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
 
@@ -176,19 +149,11 @@ export default function HomeScreen() {
                 </View>
             </View>
 
-            {/* Month Navigation */}
-            <View style={styles.monthNav}>
-                <TouchableOpacity onPress={goToPrev}>
-                    <MaterialCommunityIcons name="chevron-left" size={30} />
-                </TouchableOpacity>
-
-                <Text style={styles.monthText}>{getPeriodLabel()}</Text>
-
-                <TouchableOpacity onPress={goToNext}>
-                    <MaterialCommunityIcons name="chevron-right" size={30} />
-                </TouchableOpacity>
-
-            </View>
+            <PeriodNavigator
+                selectedDate={selectedDate}
+                viewMode={viewMode}
+                onDateChange={setSelectedDate}
+            />
 
             {type == "income" && <PieChart
                 data={incomeCategoriesGroub}

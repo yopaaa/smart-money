@@ -66,7 +66,7 @@ const groupIncomeExpenseBars = (transactions) => {
     return barData;
 };
 
-function CustomBarChart({ data = [], title }) {
+function DoubleBarChart({ data = [], title }) {
 
     const barData = useMemo(() => {
         return groupIncomeExpenseBars(data);
@@ -134,4 +134,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default CustomBarChart;
+export default DoubleBarChart;

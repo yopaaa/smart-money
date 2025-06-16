@@ -1,11 +1,9 @@
 import SimpleHeader from '@/components/SimpleHeader';
-import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
-import { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import {
-    FlatList,
     RefreshControl,
     SafeAreaView,
     StatusBar,
@@ -15,11 +13,12 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import TransactionFlashList from '../(home)/TransactionFlashList';
 import { useTransactions } from '../TransactionContext';
 
-export default function SearchScreen() {
+function SearchScreen() {
     const router = useRouter();
-    const { filterTransactions, accounts, getCategoryById } = useTransactions();
+    const { filterTransactions, getCategoryById } = useTransactions();
     const [searchQuery, setSearchQuery] = useState('');
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [updateTriggers, setUpdateTriggers] = useState();
@@ -39,18 +38,6 @@ export default function SearchScreen() {
         }, 1000);
     };
 
-    function FindIcon({ id, size = 30, style }) {
-        const category = getCategoryById(id) || {
-            "id": "29680517",
-            "name": "Lainnya",
-            "icon": "dots-horizontal",
-            "color": "#b0bec5",
-            "type": "expense"
-        };
-
-        return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} style={style} />;
-    };
-
     const filteredTransactions = useMemo(() => {
         const filteredData = filterTransactions({
             search: searchQuery,
@@ -58,12 +45,8 @@ export default function SearchScreen() {
             ...(selectedCategory && { category: selectedCategory.name })
         });
 
-        if (!searchQuery) {
-            return filteredData.slice(0, 15)
-        }
-
-        return filteredData
-    }, [searchQuery, selectedType, selectedCategory, updateTriggers, filterTransactions]);
+        return !searchQuery ? filteredData.slice(0, 15) : filteredData;
+    }, [searchQuery, selectedType, selectedCategory, updateTriggers]);
 
     const groupedTransactions = useMemo(() => {
         const groups = {};
@@ -73,11 +56,7 @@ export default function SearchScreen() {
             const now = moment().startOf('day');
             const diff = now.diff(mDate, 'days');
 
-            let dateKey = diff === 0
-                ? 'Today'
-                : diff === 1
-                    ? 'Yesterday'
-                    : mDate.format('DD MMM YYYY');
+            let dateKey = diff === 0 ? 'Today' : diff === 1 ? 'Yesterday' : mDate.format('DD MMM YYYY');
 
             if (!groups[dateKey]) {
                 groups[dateKey] = {
@@ -89,12 +68,7 @@ export default function SearchScreen() {
 
             groups[dateKey].data.push(item);
 
-            const value =
-                item.type === 'income'
-                    ? item.amount
-                    : item.type === 'expense'
-                        ? -item.amount
-                        : 0;
+            const value = item.type === 'income' ? item.amount : item.type === 'expense' ? -item.amount : 0;
 
             groups[dateKey].total += value;
         });
@@ -109,68 +83,19 @@ export default function SearchScreen() {
             .sort((a, b) => b.timestamp - a.timestamp);
     }, [filteredTransactions]);
 
-    const renderTransactionItem = ({ item }) => {
-        const isExpense = item.type === 'expense';
-        const isTransfer = item.type === 'transfer';
-        const amountStyle = isExpense ? styles.expense : isTransfer ? styles.transfer : styles.income;
-
-        return (
-            <TouchableOpacity
-                onPress={() => {
-                    router.push({
-                        pathname: '/transaction/TransactionDetails',
-                        params: {
-                            id: item.id,
-                            category: item.category,
-                            type: item.type
-                        }
-                    });
-                }}
-                style={styles.item}
-            >
-                <View style={{ paddingHorizontal: 15 }}>
-                    <FindIcon id={item.category} />
-                </View>
-
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.date}>
-                        {moment(Number(item.createdAt)).format('HH:mm, DD MMM YYYY')}
-                    </Text>
-                </View>
-                <Text style={[styles.amount, amountStyle]}>
-                    {isExpense ? '-' : isTransfer ? '' : '+'} {formatCurrency(item.amount)}
-                </Text>
-            </TouchableOpacity>
-        );
-    };
-
-    const renderGroup = ({ item }) => {
-        const amountStyle = item.total < 0 ? styles.expense : styles.income;
-
-        return (
-            <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
-                <View style={styles.transactionBox}>
-                    <Text style={styles.dateHeader}>{item.date}</Text>
-                    <Text style={[styles.amount, amountStyle]}>
-                        {formatCurrency(item.total)}
-                    </Text>
-                </View>
-
-                {item.data.map(tx => (
-                    <View key={tx.id}>
-                        {renderTransactionItem({ item: tx })}
-                    </View>
-                ))}
-            </View>
-        );
-    };
+    const onTransactionPress = useCallback((item) => {
+        router.push({
+            pathname: 'transaction/TransactionDetails/',
+            params: {
+                id: item.id,
+            },
+        });
+    }, [router]);
 
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
             <SimpleHeader title="Search Transactions" />
 
-            {/* Search Bar */}
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.searchInput}
@@ -182,50 +107,40 @@ export default function SearchScreen() {
                 <MaterialCommunityIcons name="magnify" size={24} style={styles.searchIcon} />
             </View>
 
-            {/* Filter Options */}
             <View style={styles.filterContainer}>
-                <TouchableOpacity
-                    style={[styles.filterButton, selectedType === 'income' && styles.activeFilter]}
-                    onPress={() => setSelectedType(selectedType === 'income' ? null : 'income')}
-                >
-                    <Text>Income</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.filterButton, selectedType === 'expense' && styles.activeFilter]}
-                    onPress={() => setSelectedType(selectedType === 'expense' ? null : 'expense')}
-                >
-                    <Text>Expense</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.filterButton, selectedType === 'transfer' && styles.activeFilter]}
-                    onPress={() => setSelectedType(selectedType === 'transfer' ? null : 'transfer')}
-                >
-                    <Text>Transfer</Text>
-                </TouchableOpacity>
+                {['income', 'expense', 'transfer'].map(type => (
+                    <TouchableOpacity
+                        key={type}
+                        style={[styles.filterButton, selectedType === type && styles.activeFilter]}
+                        onPress={() => setSelectedType(selectedType === type ? null : type)}
+                    >
+                        <Text>{type.charAt(0).toUpperCase() + type.slice(1)}</Text>
+                    </TouchableOpacity>
+                ))}
             </View>
 
-            <FlatList
-                initialNumToRender={3}
-                windowSize={10}
-                removeClippedSubviews={true}
-                data={groupedTransactions}
-                keyExtractor={(item) => item.date}
-                renderItem={renderGroup}
-                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-                ListEmptyComponent={
-                    <View style={{ justifyContent: "center", alignItems: "center", height: "50%" }}>
-                        <Text>No transactions found</Text>
-                    </View>
-                }
-                showsVerticalScrollIndicator={false}
-                ListFooterComponent={<View style={{ margin: 200 }} />}
-            />
+            <View style={{ paddingHorizontal: 16, flex: 1 }}>
+                <TransactionFlashList
+                    groupedTransactions={groupedTransactions}
+                    onTransactionPress={onTransactionPress}
+                    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+                    ListEmptyComponent={
+                        <View style={{ justifyContent: "center", alignItems: "center", height: 300 }}>
+                            <Text>Tidak ada transaksi</Text>
+                        </View>
+                    }
+                />
+            </View>
+
         </SafeAreaView>
     );
 }
 
+export default memo(SearchScreen);
+
 const styles = StyleSheet.create({
     container: {
+        // padding: 16,
         flex: 1,
         flexDirection: "column",
     },
@@ -251,8 +166,7 @@ const styles = StyleSheet.create({
     filterContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        paddingHorizontal: 16,
-        marginBottom: 10,
+        // marginBottom: 10,
     },
     filterButton: {
         paddingHorizontal: 15,
@@ -277,10 +191,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'transparent',
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
+        shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 1,
         elevation: 1,
@@ -316,7 +227,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 16,
         marginBottom: 8,
-        padding: 10
+        padding: 10,
     },
     dateHeader: {
         fontSize: 16,

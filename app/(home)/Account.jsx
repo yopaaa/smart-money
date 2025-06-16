@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { FlashList } from '@shopify/flash-list';
 import {
     RefreshControl,
-    SectionList,
     StatusBar,
     StyleSheet,
     Text,
@@ -11,11 +11,74 @@ import {
 
 import { formatCurrency } from '@/utils/number';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import ThreeDotMenu from '../../components/ThreeDots';
 import { useTransactions } from '../TransactionContext';
 
 const TITLE = "Buckets And Balances"
+
+// Komponen SummaryCard dimemoized
+const SummaryCard = React.memo(({ title, value, isHideBalance }) => (
+    <View style={styles.summaryCard}>
+        <Text style={styles.summaryLabel}>{title}</Text>
+        <Text style={[
+            styles.summaryValue,
+            value > 0 ? styles.assetBalance : styles.liabilityBalance
+        ]}>
+            {isHideBalance ? (formatCurrency(value) || "0") : "*****"}
+        </Text>
+    </View>
+));
+
+// Komponen AccountItem dimemoized
+const AccountItem = React.memo(({ item, isHideBalance, onPress }) => (
+    <View style={styles.accountCard}>
+        <TouchableOpacity
+            style={styles.accountItem}
+            onPress={onPress}
+            activeOpacity={0.7}
+        >
+            <View style={styles.accountLeft}>
+                <View style={styles.iconContainer}>
+                    <MaterialCommunityIcons
+                        name={item.icon}
+                        size={24}
+                        color={item.iconColor}
+                    />
+                </View>
+                <View style={styles.accountInfo}>
+                    <Text style={styles.accountName}>{item.name}</Text>
+                </View>
+            </View>
+            <View style={styles.accountRight}>
+                <Text style={[
+                    styles.accountBalance,
+                    item.hidden
+                        ? styles.hiddenBalance
+                        : item.isLiability || item.balance < 0
+                            ? styles.liabilityBalance
+                            : styles.assetBalance
+                ]}>
+                    {isHideBalance ? (formatCurrency(item.balance) || "0") : "*****"}
+                </Text>
+                <MaterialCommunityIcons name="chevron-right" size={24} color="#999" style={styles.arrow} />
+            </View>
+        </TouchableOpacity>
+    </View>
+));
+
+// Komponen SectionHeader dimemoized
+const SectionHeader = React.memo(({ title, balance, isHideBalance }) => (
+    <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={[
+            styles.sectionBalance,
+            balance < 0 ? styles.liabilityBalance : styles.assetBalance
+        ]}>
+            {isHideBalance ? (formatCurrency(balance) || "0") : "*****"}
+        </Text>
+    </View>
+));
 
 export default function AccountsScreen() {
     const router = useRouter();
@@ -23,15 +86,17 @@ export default function AccountsScreen() {
     const [isRefreshing, setisRefreshing] = useState(false)
     const [isHideBalance, setisHideBalance] = useState(true)
 
-    const handleRefresh = () => {
+    // Optimasi: Memoize handleRefresh untuk mencegah re-render
+    const handleRefresh = useCallback(() => {
         refetchData()
         setisRefreshing(true)
         setTimeout(() => {
             setisRefreshing(false)
         }, 1000);
-    }
+    }, [refetchData]);
 
-    const calculateSummary = () => {
+    // Optimasi: Memoize perhitungan summary
+    const summary = useMemo(() => {
         let assets = 0;
         let liabilities = 0;
         for (let acc of accounts) {
@@ -47,21 +112,96 @@ export default function AccountsScreen() {
             liabilities,
             total: assets - liabilities
         };
-    };
+    }, [accounts]);
 
-    const { assets, liabilities, total } = calculateSummary();
+    // Optimasi: Memoize toggle balance visibility
+    const toggleBalanceVisibility = useCallback(() => {
+        setisHideBalance(prev => !prev);
+    }, []);
 
-    const SummaryCard = ({ title, value }) => (
-        <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>{title}</Text>
-            <Text style={[
-                styles.summaryValue,
-                value > 0 ? styles.assetBalance : styles.liabilityBalance
-            ]}>
-                {isHideBalance ? (formatCurrency(value) || "0") : "*****"}
-            </Text>
-        </View>
-    );
+    // Optimasi: Memoize menu items
+    const menuItems = useMemo(() => [
+        { name: 'Add Bucket', fn: () => router.navigate("transaction/CreateAccountForm") },
+        {
+            name: 'Show/Hide', fn: () => {
+                router.push({
+                    pathname: 'settings/ShowAndHideAccount'
+                });
+            }
+        },
+        {
+            name: 'Delete', fn: () => {
+                router.push({
+                    pathname: 'settings/DeleteAccount'
+                });
+            }
+        },
+        { name: 'Modify Orders', fn: () => router.navigate("settings/ModifyOrderAccounts") },
+    ], [router]);
+
+    // Konversi data section menjadi flat list untuk FlashList
+    const flattenedData = useMemo(() => {
+        const data = [];
+        accountsGrouped.forEach(section => {
+            // Tambahkan header section
+            data.push({
+                type: 'header',
+                id: `header-${section.title}`,
+                title: section.title,
+                balance: section.balance
+            });
+            // Tambahkan items dalam section
+            section.data.forEach(item => {
+                data.push({
+                    type: 'item',
+                    ...item
+                });
+            });
+        });
+        return data;
+    }, [accountsGrouped]);
+
+    // Optimasi: Memoize renderItem function untuk FlashList
+    const renderItem = useCallback(({ item }) => {
+        if (item.type === 'header') {
+            return (
+                <SectionHeader
+                    title={item.title}
+                    balance={item.balance}
+                    isHideBalance={isHideBalance}
+                />
+            );
+        }
+
+        const handlePress = () => {
+            router.push({
+                pathname: 'transaction/PerAccountsTransactions',
+                params: {
+                    id: item.id,
+                    title: item.name
+                }
+            });
+        };
+
+        return (
+            <AccountItem
+                item={item}
+                isHideBalance={isHideBalance}
+                onPress={handlePress}
+            />
+        );
+    }, [isHideBalance, router]);
+
+    // Optimasi: Memoize keyExtractor untuk FlashList
+    const keyExtractor = useCallback((item) => item.id, []);
+
+    // Optimasi: getItemType untuk FlashList performance
+    const getItemType = useCallback((item) => {
+        return item.type === 'header' ? 'header' : 'item';
+    }, []);
+
+    // Estimasi tinggi item untuk FlashList
+    const estimatedItemSize = 80;
 
     return (
         <View style={styles.container}>
@@ -70,8 +210,9 @@ export default function AccountsScreen() {
                 <Text style={styles.headerTitle}>{TITLE}</Text>
                 <View style={styles.headerActions}>
                     <TouchableOpacity
-                        onPress={() => setisHideBalance(!isHideBalance)}
+                        onPress={toggleBalanceVisibility}
                         style={styles.eyeButton}
+                        activeOpacity={0.7}
                     >
                         <MaterialCommunityIcons
                             name={isHideBalance ? "eye" : "eye-off"}
@@ -81,24 +222,7 @@ export default function AccountsScreen() {
                     </TouchableOpacity>
                     <ThreeDotMenu
                         dotColor="#666"
-                        menuItems={[
-                            { name: 'Add Bucket', fn: () => router.navigate("transaction/CreateAccountForm") },
-                            {
-                                name: 'Show/Hide', fn: () => {
-                                    router.push({
-                                        pathname: 'settings/ShowAndHideAccount'
-                                    });
-                                }
-                            },
-                            {
-                                name: 'Delete', fn: () => {
-                                    router.push({
-                                        pathname: 'settings/DeleteAccount'
-                                    });
-                                }
-                            },
-                            { name: 'Modify Orders', fn: () => router.navigate("settings/ModifyOrderAccounts") },
-                        ]}
+                        menuItems={menuItems}
                     />
                 </View>
             </View>
@@ -106,78 +230,42 @@ export default function AccountsScreen() {
             {/* Summary Cards */}
             <View style={styles.summarySection}>
                 <View style={styles.summaryGrid}>
-                    <SummaryCard title="Assets" value={assets} />
-                    <SummaryCard title="Liabilities" value={liabilities} />
-                    <SummaryCard title="Total" value={total} />
+                    <SummaryCard title="Assets" value={summary.assets} isHideBalance={isHideBalance} />
+                    <SummaryCard title="Liabilities" value={summary.liabilities} isHideBalance={isHideBalance} />
+                    <SummaryCard title="Total" value={summary.total} isHideBalance={isHideBalance} />
                 </View>
             </View>
 
-            {/* Accounts List */}
+            {/* Accounts List dengan FlashList */}
             <View style={styles.content}>
-                <SectionList
-                    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-                    initialNumToRender={3}
-                    windowSize={10}
-                    removeClippedSubviews={true}
-                    scrollEnabled
-                    sections={accountsGrouped}
-                    keyExtractor={(item) => item.id}
-                    contentContainerStyle={{ paddingBottom: 100 }}
+                <FlashList
+                    data={flattenedData}
+                    renderItem={renderItem}
+                    keyExtractor={keyExtractor}
+                    getItemType={getItemType}
+                    estimatedItemSize={estimatedItemSize}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={isRefreshing}
+                            onRefresh={handleRefresh}
+                        />
+                    }
                     showsVerticalScrollIndicator={false}
-                    renderSectionHeader={({ section: { title, balance } }) => (
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>{title}</Text>
-                            <Text style={[
-                                styles.sectionBalance,
-                                balance < 0 ? styles.liabilityBalance : styles.assetBalance
-                            ]}>
-                                {isHideBalance ? (formatCurrency(balance) || "0") : "*****"}
-                            </Text>
-                        </View>
-                    )}
-                    renderItem={({ item }) => (
-                        <View style={styles.accountCard}>
-                            <TouchableOpacity
-                                style={styles.accountItem}
-                                onPress={() => {
-                                    router.push({
-                                        pathname: 'transaction/PerAccountsTransactions',
-                                        params: {
-                                            id: item.id,
-                                            title: item.name
-                                        }
-                                    });
-                                }}
-                            >
-                                <View style={styles.accountLeft}>
-                                    <View style={styles.iconContainer}>
-                                        <MaterialCommunityIcons
-                                            name={item.icon}
-                                            size={24}
-                                            color={item.iconColor}
-                                        />
-                                    </View>
-                                    <View style={styles.accountInfo}>
-                                        <Text style={styles.accountName}>{item.name}</Text>
-                                      
-                                    </View>
-                                </View>
-                                <View style={styles.accountRight}>
-                                    <Text style={[
-                                        styles.accountBalance,
-                                        item.hidden
-                                            ? styles.hiddenBalance
-                                            : item.isLiability || item.balance < 0
-                                                ? styles.liabilityBalance
-                                                : styles.assetBalance
-                                    ]}>
-                                        {isHideBalance ? (formatCurrency(item.balance) || "0") : "*****"}
-                                    </Text>
-                                    <MaterialCommunityIcons name="chevron-right" size={24} color="#999" style={styles.arrow}/>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
-                    )}
+                    contentContainerStyle={{ paddingBottom: 100 }}
+                    // FlashList specific optimizations
+                    drawDistance={500}
+                    overrideItemLayout={(layout, item) => {
+                        // Berbeda tinggi untuk header dan item
+                        if (item.type === 'header') {
+                            layout.size = 60; // Tinggi header
+                        } else {
+                            layout.size = 80; // Tinggi item
+                        }
+                    }}
+                    // Optimasi untuk performa
+                    removeClippedSubviews={true}
+                    disableAutoLayout={false}
+                    // Footer component
                     ListFooterComponent={<View style={{ height: 50 }} />}
                 />
             </View>
@@ -217,6 +305,10 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 8,
         backgroundColor: '#F8F9FA',
+    },
+    summarySection: {
+        paddingHorizontal: 20,
+        marginBottom: 10,
     },
     summaryGrid: {
         flexDirection: 'row',
@@ -265,10 +357,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 14,
         paddingHorizontal: 4,
-        // marginTop: 20,
         marginBottom: 8,
         borderBottomWidth: 1,
         borderBottomColor: '#E5E5E5',
+        backgroundColor: 'transparent',
     },
     sectionTitle: {
         fontSize: 14,
@@ -306,7 +398,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: 10,
-        
+
     },
     accountLeft: {
         flexDirection: 'row',

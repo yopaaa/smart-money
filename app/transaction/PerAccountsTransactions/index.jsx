@@ -1,4 +1,5 @@
-import BarChart from '@/components/DoubleBarChart';
+import DoubleBarChart from '@/components/DoubleBarChart';
+import PeriodNavigator from '@/components/PeriodNavigator';
 import SimpleHeader from '@/components/SimpleHeader';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -6,7 +7,6 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import moment from 'moment';
 import { useCallback, useMemo, useState } from 'react';
 import {
-    FlatList,
     RefreshControl,
     SafeAreaView,
     StatusBar,
@@ -15,13 +15,13 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import TransactionFlashList from '../../(home)/TransactionFlashList';
 import { useTransactions } from '../../TransactionContext';
-
 
 export default function HomeScreen() {
     const { title, id, viewMode = "month", selectedDate: selectedDates } = useLocalSearchParams();
     const router = useRouter();
-    const { filterTransactions, getCategoryById } = useTransactions();
+    const { filterTransactions } = useTransactions();
     const [selectedDate, setSelectedDate] = useState(moment());
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [updateTriggers, setUpdateTriggers] = useState();
@@ -38,45 +38,6 @@ export default function HomeScreen() {
         setTimeout(() => {
             setIsRefreshing(false);
         }, 1000);
-    };
-
-    const goToPrev = () => {
-        const newDate = moment(selectedDate);
-        if (viewMode === 'week') setSelectedDate(newDate.subtract(1, 'week'));
-        if (viewMode === 'month') setSelectedDate(newDate.subtract(1, 'month'));
-        if (viewMode === 'quarter') setSelectedDate(newDate.subtract(1, 'quarter'));
-        if (viewMode === 'year') setSelectedDate(newDate.subtract(1, 'year'));
-    };
-
-    const goToNext = () => {
-        const newDate = moment(selectedDate);
-        if (viewMode === 'week') setSelectedDate(newDate.add(1, 'week'));
-        if (viewMode === 'month') setSelectedDate(newDate.add(1, 'month'));
-        if (viewMode === 'quarter') setSelectedDate(newDate.add(1, 'quarter'));
-        if (viewMode === 'year') setSelectedDate(newDate.add(1, 'year'));
-    };
-
-    const getPeriodLabel = () => {
-        if (viewMode === 'week') {
-            const start = moment(selectedDate).startOf('week');
-            const end = moment(selectedDate).endOf('week');
-            return `${start.format('D')}-${end.format('D MMM YYYY')}`;
-        }
-        if (viewMode === 'month') return selectedDate.format('MMMM YYYY');
-        if (viewMode === 'quarter') return `Q${selectedDate.quarter()} ${selectedDate.year()}`;
-        if (viewMode === 'year') return selectedDate.format('YYYY');
-    };
-
-    function FindIcon({ id, size = 30, style }) {
-        const category = getCategoryById(id) || {
-            "id": "29680517",
-            "name": "Lainnya",
-            "icon": "dots-horizontal",
-            "color": "#b0bec5",
-            "type": "expense"
-        };
-
-        return <MaterialCommunityIcons name={category.icon} size={size} color={category.color} style={style} />;
     };
 
     const filteredTransactions = useMemo(() => {
@@ -168,71 +129,40 @@ export default function HomeScreen() {
         };
     }, [filteredTransactions]);
 
-    const renderTransactionItem = ({ item }) => {
-        const isExpense = item.type === 'expense';
-        const isTransfer = item.type === 'transfer';
-        const amountStyle = isExpense ? styles.expense : isTransfer ? styles.transfer : styles.income;
-
-        return (
-            <TouchableOpacity
-                onPress={() => {
-                    router.push({
-                        pathname: 'transaction/TransactionDetails/',
-                        params: {
-                            id: item.id
-                        }
-                    });
-                }}
-                style={styles.item}
-            >
-                <View style={{ paddingHorizontal: 15 }}>
-                    <FindIcon id={item.category} />
-                </View>
-
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.title}>{item.title}</Text>
-                    <Text style={styles.date}>
-                        {moment().diff(moment(Number(item.createdAt)), 'days') > 3
-                            ? moment(Number(item.createdAt)).format('HH:mm, DD MMM YYYY')
-                            : moment(Number(item.createdAt)).fromNow()}
-                    </Text>
-                </View>
-                <Text style={[styles.amount, amountStyle]}>
-                    {isExpense ? '-' : isTransfer ? "" : '+'} {formatCurrency(item.amount)}
-                </Text>
-            </TouchableOpacity>
-        );
-    };
-
-    const renderGroup = ({ item }) => {
-        const isNew = item.date !== "Today" && item.date !== "Yesterday";
-        const amountStyle = item.total < 0 ? styles.expense : styles.income;
-
-        return (
-            <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
-                <View style={styles.transactionBox}>
-                    <View style={{ flexDirection: 'row', alignItems: "center" }}>
-                        <Text style={[styles.dateHeader, isNew && { fontSize: 30 }]}>{item.date}</Text>
-                        {isNew && (
-                            <View style={styles.transactionRight}>
-                                <Text style={styles.day}>{moment(item.timestamp).format('dddd')}</Text>
-                                <Text style={styles.dateSmall}>{moment(item.timestamp).format("MMM YYYY")}</Text>
-                            </View>
-                        )}
-                    </View>
-                    <Text style={[styles.amount, amountStyle]}>
-                        {formatCurrency(item.total)}
-                    </Text>
-                </View>
-
-                {item.data.map(tx => (
-                    <View key={tx.id}>
-                        {renderTransactionItem({ item: tx })}
-                    </View>
-                ))}
+    const renderListHeader = useCallback(() => (
+        <View style={styles.overviewBox}>
+            <View style={styles.row}>
+                <Text style={styles.label}>{title} Income</Text>
+                <Text style={[styles.amount, styles.income]}>{formatCurrency(totalOverview.income) || 0}</Text>
             </View>
-        );
-    };
+
+            <View style={styles.row}>
+                <Text style={styles.label}>{title} Expense</Text>
+                <Text style={[styles.amount, styles.expense]}>{formatCurrency(totalOverview.expense) || 0}</Text>
+            </View>
+
+            <View style={styles.row}>
+                <Text style={styles.label}>{title} Total</Text>
+                <Text style={[styles.amount, totalOverview.net > 0 ? styles.income : styles.expense]}>{formatCurrency(totalOverview.net) || 0}</Text>
+            </View>
+
+            <View style={styles.overviewHeader}>
+                <Text style={styles.overviewTitle}>Overview per {viewMode === "year" ? "Week" : "Days"}</Text>
+                <MaterialCommunityIcons name="information-outline" size={16} />
+            </View>
+
+            <DoubleBarChart data={filteredTransactions.filter(val => val.type !== "transfer")} mode={viewMode} />
+        </View>
+    ), [title, totalOverview, filteredTransactions, viewMode]);
+
+    const onTransactionPress = useCallback((item) => {
+        router.push({
+            pathname: 'transaction/TransactionDetails/',
+            params: {
+                id: item.id,
+            },
+        });
+    }, [router]);
 
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
@@ -260,59 +190,27 @@ export default function HomeScreen() {
 
                 }
                 rightComponent={
-                    <View style={styles.monthNav}>
-                        <TouchableOpacity onPress={goToPrev}>
-                            <MaterialCommunityIcons name="chevron-left" size={30} />
-                        </TouchableOpacity>
-
-                        <Text style={styles.monthText}>{getPeriodLabel()}</Text>
-
-                        <TouchableOpacity onPress={goToNext}>
-                            <MaterialCommunityIcons name="chevron-right" size={30} />
-                        </TouchableOpacity>
-                    </View>
+                    <PeriodNavigator
+                        selectedDate={selectedDate}
+                        viewMode={viewMode}
+                        onDateChange={setSelectedDate}
+                    />
                 }
             />
 
-
-            <FlatList
-                data={groupedTransactions}
-                keyExtractor={(item) => item.date}
-                renderItem={renderGroup}
-                refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-                ListEmptyComponent={
-                    <View style={{ justifyContent: "center", alignItems: "center", height: "50%" }}>
-                        <Text>Tidak ada transaksi</Text>
-                    </View>
-                }
-                showsVerticalScrollIndicator={false}
-                ListHeaderComponent={
-                    <View style={styles.overviewBox}>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>{title} Income</Text>
-                            <Text style={[styles.amount, styles.income]}> {formatCurrency(totalOverview.income) || 0}</Text>
+            <View style={{ paddingHorizontal: 16, flex: 1 }}>
+                <TransactionFlashList
+                    groupedTransactions={groupedTransactions}
+                    onTransactionPress={onTransactionPress}
+                    refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+                    ListEmptyComponent={
+                        <View style={{ justifyContent: "center", alignItems: "center", height: 300 }}>
+                            <Text>Tidak ada transaksi</Text>
                         </View>
-
-                        <View style={styles.row}>
-                            <Text style={styles.label}>{title} Expense</Text>
-                            <Text style={[styles.amount, styles.expense]}> {formatCurrency(totalOverview.expense) || 0}</Text>
-                        </View>
-
-                        <View style={styles.row}>
-                            <Text style={styles.label}>{title} Total</Text>
-                            <Text style={[styles.amount, totalOverview.net > 0 ? styles.income : styles.expense]}> {formatCurrency(totalOverview.net) || 0}</Text>
-                        </View>
-
-                        <View style={styles.overviewHeader}>
-                            <Text style={styles.overviewTitle}>Overview per {viewMode == "year" ? "Week" : "Days"}</Text>
-                            <MaterialCommunityIcons name="information-outline" size={16} />
-                        </View>
-                        <BarChart data={filteredTransactions.filter(val => val.type != "transfer")
-                        } mode={viewMode} />
-                    </View>
-                }
-                ListFooterComponent={<View style={{ margin: 200 }} />}
-            />
+                    }
+                    ListHeaderComponent={renderListHeader}
+                />
+            </View>
         </SafeAreaView>
     );
 }
@@ -374,7 +272,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     overviewBox: {
-        paddingHorizontal: 16,
         paddingTop: 16,
     },
     overviewHeader: {
