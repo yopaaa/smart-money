@@ -5,6 +5,7 @@ import SimpleHeader from '@/components/SimpleHeader';
 import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -20,6 +21,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { FOLDER_PATH } from '../TakePhoto';
 
 const TransactionForm = () => {
     const { id } = useLocalSearchParams();
@@ -52,6 +54,7 @@ const TransactionForm = () => {
         targetAccountId: '',
         category: '',
         fee: '0',
+        img: ""
     });
 
     useEffect(() => {
@@ -81,7 +84,8 @@ const TransactionForm = () => {
                     accountId: accounts.find(acc => acc.id === tx.accountId) || accounts[0],
                     targetAccountId: accounts.find(acc => acc.id === tx.targetAccountId) || "",
                     category: matchedCategory,
-                    fee: tx.fee
+                    fee: tx.fee,
+                    img: tx.img,
                 });
 
                 setSelectedDate(txDate);
@@ -156,7 +160,7 @@ const TransactionForm = () => {
             Alert.alert('Error', e.message);
         }
     }
-    const handleCopy = () => {        
+    const handleCopy = () => {
         router.push({
             pathname: 'transaction/TransactionForm',
             params: {
@@ -330,16 +334,19 @@ const TransactionForm = () => {
                         onChangeText={(text) => handleChange('description', text)}
                     />
 
-                    {/* Actions Button */}
-                    <View style={{ flexDirection: 'row', marginTop: 16 }}>
-                        <ActionButton title="Hapus" backgroundColor="#F44336" onPress={handleDelete} disabled={!isFormEditable} />
-                        <ActionButton title="Salin" backgroundColor="#2196F3" onPress={handleCopy} />
-                        <ActionButton title="Edit" backgroundColor="#4CAF50" onPress={handleEdit} disabled={!isFormEditable} />
-                    </View>
-
+                    {formData.img && <View style={{ justifyContent: "center", flex: 1, alignItems: "center", padding: 14 }}>
+                        <Image source={{ uri: FOLDER_PATH + formData.img }} style={{ height: 300, width: 300, borderRadius: 14 }} />
+                    </View>}
 
                 </View>
             </ScrollView>
+
+            {/* Actions Button */}
+            <View style={{ flexDirection: 'row', marginBottom: 70, padding: 14 }}>
+                <ActionButton title="Hapus" backgroundColor="#F44336" onPress={handleDelete} disabled={!isFormEditable} />
+                <ActionButton title="Salin" backgroundColor="#2196F3" onPress={handleCopy} />
+                <ActionButton title="Edit" backgroundColor="#4CAF50" onPress={handleEdit} disabled={!isFormEditable} />
+            </View>
         </KeyboardAvoidingView>
     );
 };

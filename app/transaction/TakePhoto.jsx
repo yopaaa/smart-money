@@ -19,8 +19,8 @@ import {
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
-const FOLDER_NAME = 'SmartMoney';
-const HIDDEN_FOLDER_PATH = `${FileSystem.documentDirectory}${FOLDER_NAME}/`;
+export const FOLDER_NAME = 'SmartMoney';
+export const FOLDER_PATH = `${FileSystem.documentDirectory}${FOLDER_NAME}/`;
 
 // Custom Hooks
 const useTempPhotoStorage = () => {
@@ -55,8 +55,8 @@ const usePhotoSaver = () => {
     if (!photoUri) return false;
     try {
       const filename = `transaksi_${Date.now()}.jpg`;
-      await FileSystem.makeDirectoryAsync(HIDDEN_FOLDER_PATH, { intermediates: true });
-      const newPath = `${HIDDEN_FOLDER_PATH}${filename}`;
+      await FileSystem.makeDirectoryAsync(FOLDER_PATH, { intermediates: true });
+      const newPath = `${FOLDER_PATH}${filename}`;
       await FileSystem.copyAsync({ from: photoUri, to: newPath });
       return { success: true, filePath: newPath, filename };
     } catch (error) {

@@ -1,27 +1,32 @@
 import appJson from '@/app.json';
+import SimpleHeader from '@/components/SimpleHeader';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 
 export default function AppInfoScreen() {
   const info = appJson.expo;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <MaterialCommunityIcons name="information-outline" size={48} color="#4F46E5" />
-        <Text style={styles.title}>Informasi Aplikasi</Text>
-        <Text style={styles.subtitle}>Versi: {info.version}</Text>
-      </View>
+      <SimpleHeader title={"Gallery SmartMoney"} />
 
-      <View style={styles.card}>
-        <InfoItem label="Nama Aplikasi" value={info.name} />
-        <InfoItem label="Slug" value={info.slug} />
-        <InfoItem label="Orientasi" value={info.orientation} />
-        {/* <InfoItem label="UI Style" value={info.userInterfaceStyle} /> */}
-        {/* <InfoItem label="Platform" value={info.platforms?.join(', ')} /> */}
-      </View>
+      <View style={{ justifyContent: "center", alignItems: "center", padding: 20 }}>
+        <View style={styles.header}>
+          <MaterialCommunityIcons name="information-outline" size={48} color="#4F46E5" />
+          <Text style={styles.title}>Informasi Aplikasi</Text>
+          <Text style={styles.subtitle}>Versi: {info.version}</Text>
+        </View>
 
-      <Text style={styles.footer}>© 2025 {info.name}</Text>
+        <View style={styles.card}>
+          <InfoItem label="Nama Aplikasi" value={info.name} />
+          <InfoItem label="Slug" value={info.slug} />
+          <InfoItem label="Orientasi" value={info.orientation} />
+          {/* <InfoItem label="UI Style" value={info.userInterfaceStyle} /> */}
+          {/* <InfoItem label="Platform" value={info.platforms?.join(', ')} /> */}
+        </View>
+
+        <Text style={styles.footer}>© 2025 {info.name}</Text>
+      </View>
     </ScrollView>
   );
 }
@@ -37,12 +42,8 @@ function InfoItem({ label, value }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingTop: 60,
-    alignItems: 'center',
-    justifyContent: "center",
-    backgroundColor: '#F9FAFB',
-    flexGrow: 1,
+    flex: 1,
+    paddingTop: StatusBar.currentHeight || 0,
   },
   header: {
     alignItems: 'center',

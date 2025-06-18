@@ -64,6 +64,9 @@ export const initDB = () => {
             addCategory(val)
         })
     }
+
+    addColumnIfNotExists(TRANSACTION_TABLE_NAME, 'img', "TEXT");
+    addColumnIfNotExists(ACCOUNT_TABLE_NAME, 'isFavorite', "INTEGER DEFAULT 0");
 };
 
 
@@ -84,5 +87,28 @@ export function resetTables() {
     } catch (error) {
         db.execSync('ROLLBACK');
         console.error('❌ Gagal reset tabel:', error);
+    }
+}
+
+/**
+ * Menambahkan kolom ke tabel SQLite jika belum ada.
+ * @param {string} tableName - Nama tabel.
+ * @param {string} columnName - Nama kolom yang ingin ditambahkan.
+ * @param {string} columnDefinition - Definisi kolom (misalnya: "TEXT DEFAULT ''").
+ */
+export function addColumnIfNotExists(tableName, columnName, columnDefinition) {
+    try {
+        const columns = db.getAllSync(`PRAGMA table_info(${tableName})`);
+
+        const exists = columns.some(col => col.name === columnName);
+        if (exists) {
+            return;
+        }
+
+        const sql = `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnDefinition}`;
+        db.execSync(sql);
+        console.log(`✅ Kolom '${columnName}' berhasil ditambahkan ke tabel '${tableName}'`);
+    } catch (e) {
+        console.error(`❌ Gagal menambahkan kolom '${columnName}' ke '${tableName}':`, e.message);
     }
 }

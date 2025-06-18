@@ -12,18 +12,15 @@ import { ACCOUNT_TABLE_NAME, TRANSACTION_TABLE_NAME } from './initDB';
         targetAccountId?: string, // untuk transfer
         createdAt: string (ISO date),
         category:  string,
-        fee
+        fee: string,
+        img: string
       }
 */
+
 export const getTransactions = () => {
     return db.getAllSync(`SELECT * FROM ${TRANSACTION_TABLE_NAME} ORDER BY createdAt DESC`);
 };
 
-/**
- * Fungsi untuk mendapatkan transaksi berdasarkan ID
- * @param {string} id - ID transaksi yang dicari
- * @returns {Object|null} Objek transaksi jika ditemukan, null jika tidak
- */
 export const getTransactionById = (id) => {
     try {
         const sql = `SELECT * FROM ${TRANSACTION_TABLE_NAME} WHERE id = ? LIMIT 1`;
@@ -52,7 +49,8 @@ export const addTransaction = (
         targetAccountId: null,
         createdAt: Number,
         category: String,
-        fee: NUmber
+        fee: NUmber,
+        img, String,
     }
 ) => {
     try {
@@ -62,8 +60,8 @@ export const addTransaction = (
         const id = generateId();
         db.runSync(
             `INSERT INTO ${TRANSACTION_TABLE_NAME} 
-                (id, title, description, amount, type, accountId, targetAccountId, createdAt, category, fee)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                (id, title, description, amount, type, accountId, targetAccountId, createdAt, category, fee, img)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
             [
                 id,
                 transaction.title,
@@ -74,7 +72,8 @@ export const addTransaction = (
                 transaction.targetAccountId,
                 transaction.createdAt,
                 transaction.category || null,
-                transaction.fee || 0
+                transaction.fee || 0,
+                transaction.img || ""
             ]
         );
 

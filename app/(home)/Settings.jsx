@@ -189,9 +189,14 @@ export default function SettingsScreen() {
             }}
           />
           <SettingItem
+            title="Gallery"
+            subtitle="Transactions image list"
+            onPress={() => router.push("transaction/GalleryScreen")}
+          />
+          <SettingItem
             title="Clear Cache"
             subtitle="Free up storage space"
-            // onPress={() => router.push("transaction/TransactionPhoto")}
+            onPress={() => router.push("transaction/GalleryScreen")}
           />
         </SettingSection>
 
