@@ -296,19 +296,6 @@ export const deleteTransaction = (id) => {
     }
 };
 
-/**
- * Fungsi untuk filter transaksi dengan berbagai kriteria
- * @param {Object} query - Objek berisi parameter filter
- * @param {string} [query.search] - Pencarian di title/description (case insensitive)
- * @param {string} [query.type] - Jenis transaksi (income/expense/transfer)
- * @param {string} [query.category] - Kategori transaksi
- * @param {string} [query.accountId] - ID akun terkait
- * @param {number} [query.minAmount] - Jumlah minimum
- * @param {number} [query.maxAmount] - Jumlah maksimum
- * @param {number} [query.startDate] - Timestamp awal (createdAt >= startDate)
- * @param {number} [query.endDate] - Timestamp akhir (createdAt <= endDate)
- * @returns {Array} Array transaksi yang memenuhi kriteria
- */
 export const filterTransactions = (query = {}) => {
     try {
         // Base query
@@ -354,6 +341,10 @@ export const filterTransactions = (query = {}) => {
         if (query.endDate) {
             sql += ` AND createdAt <= ?`;
             params.push(query.endDate);
+        }
+
+        if (query.hasImage === true) {
+            sql += ` AND img IS NOT NULL AND img != ''`;
         }
 
         // Sorting default: terbaru dulu

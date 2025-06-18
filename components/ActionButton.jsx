@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 const ActionButton = ({
@@ -8,6 +9,7 @@ const ActionButton = ({
     backgroundColor = '#4CAF50',
     textColor = '#fff',
     disabled = false,
+    icon
 }) => {
     return (
         <TouchableOpacity
@@ -15,7 +17,12 @@ const ActionButton = ({
             onPress={onPress}
             disabled={disabled}
         >
-            <Text style={[styles.text, { color: textColor }, textStyle]}>{title}</Text>
+            {icon &&
+                <MaterialCommunityIcons name={icon.icon || "progress-question"} size={icon.size || 24} style={icon.styles || {}} color={icon.color || black} />
+            }
+            {title &&
+                <Text style={[styles.text, { color: textColor }, textStyle]}>{title}</Text>
+            }
         </TouchableOpacity>
     );
 };
@@ -27,7 +34,9 @@ const styles = StyleSheet.create({
         marginHorizontal: 4,
         borderRadius: 8,
         alignItems: 'center',
-        justifyContent: "center"
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: 5
     },
     text: {
         textAlign: "center",

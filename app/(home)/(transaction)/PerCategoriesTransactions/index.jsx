@@ -1,3 +1,4 @@
+import { useTransactions } from '@/app/TransactionContext';
 import DoubleBarChart from '@/components/DoubleBarChart';
 import PeriodNavigator from '@/components/PeriodNavigator';
 import SimpleHeader from '@/components/SimpleHeader';
@@ -14,8 +15,7 @@ import {
     Text,
     View
 } from 'react-native';
-import TransactionFlashList from '../../(home)/TransactionFlashList';
-import { useTransactions } from '../../TransactionContext';
+import TransactionFlashList from '../TransactionFlashList';
 
 export default function HomeScreen() {
     const { title, category, type, viewMode = "month", selectedDate: selectedDates } = useLocalSearchParams();
@@ -145,7 +145,7 @@ export default function HomeScreen() {
 
     const onTransactionPress = useCallback((item) => {
         router.push({
-            pathname: 'transaction/TransactionDetails/',
+            pathname: '(home)/(transaction)/TransactionDetails/',
             params: {
                 id: item.id,
             },

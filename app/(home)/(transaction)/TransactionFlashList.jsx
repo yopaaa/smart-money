@@ -1,4 +1,6 @@
-// components/TransactionFlashList.js
+import { useTransactions } from '@/app/TransactionContext';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedTouchableOpacity } from '@/components/ThemedTouchableOpacity';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
@@ -9,9 +11,6 @@ import {
     Text,
     View
 } from 'react-native';
-import { ThemedText } from '../../components/ThemedText';
-import { ThemedTouchableOpacity } from '../../components/ThemedTouchableOpacity';
-import { useTransactions } from '../TransactionContext';
 
 export const FindIcon = React.memo(({ id, size = 30, style }) => {
     const { getCategoryById } = useTransactions();

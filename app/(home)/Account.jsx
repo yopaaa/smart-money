@@ -180,7 +180,7 @@ export default function AccountsScreen() {
 
         const handlePress = () => {
             router.push({
-                pathname: 'transaction/PerAccountsTransactions',
+                pathname: '(home)/(transaction)/PerAccountsTransactions',
                 params: {
                     id: item.id,
                     title: item.name

@@ -2,10 +2,10 @@
   "expo": {
     "name": "Smart Money",
     "slug": "smart-money",
-    "version": "1.2.0",
-    "date": "June 16 2025",
+    "version": "1.3.0",
+    "date": "June 18 2025",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/adaptive-icon.png",
     "scheme": "smartmoney",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,17 +13,22 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Aplikasi memerlukan akses untuk menyimpan backup"
-      }
+      },
+      "bundleIdentifier": "com.koucheng.smartmoney"
     },
     "android": {
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#22a7a7"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.koucheng.smartmoney"
@@ -39,10 +44,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon-light.png",
+          "image": "./assets/images/splash.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#33c3c2"
+          "backgroundColor": "#22a7a7"
         }
       ],
       "expo-sqlite",

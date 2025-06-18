@@ -1,3 +1,4 @@
+import { useTransactions } from '@/app/TransactionContext';
 import ActionButton from '@/components/ActionButton';
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
@@ -20,8 +21,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useTransactions } from '../TransactionContext';
 import ChatInput from './ChatInput';
+import ImageModal from './ImageModal';
 import CameraComponent, { useFormPhoto } from './TakePhoto';
 
 const TransactionForm = () => {
@@ -44,6 +45,8 @@ const TransactionForm = () => {
   const [incomeCategories, setIncomeCategories] = useState();
   const [expenseCategories, setExpenseCategories] = useState();
   const [type, setType] = useState('keyboard');
+
+  const [modalVisible, setModalVisible] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -426,6 +429,14 @@ const TransactionForm = () => {
                   onPhotoRemoved={handlePhotoRemoved}
                   tempPhotoUri={tempPhotoUri}
                   buttonStyle={{ height: 50, width: 50, margin: 10 }}
+                  onRenderPhotoPreviewPress={() => setModalVisible(true)}
+                />
+
+                <ImageModal
+                  onDeleteImage={handlePhotoRemoved}
+                  visible={modalVisible}
+                  onClose={() => setModalVisible(false)}
+                  imageItem={tempPhotoUri}
                 />
               </View> :
                 <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
@@ -450,13 +461,7 @@ const TransactionForm = () => {
 
           {/* Save Button */}
           <View style={styles.buttonContainer}>
-            {/* <Button
-              title="Tambah Transaksi"
-              onPress={handleSubmit}
-              color="#4CAF50"
-            /> */}
             <ActionButton title="Tambah Transaksi" backgroundColor="#2196F3" onPress={handleSubmit} />
-
           </View>
         </>
 

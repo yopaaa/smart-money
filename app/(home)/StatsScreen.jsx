@@ -163,7 +163,7 @@ export default function HomeScreen() {
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
                 legendOnPress={(data) => {
                     router.push({
-                        pathname: 'transaction/PerCategoriesTransactions',
+                        pathname: '(home)/(transaction)/PerCategoriesTransactions',
                         params: {
                             category: data.category,
                             title: data.icon.name,
@@ -179,7 +179,7 @@ export default function HomeScreen() {
                 refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
                 legendOnPress={(data) => {
                     router.push({
-                        pathname: 'transaction/PerCategoriesTransactions',
+                        pathname: '(home)/(transaction)/PerCategoriesTransactions',
                         params: {
                             category: data.category,
                             title: data.icon.name,

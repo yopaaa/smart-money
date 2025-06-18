@@ -104,6 +104,7 @@ const TakePhoto = ({
   showTriggerButton = true,
   customTriggerButton,
   tempPhotoUri = null,
+  onRenderPhotoPreviewPress
 }) => {
   // Permissions and Refs
   const [permission, requestPermission] = useCameraPermissions();
@@ -193,7 +194,9 @@ const TakePhoto = ({
   // Render Functions
   const renderPhotoPreview = () => (
     <View style={styles.photoPreviewContainer}>
-      <Image source={{ uri: tempPhotoUri }} style={styles.previewImage} />
+      <TouchableOpacity onPress={onRenderPhotoPreviewPress || null}>
+        <Image source={{ uri: tempPhotoUri }} style={styles.previewImage} />
+      </TouchableOpacity>
       <View style={styles.photoActions}>
         <TouchableOpacity style={styles.actionButton} onPress={handleOpenCamera}>
           <Ionicons name="camera" size={20} color="#007AFF" />
@@ -253,10 +256,12 @@ const TakePhoto = ({
             </View>
 
             <CameraView
+              mirror={true}
               style={styles.camera}
               facing={facing}
               flash={flash}
               ref={cameraRef}
+              ratio='1:1'
             >
               <View style={styles.focusArea}>
                 <View style={styles.focusSquare} />
@@ -380,7 +385,7 @@ const styles = StyleSheet.create({
   },
   cameraModal: {
     flex: 1,
-    backgroundColor: '#00000085',
+    backgroundColor: 'black',
   },
   cameraContainer: {
     flex: 1,

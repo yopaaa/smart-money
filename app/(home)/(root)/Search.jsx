@@ -1,3 +1,4 @@
+import { useTransactions } from '@/app/TransactionContext';
 import SimpleHeader from '@/components/SimpleHeader';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
@@ -13,8 +14,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import TransactionFlashList from '../(home)/TransactionFlashList';
-import { useTransactions } from '../TransactionContext';
+import TransactionFlashList from '../(transaction)/TransactionFlashList';
 
 function SearchScreen() {
     const router = useRouter();
@@ -85,7 +85,7 @@ function SearchScreen() {
 
     const onTransactionPress = useCallback((item) => {
         router.push({
-            pathname: 'transaction/TransactionDetails/',
+            pathname: '(home)/(transaction)/TransactionDetails/',
             params: {
                 id: item.id,
             },

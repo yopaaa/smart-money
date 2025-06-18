@@ -1,10 +1,9 @@
-import { formatCurrency } from '@/utils/number';
+import CustomPicker from '@/components/CustomPicker';
+import { useTheme } from '@/hooks/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { useFocusEffect, useRouter } from 'expo-router';
-import moment from 'moment';
-import React, { useCallback, useMemo, useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
 import {
-    RefreshControl,
     SafeAreaView,
     StatusBar,
     StyleSheet,
@@ -12,46 +11,27 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import CustomPicker from '../../components/CustomPicker';
-import PeriodNavigator from '../../components/PeriodNavigator';
-import { ThemedText } from '../../components/ThemedText';
-import { useTheme } from '../../hooks/ThemeContext';
-import { useTransactions } from '../TransactionContext';
 import timePeriods from '../json/timePeriods.json';
-import TransactionFlashList from './TransactionFlashList';
-
-const OverviewHeader = React.memo(({ totalOverview, theme }) => (
-    <View style={styles.overviewBox}>
-        <View style={styles.overviewHeader}>
-            <ThemedText style={styles.overviewTitle}>Overview</ThemedText>
-            <MaterialCommunityIcons name="information-outline" size={16} color={theme.colors.text} />
-        </View>
-        <View style={styles.row}>
-            <ThemedText type="description">Income</ThemedText>
-            <Text style={[styles.amount, styles.income]}>{formatCurrency(totalOverview.income) || 0}</Text>
-        </View>
-        <View style={styles.row}>
-            <ThemedText type="description">Expense</ThemedText>
-            <Text style={[styles.amount, styles.expense]}>{formatCurrency(0 - totalOverview.expense) || 0}</Text>
-        </View>
-        <View style={styles.row}>
-            <ThemedText type="description">Total</ThemedText>
-            <Text style={[styles.amount, totalOverview.net < 0 ? styles.expense : styles.income]}>{formatCurrency(totalOverview.net) || 0}</Text>
-        </View>
-    </View>
-));
+import AnimatedTabBar from './(root)/AnimatedTabBar';
+import { GalleryScreen } from './(root)/GalleryScreen';
+import HistoryScreen from './(root)/HistoryScreen';
 
 const NavigationHeader = React.memo(({
     setViewMode,
     router,
-    theme
+    theme,
+    onNavigate
 }) => (
     <View>
         <View style={styles.headercontainer}>
-            <ThemedText style={styles.headerTitle}>Riwayat Transaksi</ThemedText>
+            <View>
+                <AnimatedTabBar tabs={TABS} onPress={onNavigate
+                } style={{ height: 40, width: 200 }} selectedColor={theme.colors.primary}/>
+            </View>
+
             <View style={styles.headerIcons}>
                 <TouchableOpacity
-                    onPress={() => router.push(`/transaction/Search`)}>
+                    onPress={() => router.push(`(home)/(root)/Search`)}>
                     <MaterialCommunityIcons name="magnify" size={25} style={styles.iconSpacing} color={theme.colors.text} />
                 </TouchableOpacity>
 
@@ -74,126 +54,21 @@ const NavigationHeader = React.memo(({
     </View>
 ));
 
+// ✅ GANTI atau TAMBAH ikon di sini
+const TABS = [
+    { key: 'format-list-bulleted', icon: 'format-list-bulleted' },
+    { key: 'folder-image', icon: 'folder-image' },
+    // { key: 'layers', icon: 'layers-outline' },
+    // { key: 'cloud', icon: 'cloud-outline' },        // Tambahan
+    // { key: 'code-tags', icon: 'code-tags' },        // Tambahan
+];
+
 export default function HomeScreen() {
     const { theme } = useTheme();
 
     const router = useRouter();
-    const { filterTransactions } = useTransactions();
     const [viewMode, setViewMode] = useState('month');
-    const [selectedDate, setSelectedDate] = useState(moment());
-    const [isRefreshing, setIsRefreshing] = useState(false);
-    const [updateTriggers, setUpdateTriggers] = useState();
-
-    // Auto refresh when focus
-    useFocusEffect(
-        useCallback(() => {
-            setUpdateTriggers(Date.now());
-        }, [])
-    );
-
-    const handleRefresh = useCallback(() => {
-        setIsRefreshing(true);
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 1000);
-    }, []);
-
-    const filteredTransactions = useMemo(() => {
-        const start = moment(selectedDate);
-        let end = moment(selectedDate);
-        console.log("Refresh riwayat transaksi...");
-
-        if (viewMode === 'week') {
-            start.startOf('week');
-            end.endOf('week');
-        } else if (viewMode === 'month') {
-            start.startOf('month');
-            end.endOf('month');
-        } else if (viewMode === 'quarter') {
-            start.startOf('quarter');
-            end.endOf('quarter');
-        } else if (viewMode === 'year') {
-            start.startOf('year');
-            end.endOf('year');
-        }
-
-        return filterTransactions({
-            startDate: start.valueOf(),
-            endDate: end.valueOf()
-        });
-    }, [selectedDate, viewMode, isRefreshing, updateTriggers, filterTransactions]);
-
-    const groupedTransactions = useMemo(() => {
-        const groups = {};
-
-        filteredTransactions.forEach((item) => {
-            const mDate = moment(Number(item.createdAt)).startOf('day');
-            const now = moment().startOf('day');
-            const diff = now.diff(mDate, 'days');
-
-            let dateKey = diff === 0
-                ? 'Today'
-                : diff === 1
-                    ? 'Yesterday'
-                    : mDate.format('DD');
-
-            if (!groups[dateKey]) {
-                groups[dateKey] = {
-                    data: [],
-                    timestamp: mDate.valueOf(),
-                    total: 0,
-                };
-            }
-
-            groups[dateKey].data.push(item);
-
-            const value =
-                item.type === 'income'
-                    ? item.amount
-                    : item.type === 'expense'
-                        ? -item.amount
-                        : 0;
-
-            groups[dateKey].total += value;
-        });
-
-        return Object.entries(groups)
-            .map(([date, group]) => ({
-                date,
-                timestamp: group.timestamp,
-                total: group.total,
-                data: group.data,
-            }))
-            .sort((a, b) => b.timestamp - a.timestamp);
-    }, [filteredTransactions]);
-
-    const totalOverview = useMemo(() => {
-        let totalIncome = 0;
-        let totalExpense = 0;
-
-        filteredTransactions.forEach((item) => {
-            if (item.type === 'income') {
-                totalIncome += item.amount;
-            } else if (item.type === 'expense') {
-                totalExpense += item.amount;
-            }
-        });
-
-        return {
-            income: totalIncome,
-            expense: totalExpense,
-            net: totalIncome - totalExpense,
-        };
-    }, [filteredTransactions]);
-
-    const onTransactionPress = useCallback((item) => {
-        router.push({
-            pathname: 'transaction/TransactionDetails/',
-            params: {
-                id: item.id
-            }
-        });
-    }, [router]);
+    const [see, setSee] = useState(TABS[0].key);
 
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
@@ -201,35 +76,17 @@ export default function HomeScreen() {
                 setViewMode={setViewMode}
                 router={router}
                 theme={theme}
+                onNavigate={(val) => setSee(val)}
             />
 
-            <PeriodNavigator
-                selectedDate={selectedDate}
-                viewMode={viewMode}
-                onDateChange={setSelectedDate}
-                theme={theme}
-            />
-
-            <TransactionFlashList
-                groupedTransactions={groupedTransactions}
-                onTransactionPress={onTransactionPress}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={isRefreshing}
-                        onRefresh={handleRefresh}
-                    />
-                }
-                ListHeaderComponent={<OverviewHeader totalOverview={totalOverview} theme={theme} />}
-                ListEmptyComponent={
-                    <View style={{ justifyContent: "center", alignItems: "center", height: 300 }}>
-                        <Text>Tidak ada transaksi</Text>
-                    </View>
-                }
-            />
+            {see == "format-list-bulleted" && <HistoryScreen viewMode={viewMode} />}
+            {see == "folder-image" &&
+                <View>
+                    <GalleryScreen viewMode={viewMode} />
+                </View>}
         </SafeAreaView>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         padding: 16,
@@ -252,43 +109,5 @@ const styles = StyleSheet.create({
     },
     iconSpacing: {
         marginHorizontal: 10,
-    },
-    monthNav: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginVertical: 16,
-    },
-    monthText: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    overviewBox: {
-        paddingTop: 16,
-    },
-    overviewHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-        gap: 10
-    },
-    overviewTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 4,
-    },
-    amount: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    income: {
-        color: '#2e7d32',
-    },
-    expense: {
-        color: '#c62828',
     },
 });

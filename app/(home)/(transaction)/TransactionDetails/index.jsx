@@ -58,10 +58,8 @@ const TransactionForm = () => {
     });
 
     useEffect(() => {
-
         if (id) {
             const tx = getTransactionById(id); // Use the new function
-            // console.log(tx);
 
             const tempX = getCategoriesByType("income")
             const tempY = getCategoriesByType("expense")
@@ -334,9 +332,10 @@ const TransactionForm = () => {
                         onChangeText={(text) => handleChange('description', text)}
                     />
 
-                    {formData.img && <View style={{ justifyContent: "center", flex: 1, alignItems: "center", padding: 14 }}>
-                        <Image source={{ uri: FOLDER_PATH + formData.img }} style={{ height: 300, width: 300, borderRadius: 14 }} />
-                    </View>}
+                    {formData.img &&
+                        <View style={{ justifyContent: "center", flex: 1, alignItems: "center", padding: 14 }}>
+                            <Image source={{ uri: FOLDER_PATH + formData.img }} style={{ height: 300, width: 300, borderRadius: 14 }} />
+                        </View>}
 
                 </View>
             </ScrollView>

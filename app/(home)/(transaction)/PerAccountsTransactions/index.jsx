@@ -1,3 +1,4 @@
+import { useTransactions } from '@/app/TransactionContext';
 import DoubleBarChart from '@/components/DoubleBarChart';
 import PeriodNavigator from '@/components/PeriodNavigator';
 import SimpleHeader from '@/components/SimpleHeader';
@@ -7,16 +8,15 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import moment from 'moment';
 import { useCallback, useMemo, useState } from 'react';
 import {
-  RefreshControl,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    RefreshControl,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import TransactionFlashList from '../../(home)/TransactionFlashList';
-import { useTransactions } from '../../TransactionContext';
+import TransactionFlashList from '../TransactionFlashList';
 
 export default function HomeScreen() {
     const { title, id, viewMode = "month", selectedDate: selectedDates } = useLocalSearchParams();
@@ -157,7 +157,7 @@ export default function HomeScreen() {
 
     const onTransactionPress = useCallback((item) => {
         router.push({
-            pathname: 'transaction/TransactionDetails/',
+            pathname: '(home)/(transaction)/TransactionDetails/',
             params: {
                 id: item.id,
             },

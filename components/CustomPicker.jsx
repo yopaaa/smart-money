@@ -36,11 +36,12 @@ export default function CustomPicker({
 
             <Modal visible={visible} transparent animationType="fade">
                 <TouchableOpacity
-                    style={styles.modalContainer}
-                    onPress={() => setVisible(false)} // Tutup jika ditekan di luar
-                >
-                    <TouchableOpacity
-                        style={styles.modalBox}
+                    style={{ height: "100%", width: "100%", backgroundColor: "rgba(0,0,0,0.5)" }}
+                    onPress={() => setVisible(false)}
+                />
+                <View style={styles.modalContainer} >
+                    <View
+                        style={[styles.modalBox]}
                         onPress={(e) => e.stopPropagation()} // Jangan tutup saat tekan isi modal
                     >
                         <FlatList
@@ -67,8 +68,8 @@ export default function CustomPicker({
                         <TouchableOpacity onPress={() => setVisible(false)}>
                             <Text style={{ textAlign: 'center', color: '#888', marginTop: 10 }}>Tutup</Text>
                         </TouchableOpacity>
-                    </TouchableOpacity>
-                </TouchableOpacity>
+                    </View>
+                </View>
             </Modal>
 
         </>
@@ -111,10 +112,13 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     modalContainer: {
-        flex: 1,
+        height: "100%",
+        width: "100%",
+        // backgroundColor: "red",
+        position: "absolute",
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        // backgroundColor: '',
     },
     modalBox: {
         backgroundColor: 'white',
