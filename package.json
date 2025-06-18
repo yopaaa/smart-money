@@ -33,7 +33,7 @@
     "expo-image": "~2.1.7",
     "expo-linear-gradient": "^14.1.4",
     "expo-linking": "~7.1.5",
-    "expo-media-library": "~17.1.6",
+    "expo-media-library": "~17.1.7",
     "expo-notifications": "~0.31.2",
     "expo-router": "~5.0.6",
     "expo-sharing": "~13.1.5",
@@ -63,7 +63,11 @@
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5",
     "uuid": "^11.1.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "expo-camera": "~16.1.8",
+    "expo-image-manipulator": "~13.1.7",
+    "expo-av": "~15.1.6",
+    "expo-image-picker": "~16.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

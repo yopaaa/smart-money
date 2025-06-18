@@ -191,7 +191,7 @@ export default function SettingsScreen() {
           <SettingItem
             title="Clear Cache"
             subtitle="Free up storage space"
-            onPress={() => console.log('Clear cache pressed')}
+            // onPress={() => router.push("transaction/TransactionPhoto")}
           />
         </SettingSection>
 
@@ -200,12 +200,12 @@ export default function SettingsScreen() {
           <SettingItem
             title="Help Center"
             subtitle="Get help and support"
-            onPress={() => console.log('Help pressed')}
+            onPress={() => router.push("(home)/(settings)/WebView")}
           />
           <SettingItem
             title="Contact Us"
             subtitle="Send feedback or report issues"
-            onPress={() => console.log('Contact pressed')}
+            onPress={() => router.push("(home)/(settings)/WebView")}
           />
           <SettingItem
             title="Rate App"

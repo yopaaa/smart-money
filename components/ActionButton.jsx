@@ -27,8 +27,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 4,
         borderRadius: 8,
         alignItems: 'center',
+        justifyContent: "center"
     },
     text: {
+        textAlign: "center",
         fontSize: 16,
         fontWeight: '600',
     },

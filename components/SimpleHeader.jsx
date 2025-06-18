@@ -12,7 +12,8 @@ const Header = React.memo((
         headerTitleStyle,
         title,
         rightComponent,
-        headerComponent
+        headerComponent,
+        onBack
     }) => {
     const router = useRouter();
 
@@ -29,7 +30,10 @@ const Header = React.memo((
             alignItems: 'center',
             height: 60,
         }}>
-            <Pressable onPress={() => router.back()} style={{ padding: 10 }}>
+            <Pressable onPress={() => {
+                router.back()
+                if (onBack) onBack()
+            }} style={{ padding: 10 }}>
                 <Ionicons name="arrow-back" size={24} color="#000" />
             </Pressable>
 

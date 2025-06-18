@@ -1,3 +1,4 @@
+import ActionButton from '@/components/ActionButton';
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
 import SlideSelect from '@/components/SlideSelect';
@@ -8,7 +9,6 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
-  Button,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -22,20 +22,28 @@ import {
 } from 'react-native';
 import { useTransactions } from '../TransactionContext';
 import ChatInput from './ChatInput';
-
+import CameraComponent, { useFormPhoto } from './TakePhoto';
 
 const TransactionForm = () => {
   const router = useRouter();
   const { id: copyDataId } = useLocalSearchParams();
-  const { refetchData, accounts, addTransaction, getCategoriesByType, getTransactionById, getCategoryById } = useTransactions();
+  const { refetchData,
+    accounts,
+    addTransaction,
+    getCategoriesByType,
+    getTransactionById,
+    getCategoryById,
+    filterTransactions } = useTransactions();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [incomeCategories, setIncomeCategories] = useState();
   const [expenseCategories, setExpenseCategories] = useState();
+  const [type, setType] = useState('keyboard');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -45,7 +53,8 @@ const TransactionForm = () => {
     accountId: '',
     targetAccountId: '',
     category: '',
-    fee: '0'
+    fee: '0',
+    img: ""
   });
 
   useEffect(() => {
@@ -102,7 +111,7 @@ const TransactionForm = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.title.trim() || !formData.amount || isNaN(formData.amount)) {
       Alert.alert('Error', 'Mohon isi semua data dengan benar');
       return;
@@ -130,6 +139,12 @@ const TransactionForm = () => {
       selectedTime.getMilliseconds(),
     );
 
+    let finalPhotoUri = null;
+
+    // Save foto hanya jika ada foto temporary
+    if (hasPhoto) {
+      finalPhotoUri = await saveFinalPhoto();
+    }
 
     const transaction = {
       title: formData.title.trim(),
@@ -140,16 +155,14 @@ const TransactionForm = () => {
       targetAccountId: formData.type === 'transfer' ? formData.targetAccountId.id : undefined,
       createdAt: mergedDate.getTime(),
       category: formData.type === 'transfer' ? "52841730" : formData.category.id,
-      fee: formData.type === 'transfer' ? parseInt(formData.fee || '0') : 0
+      fee: formData.type === 'transfer' ? parseInt(formData.fee || '0') : 0,
+      img: finalPhotoUri.filename
     };
 
     try {
       // console.log(moment(mergedDate).format('MMMM Do YYYY, h:mm:ss a'));
-
       addTransaction(transaction);
-      Alert.alert('Sukses', 'Transaksi berhasil ditambahkan');
       refetchData();
-
 
       // reset form
       setFormData({
@@ -168,26 +181,63 @@ const TransactionForm = () => {
       router.push("/");
     } catch (e) {
       Alert.alert('Error', e.message);
+    } finally {
+      await cleanup();
     }
   };
-  const [type, setType] = useState('keyboard');
 
+  useEffect(() => {
+    if (searchQuery.length >= 3) {
+      const tx = filterTransactions({
+        search: searchQuery,
+        limit: 1,
+        type: formData.type
+      })[0];
+
+      try {
+        let matchedCategory = getCategoryById(tx.category)
+        handleChange('category', matchedCategory)
+        handleChange('accountId', accounts.find(acc => acc.id === tx.accountId) || accounts[0])
+      } catch (error) {
+        console.log(tx);
+        console.info(error);
+      }
+    }
+  }, [searchQuery]);
+
+
+  const {
+    tempPhotoUri,
+    handlePhotoSelected,
+    handlePhotoRemoved,
+    saveFinalPhoto,
+    cleanup,
+    hasPhoto,
+  } = useFormPhoto();
+
+  const handleCancel = async () => {
+    await cleanup();
+  };
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, paddingTop: StatusBar.currentHeight || 0 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <SimpleHeader title={formData.type} rightComponent={
-        <SlideSelect
-          initial={type}
-          onChange={(val) => setType(val)}
-          options={[
-            { key: 'keyboard', label: 'Keyboard', icon: 'keyboard' },
-            { key: 'chat', label: 'Chat', icon: 'chat' },
-          ]}
-        />
-      } />
+      <SimpleHeader
+        title={formData.type}
+        rightComponent={
+          <SlideSelect
+            initial={type}
+            onChange={(val) => setType(val)}
+            options={[
+              { key: 'keyboard', label: 'Keyboard', icon: 'keyboard' },
+              { key: 'chat', label: 'Chat', icon: 'chat' },
+            ]}
+          />
+        }
+        onBack={handleCancel}
+      />
 
       {type == "chat" && <ChatInput />}
 
@@ -263,7 +313,10 @@ const TransactionForm = () => {
                   placeholder="Dinner, Gaji or Transfer"
                   // placeholderTextColor={"black"}
                   value={formData.title}
-                  onChangeText={(text) => handleChange('title', text)}
+                  onChangeText={(text) => {
+                    handleChange('title', text)
+                    setSearchQuery(text)
+                  }}
                   autoFocus
                 />
               </View>
@@ -288,7 +341,9 @@ const TransactionForm = () => {
                   pickerStyle={styles.picker}
                   label="Kategori"
                   selected={formData.category}
-                  onSelect={(val) => handleChange('category', val)}
+                  onSelect={(val) => {
+                    handleChange('category', val)
+                  }}
                   options={formData.type === "income" ? incomeCategories : expenseCategories}
                   selectedComponent={(val) => {
                     return (
@@ -356,24 +411,53 @@ const TransactionForm = () => {
 
               {/* Description Input */}
               <Text style={{ ...styles.label, padding: 10 }}>Deskripsi</Text>
-              <TextInput
-                style={[styles.input, { height: 80, width: "100%" }]}
-                placeholder="Tambahkan deskripsi (opsional)"
-                multiline
-                value={formData.description}
-                onChangeText={(text) => handleChange('description', text)}
-              />
-
-              {/* Save Button */}
-              <View style={styles.buttonContainer}>
-                <Button
-                  title="Tambah Transaksi"
-                  onPress={handleSubmit}
-                  color="#4CAF50"
+              {hasPhoto ? <View style={{ flexDirection: "column", gap: 10 }}>
+                <TextInput
+                  style={[styles.input, { height: 80, width: "100%" }]}
+                  placeholder="Tambahkan deskripsi (opsional)"
+                  multiline
+                  value={formData.description}
+                  onChangeText={(text) => handleChange('description', text)}
                 />
-              </View>
+
+
+                <CameraComponent
+                  onPhotoSelected={handlePhotoSelected}
+                  onPhotoRemoved={handlePhotoRemoved}
+                  tempPhotoUri={tempPhotoUri}
+                  buttonStyle={{ height: 50, width: 50, margin: 10 }}
+                />
+              </View> :
+                <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
+                  <TextInput
+                    style={[styles.input, { height: 80, width: "100%" }]}
+                    placeholder="Tambahkan deskripsi (opsional)"
+                    multiline
+                    value={formData.description}
+                    onChangeText={(text) => handleChange('description', text)}
+                  />
+
+
+                  <CameraComponent
+                    onPhotoSelected={handlePhotoSelected}
+                    onPhotoRemoved={handlePhotoRemoved}
+                    tempPhotoUri={tempPhotoUri}
+                    buttonStyle={{ height: 50, width: 50, margin: 10 }}
+                  />
+                </View>}
             </View>
           </ScrollView>
+
+          {/* Save Button */}
+          <View style={styles.buttonContainer}>
+            {/* <Button
+              title="Tambah Transaksi"
+              onPress={handleSubmit}
+              color="#4CAF50"
+            /> */}
+            <ActionButton title="Tambah Transaksi" backgroundColor="#2196F3" onPress={handleSubmit} />
+
+          </View>
         </>
 
       }
@@ -482,13 +566,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    // width: 250,
-    // backgroundColor: '#f9f9f9',
   },
   buttonContainer: {
-    marginTop: 24,
-    borderRadius: 8,
-    overflow: 'hidden',
+    height: 80,
+    margin: 10,
+    padding: 14,
   },
 });
 

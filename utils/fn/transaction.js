@@ -360,6 +360,17 @@ export const filterTransactions = (query = {}) => {
         // Sorting default: terbaru dulu
         sql += ` ORDER BY createdAt DESC`;
 
+        // Limit and optional offset
+        if (query.limit !== undefined) {
+            sql += ` LIMIT ?`;
+            params.push(query.limit);
+
+            if (query.offset !== undefined) {
+                sql += ` OFFSET ?`;
+                params.push(query.offset);
+            }
+        }
+
         return db.getAllSync(sql, params);
     } catch (e) {
         console.error('Gagal memfilter transaksi:', e.message);
