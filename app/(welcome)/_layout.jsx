@@ -3,7 +3,7 @@ import { Redirect, Stack } from 'expo-router';
 
 import { colorTheme } from '@/hooks/useColorScheme';
 
-import { useTransactions } from '../TransactionContext';
+import { useTransactions } from '@/hooks/TransactionContext';
 import NewAccountProvider from './NewAccountProvider';
 
 export default function RootLayout() {

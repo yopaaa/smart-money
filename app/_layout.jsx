@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { CustomDarkTheme, CustomLightTheme, ThemeProvider, useTheme } from '@/hooks/ThemeContext';
-import { TransactionProvider } from './TransactionContext';
+import { TransactionProvider } from '@/hooks/TransactionContext.jsx';
 
 function InnerLayout() {
   const { theme } = useTheme();
@@ -29,8 +29,10 @@ function InnerLayout() {
           headerTitleAlign: 'center',
         }}
         >
+          {/* <Stack.Screen name="function/ReminderSettings" options={{ animation: "none" }} /> */}
           <Stack.Screen name="(home)" options={{ animation: "none" }} />
           <Stack.Screen name="(welcome)" options={{ animation: "fade" }} />
+          <Stack.Screen name="Report" options={{ animation: "none" }} />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="auto" />

@@ -2,6 +2,9 @@ import CustomPicker from '@/components/CustomPicker';
 import PeriodNavigator from '@/components/PeriodNavigator';
 import PieChart from '@/components/PieChart';
 import SlideSelect from '@/components/SlideSelect';
+import { ThemedText } from '@/components/ThemedText';
+import { useTheme } from '@/hooks/ThemeContext';
+import { useTransactions } from '@/hooks/TransactionContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import moment from 'moment';
@@ -14,9 +17,6 @@ import {
     Text,
     View
 } from 'react-native';
-import { ThemedText } from '../../components/ThemedText';
-import { useTheme } from '../../hooks/ThemeContext';
-import { useTransactions } from '../TransactionContext';
 import timePeriods from '../json/timePeriods.json';
 
 export default function HomeScreen() {

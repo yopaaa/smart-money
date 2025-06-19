@@ -12,8 +12,8 @@ import {
     View
 } from 'react-native';
 
-import { useTransactions } from '@/app/TransactionContext';
 import SimpleHeader from '@/components/SimpleHeader';
+import { useTransactions } from '@/hooks/TransactionContext';
 import { useRouter } from 'expo-router';
 
 const DeleteAccountScreen = () => {

@@ -1,26 +1,26 @@
 import colorOptions from '@/app/json/colorOptions.json';
 import groupLabels from '@/app/json/groupLabels.json';
 import iconOptions from '@/app/json/iconOptions.json';
-import { useTransactions } from '@/app/TransactionContext';
 import CustomIconPickerGrid from '@/components/CustomIconPickerGrid';
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
 import SwitchToggle from '@/components/SwitchToggle';
+import { useTransactions } from '@/hooks/TransactionContext';
 import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
-  Button,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View
+    Alert,
+    Button,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    View
 } from 'react-native';
 
 const TransactionForm = () => {

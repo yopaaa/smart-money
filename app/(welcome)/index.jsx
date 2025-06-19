@@ -90,9 +90,9 @@ export default function FinancialOnboardingScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={{justifyContent: "center", alignItems: "center"}}>
+      <View style={{ justifyContent: "center", alignItems: "center" }}>
 
-      <Text style={{fontSize: 30, fontWeight: "800"}}>Herzlich willkommen</Text>
+        <Text style={{ fontSize: 30, fontWeight: "800" }}>Herzlich willkommen</Text>
       </View>
       {/* Swiper area */}
       <View style={styles.sliderContainer}>
@@ -141,7 +141,7 @@ export default function FinancialOnboardingScreen() {
           <Text style={styles.getStartedText}>GET STARTED</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => {
-          router.push("settings/(backup)")
+          const x = router.push("(backup)/")          
         }}>
           <Text style={styles.restoreText}>RESTORE DATA</Text>
         </TouchableOpacity>

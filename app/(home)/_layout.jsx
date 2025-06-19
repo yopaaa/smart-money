@@ -1,7 +1,7 @@
 import { Redirect, Stack } from 'expo-router';
 
 
-import { useTransactions } from '../TransactionContext';
+import { useTransactions } from '@/hooks/TransactionContext';
 
 export default function RootLayout() {
   const { isNewUser } = useTransactions();

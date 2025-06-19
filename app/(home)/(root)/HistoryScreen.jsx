@@ -1,7 +1,7 @@
-import { useTransactions } from '@/app/TransactionContext';
 import PeriodNavigator from '@/components/PeriodNavigator';
 import { ThemedText } from '@/components/ThemedText';
 import { useTheme } from '@/hooks/ThemeContext';
+import { useTransactions } from '@/hooks/TransactionContext';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';

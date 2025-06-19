@@ -1,6 +1,6 @@
+import { useTransactions } from '@/hooks/TransactionContext';
 import { useRouter } from 'expo-router';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTransactions } from '../TransactionContext';
 
 export default function Success() {
     const router = useRouter();

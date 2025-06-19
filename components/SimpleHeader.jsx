@@ -7,7 +7,7 @@ import {
     View
 } from 'react-native';
 
-const Header = React.memo((
+const SimpleHeader = React.memo((
     { style,
         headerTitleStyle,
         title,
@@ -51,4 +51,4 @@ const Header = React.memo((
     </View>)
 })
 
-export default Header
+export default SimpleHeader

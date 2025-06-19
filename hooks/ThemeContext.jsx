@@ -42,7 +42,7 @@ export const CustomLightTheme = {
 
 export const ThemeProvider = ({ children }) => {
   // const colorScheme = Appearance.getColorScheme();
-  const [themeMode, setThemeMode] = useState(getSetting("@theme") || "white");
+  const [themeMode, setThemeMode] = useState(getSetting("@theme") || "light");
 
   const toggleTheme = () => {
     setThemeMode(prev => (prev === 'light' ? 'dark' : 'light'));

@@ -1,6 +1,6 @@
-import { useTransactions } from '@/app/TransactionContext';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedTouchableOpacity } from '@/components/ThemedTouchableOpacity';
+import { useTransactions } from '@/hooks/TransactionContext';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';

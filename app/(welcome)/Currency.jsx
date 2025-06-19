@@ -81,9 +81,9 @@ export default function AddAccountScreen() {
             {selectedCurrency ? (
               <View style={styles.selectedCurrency}>
                 <Text style={styles.selectedSymbol}>{selectedCurrency.symbol}</Text>
-                <View>
+                <View style={{ flex: 1, alignItems: "center", flexDirection: "row", gap: 10 }}>
+                  <Text style={styles.selectedCode}>{selectedCurrency.currency}</Text>
                   <Text style={styles.selectedName}>{selectedCurrency.name}</Text>
-                  <Text style={styles.selectedCode}>{selectedCurrency.code}</Text>
                 </View>
               </View>
             ) : (
@@ -142,7 +142,6 @@ export default function AddAccountScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   contentContainer: {
     flexGrow: 1,

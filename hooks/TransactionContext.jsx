@@ -1,21 +1,21 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import groupLabels from '@/app/json/groupLabels.json';
 import {
     addAccount,
     deleteAccount,
     editAccount,
     getAccountById,
     getAccounts
-} from '../utils/fn/account';
+} from '@/utils/fn/account';
 import {
     getAllCategories,
     getCategoriesByType,
     getCategoryById
-} from '../utils/fn/category';
+} from '@/utils/fn/category';
 import {
     initDB,
     resetTables
-} from '../utils/fn/initDB';
-import { getSetting, saveSetting } from '../utils/fn/settings';
+} from '@/utils/fn/initDB';
+import { getSetting, saveSetting } from '@/utils/fn/settings';
 import {
     addTransaction,
     deleteTransaction,
@@ -23,13 +23,16 @@ import {
     filterTransactions,
     getTransactionById,
     getTransactions,
-} from '../utils/fn/transaction';
-import groupLabels from './json/groupLabels.json';
+} from '@/utils/fn/transaction';
+import { useRouter } from 'expo-router';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const TransactionContext = createContext();
 initDB()
 
 export const TransactionProvider = ({ children }) => {
+    const router = useRouter();
+
     const [accounts, setAccounts] = useState([]);
     const [accountsGrouped, setAccountsGrouped] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -151,11 +154,34 @@ export const TransactionProvider = ({ children }) => {
         setAccountsGrouped(latestGrouped)
     };
 
+    // useEffect(() => {
+    //     try {
+    //         initDB()
+    //         loadAccounts()
+    //         refetchData();
+    //     } catch (e) {
+    //         <Redirect href={"(welcome)/"} />
+    //     }
+    // }, []);
+
     useEffect(() => {
-        initDB()
-        loadAccounts()
-        refetchData();
+        const runInit = async () => {
+            try {
+                initDB();
+                await loadAccounts();
+                refetchData();                
+            } catch (e) {
+                console.error("Initialization error:", e);
+                router.replace({
+                    pathname: "Report",
+                    params: { description: e }
+                });
+            }
+        };
+
+        runInit();
     }, []);
+
 
     return (
         <TransactionContext.Provider value={{

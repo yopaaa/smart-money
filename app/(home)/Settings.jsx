@@ -150,6 +150,13 @@ export default function SettingsScreen() {
             }
             showArrow={false}
           />
+           <SettingItem
+            title="Notifications"
+            subtitle="Manage notification settings"
+            onPress={() => {
+              router.push("/function/ReminderSettings");
+            }}
+          />
           <SettingItem
             title="Language"
             subtitle="English"

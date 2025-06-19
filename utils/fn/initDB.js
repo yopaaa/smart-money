@@ -21,7 +21,8 @@ export const initDB = () => {
     hidden INTEGER,
     icon TEXT,
     iconColor TEXT,
-    description TEXT
+    description TEXT,
+    INTEGER DEFAULT 0
     );`
     );
 
@@ -37,6 +38,7 @@ export const initDB = () => {
         createdAt TEXT NOT NULL,
         category TEXT,
         fee INTEGER DEFAULT 0,
+        img TEXT,
         FOREIGN KEY (accountId) REFERENCES accounts(id),
         FOREIGN KEY (targetAccountId) REFERENCES accounts(id)
     );`);
@@ -90,12 +92,7 @@ export function resetTables() {
     }
 }
 
-/**
- * Menambahkan kolom ke tabel SQLite jika belum ada.
- * @param {string} tableName - Nama tabel.
- * @param {string} columnName - Nama kolom yang ingin ditambahkan.
- * @param {string} columnDefinition - Definisi kolom (misalnya: "TEXT DEFAULT ''").
- */
+
 export function addColumnIfNotExists(tableName, columnName, columnDefinition) {
     try {
         const columns = db.getAllSync(`PRAGMA table_info(${tableName})`);

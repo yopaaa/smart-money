@@ -9,14 +9,14 @@ import {
     View
 } from 'react-native';
 
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import ThreeDotMenu from '@/components/ThreeDots';
+import { useTheme } from '@/hooks/ThemeContext';
+import { useTransactions } from '@/hooks/TransactionContext';
 import { formatCurrency } from '@/utils/number';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ThemedText } from '../../components/ThemedText';
-import { ThemedView } from '../../components/ThemedView';
-import ThreeDotMenu from '../../components/ThreeDots';
-import { useTheme } from '../../hooks/ThemeContext';
-import { useTransactions } from '../TransactionContext';
 
 const TITLE = "Buckets And Balances"
 

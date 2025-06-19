@@ -1,7 +1,7 @@
-import { useTransactions } from '@/app/TransactionContext';
 import DoubleBarChart from '@/components/DoubleBarChart';
 import PeriodNavigator from '@/components/PeriodNavigator';
 import SimpleHeader from '@/components/SimpleHeader';
+import { useTransactions } from '@/hooks/TransactionContext';
 import { formatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';

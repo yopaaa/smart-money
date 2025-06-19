@@ -8,8 +8,8 @@ import { getSetting, saveSetting } from './settings';
 
 const addAccountToSavedOrder = async (newAccount) => {
     try {
-        const saved = getSetting("@modified_account_order");
-        let savedOrder = saved ? JSON.parse(saved) : [];
+        const saved = getSetting("@modified_account_order");        
+        let savedOrder = saved ? saved : [];
 
         const type = newAccount.type || 'other';
         const meta = groupLabels.find(val => val.key == type)
