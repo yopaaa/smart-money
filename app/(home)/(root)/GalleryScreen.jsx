@@ -120,7 +120,6 @@ export function GalleryScreen() {
         try {
             const dirInfo = await FileSystem.getInfoAsync(FOLDER_PATH);
             if (!dirInfo.exists) {
-                console.log('Directory not found');
                 setGroupedImages([]);
                 return;
             }
@@ -228,7 +227,9 @@ export function GalleryScreen() {
                     viewMode={viewMode}
                     onDateChange={setSelectedDate}
                 />
-                <View style={styles.centerContainer}>
+                    {/* <Text style={styles.emptyText}>No images found</Text> */}
+
+                <View style={[styles.centerContainer,]}>
                     <Ionicons name="images-outline" size={64} color="#ccc" />
                     <Text style={styles.emptyText}>No images found</Text>
                     <Text style={styles.emptySubText}>
@@ -285,7 +286,6 @@ const styles = StyleSheet.create({
         paddingTop: StatusBar.currentHeight || 0,
     },
     centerContainer: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,

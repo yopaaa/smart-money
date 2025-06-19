@@ -1,22 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import currencies from '../json/currency.json';
 import { useData } from './NewAccountProvider';
-
-const currencies = [
-  { currency: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', locale: 'id-ID' },
-  { currency: 'USD', name: 'US Dollar', symbol: '$', locale: 'en-US' },
-  { currency: 'EUR', name: 'Euro', symbol: '€', locale: 'de-DE' }, // Jerman atau bisa juga 'fr-FR'
-  { currency: 'GBP', name: 'British Pound', symbol: '£', locale: 'en-GB' },
-  { currency: 'JPY', name: 'Japanese Yen', symbol: '¥', locale: 'ja-JP' },
-  { currency: 'SGD', name: 'Singapore Dollar', symbol: 'S$', locale: 'en-SG' },
-  { currency: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM', locale: 'ms-MY' },
-  { currency: 'THB', name: 'Thai Baht', symbol: '฿', locale: 'th-TH' },
-  { currency: 'CNY', name: 'Chinese Yuan', symbol: '¥', locale: 'zh-CN' },
-  { currency: 'KRW', name: 'South Korean Won', symbol: '₩', locale: 'ko-KR' },
-  { currency: 'AUD', name: 'Australian Dollar', symbol: 'A$', locale: 'en-AU' },
-  { currency: 'CAD', name: 'Canadian Dollar', symbol: 'C$', locale: 'en-CA' },
-];
 
 export default function AddAccountScreen() {
   const { handleChange } = useData()

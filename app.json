@@ -48,19 +48,7 @@
           "backgroundColor": "#22a7a7"
         }
       ],
-      "expo-sqlite",
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Izinkan aplikasi untuk mengambil foto bukti transaksi."
-        }
-      ],
-      [
-        "expo-media-library",
-        {
-          "photosPermission": "Izinkan aplikasi menyimpan dan mengakses foto transaksi."
-        }
-      ]
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
