@@ -141,7 +141,7 @@ export default function FinancialOnboardingScreen() {
           <Text style={styles.getStartedText}>GET STARTED</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => {
-          const x = router.push("(backup)/")          
+          const x = router.push("(backup)/_index")          
         }}>
           <Text style={styles.restoreText}>RESTORE DATA</Text>
         </TouchableOpacity>

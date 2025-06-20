@@ -206,7 +206,7 @@ const BackupRestoreScreen = () => {
                 <ThreeDotMenu
                     dotColor="black"
                     menuItems={[
-                        { name: 'Restore from .mmbak file', fn: () => router.navigate("(home)/(settings)/(backup)/MMBAK_Restore") },
+                        { name: 'Restore from .mmbak file', fn: () => router.navigate("/MMBAK_Restore") },
                         {
                             name: 'Reset app data', fn: () => {
                                 resetTables()

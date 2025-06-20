@@ -31,6 +31,7 @@ function InnerLayout() {
         >
           {/* <Stack.Screen name="function/ReminderSettings" options={{ animation: "none" }} /> */}
           <Stack.Screen name="(home)" options={{ animation: "none" }} />
+          <Stack.Screen name="(backup)" options={{ animation: "none" }} />
           <Stack.Screen name="(welcome)" options={{ animation: "fade" }} />
           <Stack.Screen name="Report" options={{ animation: "none" }} />
           <Stack.Screen name="+not-found" />

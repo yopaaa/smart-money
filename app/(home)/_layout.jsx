@@ -7,7 +7,7 @@ export default function RootLayout() {
   const { isNewUser } = useTransactions();
 
   if (isNewUser) {
-    return <Redirect href={"(welcome)/"} />
+    return <Redirect href={"(welcome)/_index"} />
   }
 
   return (
@@ -21,6 +21,7 @@ export default function RootLayout() {
         <Stack.Screen name="Settings"  options={{ animation: "none" }} />
         <Stack.Screen name="(settings)"  options={{ animation: "slide_from_right" }} />
         <Stack.Screen name="StatsScreen"  options={{ animation: "none" }} />
+        {/* <Stack.Screen name="(transaction)/TransactionForm"  options={{ animation: "slide_from_bottom" }} /> */}
       </Stack>
   );
 }

@@ -86,7 +86,7 @@ export default function SettingsScreen() {
             title="Backup & Restore"
             subtitle="Manage your data backup"
             onPress={() => {
-              router.push("(home)/(settings)/(backup)");
+              router.push("(backup)/_index", { animation: "slide_from_right" });
             }}
           />
         </SettingSection>
@@ -150,7 +150,7 @@ export default function SettingsScreen() {
             }
             showArrow={false}
           />
-           <SettingItem
+          <SettingItem
             title="Notifications"
             subtitle="Manage notification settings"
             onPress={() => {

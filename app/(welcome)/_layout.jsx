@@ -20,7 +20,7 @@ export default function RootLayout() {
           headerShown: false,
         }}
         >
-          <Stack.Screen name="index" options={{ animation: "fade" }} />
+          <Stack.Screen name="_index" options={{ animation: "none" }} />
           <Stack.Screen name="Account" options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="Currency" options={{ animation: "slide_from_right" }} />
           <Stack.Screen name="Balance" options={{ animation: "slide_from_right" }} />

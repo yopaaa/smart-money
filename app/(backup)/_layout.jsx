@@ -7,6 +7,7 @@ export default function RootLayout() {
         headerShown: false,
       }}
       >
+        <Stack.Screen name="_index" options={{ animation: "none" }} />
         <Stack.Screen name="MMBAK_Restore" options={{ animation: "simple_push" }} />
       </Stack>
   );
