@@ -17,8 +17,9 @@ import {
     View
 } from 'react-native';
 import ImageModal from '../(transaction)/ImageModal';
-import { FOLDER_PATH } from '../(transaction)/TakePhoto';
-
+// import { FOLDER_PATH } from '../(transaction)/TakePhoto';
+export const FOLDER_NAME = 'SmartMoney';
+export const FOLDER_PATH = `${FileSystem.documentDirectory}${FOLDER_NAME}/`;
 
 export function GalleryScreen() {
     const { viewMode = "month", selectedDate: selectedDates } = useLocalSearchParams();

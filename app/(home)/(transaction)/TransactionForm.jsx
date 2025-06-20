@@ -9,21 +9,21 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
 import ChatInput from './ChatInput';
-import ImageModal from './ImageModal';
-import CameraComponent, { useFormPhoto } from './TakePhoto';
+// import ImageModal from './ImageModal';
+// import CameraComponent, { useFormPhoto } from './TakePhoto';
 
 const TransactionForm = () => {
   const router = useRouter();
@@ -209,18 +209,18 @@ const TransactionForm = () => {
   }, [searchQuery]);
 
 
-  const {
-    tempPhotoUri,
-    handlePhotoSelected,
-    handlePhotoRemoved,
-    saveFinalPhoto,
-    cleanup,
-    hasPhoto,
-  } = useFormPhoto();
+  // const {
+  //   tempPhotoUri,
+  //   handlePhotoSelected,
+  //   handlePhotoRemoved,
+  //   saveFinalPhoto,
+  //   cleanup,
+  //   hasPhoto,
+  // } = useFormPhoto();
 
-  const handleCancel = async () => {
-    await cleanup();
-  };
+  // const handleCancel = async () => {
+  //   await cleanup();
+  // };
 
   return (
     <KeyboardAvoidingView
@@ -239,7 +239,7 @@ const TransactionForm = () => {
             ]}
           />
         }
-        onBack={handleCancel}
+        // onBack={handleCancel}
       />
 
       {type == "chat" && <ChatInput />}
@@ -413,7 +413,7 @@ const TransactionForm = () => {
               )}
 
               {/* Description Input */}
-              <Text style={{ ...styles.label, padding: 10 }}>Deskripsi</Text>
+              {/* <Text style={{ ...styles.label, padding: 10 }}>Deskripsi</Text>
               {hasPhoto ? <View style={{ flexDirection: "column", gap: 10 }}>
                 <TextInput
                   style={[styles.input, { height: 80, width: "100%" }]}
@@ -439,7 +439,7 @@ const TransactionForm = () => {
                   imageItem={tempPhotoUri}
                 />
               </View> :
-                <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
+                <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}> */}
                   <TextInput
                     style={[styles.input, { height: 80, width: "100%" }]}
                     placeholder="Tambahkan deskripsi (opsional)"
@@ -449,13 +449,13 @@ const TransactionForm = () => {
                   />
 
 
-                  <CameraComponent
+                  {/* <CameraComponent
                     onPhotoSelected={handlePhotoSelected}
                     onPhotoRemoved={handlePhotoRemoved}
                     tempPhotoUri={tempPhotoUri}
                     buttonStyle={{ height: 50, width: 50, margin: 10 }}
                   />
-                </View>}
+                </View>} */}
             </View>
           </ScrollView>
 

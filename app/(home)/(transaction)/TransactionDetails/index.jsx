@@ -21,7 +21,11 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { FOLDER_PATH } from '../TakePhoto';
+// import { FOLDER_PATH } from '../TakePhoto';
+import * as FileSystem from 'expo-file-system';
+
+export const FOLDER_NAME = 'SmartMoney';
+export const FOLDER_PATH = `${FileSystem.documentDirectory}${FOLDER_NAME}/`;
 
 const TransactionForm = () => {
     const { id } = useLocalSearchParams();
