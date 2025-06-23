@@ -22,7 +22,7 @@ export const initDB = () => {
     icon TEXT,
     iconColor TEXT,
     description TEXT,
-    INTEGER DEFAULT 0
+    isFavorite INTEGER DEFAULT 0
     );`
     );
 
