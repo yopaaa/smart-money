@@ -22,7 +22,7 @@ function InnerLayout() {
     <TransactionProvider>
       <NavThemeProvider value={theme.mode === 'dark' ? CustomDarkTheme : CustomLightTheme}>
         <Stack screenOptions={{
-          animation: "fade_from_bottom",
+          animation: "none",
           headerShown: false,
           headerStyle: { backgroundColor: '#00BFFF' },
           headerTintColor: '#fff',

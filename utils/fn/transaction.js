@@ -218,12 +218,13 @@ export const editTransaction = (id, updatedTransaction) => {
             db.runSync('UPDATE accounts SET balance = ? WHERE id = ?', [newTargetBalance, updatedTransaction.targetAccountId]);
 
 
-            if (updatedTransaction.fee && updatedTransaction.fee > 0) {
-                const oldFee = db.getAllSync(
-                    `SELECT * FROM ${TRANSACTION_TABLE_NAME} WHERE 1=1 AND title = ? AND createdAt = ? AND accountId = ?`,
-                    ['Biaya transfer', Number(oldTx.createdAt) + 1, oldTx.accountId]
-                )[0];
+            const oldFee = db.getAllSync(
+                `SELECT * FROM ${TRANSACTION_TABLE_NAME} WHERE 1=1 AND title = ? AND createdAt = ? AND accountId = ?`,
+                ['Biaya transfer', Number(oldTx.createdAt) + 1, oldTx.accountId]
+            )[0];
+            console.log(oldFee);
 
+            if (updatedTransaction.fee && updatedTransaction.fee > 0) {
                 db.runSync(`UPDATE ${TRANSACTION_TABLE_NAME} SET amount = ?, accountId = ?, targetAccountId = ?, createdAt = ? WHERE id = ? `, [
                     updatedTransaction.fee,
                     updatedTransaction.accountId,

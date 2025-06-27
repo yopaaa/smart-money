@@ -1,11 +1,11 @@
 // CameraComponent.js - Optimized
 import { Ionicons } from '@expo/vector-icons';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+// import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
+  // ActivityIndicator,
   Alert,
   Animated,
   Dimensions,
@@ -107,7 +107,8 @@ const TakePhoto = ({
   onRenderPhotoPreviewPress
 }) => {
   // Permissions and Refs
-  const [permission, requestPermission] = useCameraPermissions();
+  // const [permission, requestPermission] = useCameraPermissions();
+  const [permission, requestPermission] = useState(null);
   const cameraRef = useRef(null);
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').height)).current;
 
@@ -226,13 +227,13 @@ const TakePhoto = ({
       </TouchableOpacity>
     );
 
-  if (!permission) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
-      </View>
-    );
-  }
+  // if (!permission) {
+  //   return (
+  //     <View style={styles.loadingContainer}>
+  //       <ActivityIndicator size="large" color="#007AFF" />
+  //     </View>
+  //   );
+  // }
 
   return (
     <>
@@ -255,7 +256,9 @@ const TakePhoto = ({
               </TouchableOpacity>
             </View>
 
-            <CameraView
+
+            {permission ?
+              {/* <CameraView
               mirror={true}
               style={styles.camera}
               facing={facing}
@@ -266,12 +269,28 @@ const TakePhoto = ({
               <View style={styles.focusArea}>
                 <View style={styles.focusSquare} />
               </View>
-            </CameraView>
+            </CameraView> */}
+              :
+              <View style={styles.camera} />}
 
             <View style={styles.bottomControls}>
-              <TouchableOpacity style={styles.galleryButton} onPress={pickPhoto}>
+              <TouchableOpacity
+                style={styles.galleryButton}
+                onPress={async () => {
+                  const photoUri = await pickPhoto();
+                  if (photoUri) {
+                    const tempUri = await saveTempPhoto(photoUri);
+                    if (tempUri) {
+                      if (tempPhotoUri) await deleteTempPhoto(tempPhotoUri);
+                      onPhotoSelected?.(tempUri);
+                      handleCloseCamera(); // kalau kamu mau langsung tutup kamera
+                    }
+                  }
+                }}
+              >
                 <Ionicons name="images-outline" size={20} color="white" />
               </TouchableOpacity>
+
               <TouchableOpacity
                 style={[styles.captureButton, isCapturing && styles.capturingButton]}
                 onPress={handleTakePhoto}

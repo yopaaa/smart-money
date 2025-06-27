@@ -164,7 +164,7 @@ const TransactionForm = () => {
     }
     const handleCopy = () => {
         router.push({
-            pathname: 'transaction/TransactionForm',
+            pathname: '(home)/(transaction)/TransactionForm',
             params: {
                 id: formData.id,
             }

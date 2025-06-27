@@ -84,8 +84,8 @@ const SectionHeader = React.memo(({ title, balance, isHideBalance }) => (
 ));
 
 export default function AccountsScreen() {
-        const { theme } = useTheme();
-    
+    const { theme } = useTheme();
+
     const router = useRouter();
     const { accounts, accountsGrouped, refetchData } = useTransactions();
     const [isRefreshing, setisRefreshing] = useState(false)
@@ -168,6 +168,8 @@ export default function AccountsScreen() {
 
     // Optimasi: Memoize renderItem function untuk FlashList
     const renderItem = useCallback(({ item }) => {
+        console.log(isHideBalance);
+
         if (item.type === 'header') {
             return (
                 <SectionHeader
@@ -244,6 +246,7 @@ export default function AccountsScreen() {
             {/* Accounts List dengan FlashList */}
             <View style={styles.content}>
                 <FlashList
+                    extraData={isHideBalance}
                     data={flattenedData}
                     renderItem={renderItem}
                     keyExtractor={keyExtractor}

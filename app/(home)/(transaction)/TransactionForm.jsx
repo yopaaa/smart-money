@@ -22,8 +22,8 @@ import {
   View
 } from 'react-native';
 import ChatInput from './ChatInput';
-// import ImageModal from './ImageModal';
-// import CameraComponent, { useFormPhoto } from './TakePhoto';
+import ImageModal from './ImageModal';
+import CameraComponent, { useFormPhoto } from './TakePhoto';
 
 const TransactionForm = () => {
   const router = useRouter();
@@ -159,7 +159,7 @@ const TransactionForm = () => {
       createdAt: mergedDate.getTime(),
       category: formData.type === 'transfer' ? "52841730" : formData.category.id,
       fee: formData.type === 'transfer' ? parseInt(formData.fee || '0') : 0,
-      img: finalPhotoUri.filename
+      img: finalPhotoUri?.filename || null
     };
 
     try {
@@ -176,17 +176,20 @@ const TransactionForm = () => {
         accountId: accounts[0],
         targetAccountId: accounts[0],
         category: '',
-        fee: '0'
+        fee: '0',
+        img: ""
       });
+
       setSelectedDate(new Date())
       setSelectedTime(new Date())
 
       router.push("/");
     } catch (e) {
       Alert.alert('Error', e.message);
-    } finally {
-      await cleanup();
     }
+    // finally {
+    // await cleanup();
+    // }
   };
 
   useEffect(() => {
@@ -209,18 +212,18 @@ const TransactionForm = () => {
   }, [searchQuery]);
 
 
-  // const {
-  //   tempPhotoUri,
-  //   handlePhotoSelected,
-  //   handlePhotoRemoved,
-  //   saveFinalPhoto,
-  //   cleanup,
-  //   hasPhoto,
-  // } = useFormPhoto();
+  const {
+    tempPhotoUri,
+    handlePhotoSelected,
+    handlePhotoRemoved,
+    saveFinalPhoto,
+    cleanup,
+    hasPhoto,
+  } = useFormPhoto();
 
-  // const handleCancel = async () => {
-  //   await cleanup();
-  // };
+  const handleCancel = async () => {
+    await cleanup();
+  };
 
   return (
     <KeyboardAvoidingView
@@ -239,7 +242,7 @@ const TransactionForm = () => {
             ]}
           />
         }
-        // onBack={handleCancel}
+        onBack={handleCancel}
       />
 
       {type == "chat" && <ChatInput />}
@@ -413,7 +416,7 @@ const TransactionForm = () => {
               )}
 
               {/* Description Input */}
-              {/* <Text style={{ ...styles.label, padding: 10 }}>Deskripsi</Text>
+              <Text style={{ ...styles.label, padding: 10 }}>Deskripsi</Text>
               {hasPhoto ? <View style={{ flexDirection: "column", gap: 10 }}>
                 <TextInput
                   style={[styles.input, { height: 80, width: "100%" }]}
@@ -439,7 +442,7 @@ const TransactionForm = () => {
                   imageItem={tempPhotoUri}
                 />
               </View> :
-                <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}> */}
+                <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
                   <TextInput
                     style={[styles.input, { height: 80, width: "100%" }]}
                     placeholder="Tambahkan deskripsi (opsional)"
@@ -449,13 +452,13 @@ const TransactionForm = () => {
                   />
 
 
-                  {/* <CameraComponent
+                  <CameraComponent
                     onPhotoSelected={handlePhotoSelected}
                     onPhotoRemoved={handlePhotoRemoved}
                     tempPhotoUri={tempPhotoUri}
                     buttonStyle={{ height: 50, width: 50, margin: 10 }}
                   />
-                </View>} */}
+                </View>}
             </View>
           </ScrollView>
 
