@@ -6,7 +6,7 @@ import * as FileSystem from 'expo-file-system';
 import { Image } from 'expo-image';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import moment from 'moment';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
     Alert,
     FlatList,
@@ -17,9 +17,63 @@ import {
     View
 } from 'react-native';
 import ImageModal from '../(transaction)/ImageModal';
-// import { FOLDER_PATH } from '../(transaction)/TakePhoto';
+
 export const FOLDER_NAME = 'SmartMoney';
 export const FOLDER_PATH = `${FileSystem.documentDirectory}${FOLDER_NAME}/`;
+
+// Memoized components
+const DateHeader = memo(({ date, count }) => (
+    <View style={styles.dateHeader}>
+        <Text style={styles.dateHeaderText}>{date}</Text>
+        <Text style={styles.dateHeaderCount}>{count} photos</Text>
+    </View>
+));
+
+const ImageItem = memo(({ item, onPress }) => (
+    <View style={styles.imageContainer}>
+        <TouchableOpacity style={styles.imageWrapper} onPress={onPress}>
+            <Image source={{ uri: item.uri }} style={styles.image} />
+            <View style={styles.imageOverlay}>
+                <Text style={styles.transactionTitle} numberOfLines={1}>
+                    {item.transactionTitle}
+                </Text>
+                <Text style={styles.transactionAmount}>
+                    {item.transactionType === 'expense' ? '-' : '+'}
+                    Rp {item.transactionAmount.toLocaleString('id-ID')}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    </View>
+));
+
+const EmptyGallery = memo(({ onRefresh }) => (
+    <View style={[styles.centerContainer]}>
+        <Ionicons name="images-outline" size={64} color="#ccc" />
+        <Text style={styles.emptyText}>No images found</Text>
+        <Text style={styles.emptySubText}>
+            No transaction images found for the selected period
+        </Text>
+        <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
+            <Text style={styles.refreshButtonText}>Refresh</Text>
+        </TouchableOpacity>
+    </View>
+));
+
+const DateSection = memo(({ item, onImagePress }) => (
+    <View style={styles.dateSection}>
+        <DateHeader date={item.date} count={item.count} />
+        <FlatList
+            data={item.images}
+            renderItem={({ item }) => (
+                <ImageItem item={item} onPress={() => onImagePress(item)} />
+            )}
+            keyExtractor={(imageItem) => imageItem.id}
+            numColumns={3}
+            scrollEnabled={false}
+            showsVerticalScrollIndicator={false}
+        />
+    </View>
+));
 
 export function GalleryScreen() {
     const { viewMode = "month", selectedDate: selectedDates } = useLocalSearchParams();
@@ -33,24 +87,22 @@ export function GalleryScreen() {
 
     useFocusEffect(
         useCallback(() => {
-            setSelectedDate(moment(selectedDates))
+            setSelectedDate(moment(selectedDates));
             setUpdateTriggers(Date.now());
-        }, [])
+        }, [selectedDates])
     );
 
-    const handleRefresh = () => {
+    const handleRefresh = useCallback(() => {
         setIsRefreshing(true);
         setTimeout(() => {
             setIsRefreshing(false);
+            setUpdateTriggers(Date.now());
         }, 1000);
-    };
-
-
+    }, []);
 
     const filteredTransactions = useMemo(() => {
         const start = moment(selectedDate);
         let end = moment(selectedDate);
-        console.log("Galery screen..");
 
         if (viewMode === 'week') {
             start.startOf('week');
@@ -71,7 +123,7 @@ export function GalleryScreen() {
             endDate: end.valueOf(),
             hasImage: true,
         });
-    }, [selectedDate, viewMode, isRefreshing, updateTriggers]);
+    }, [selectedDate, viewMode, filterTransactions]);
 
     const groupedTransactions = useMemo(() => {
         const groups = {};
@@ -96,14 +148,7 @@ export function GalleryScreen() {
             }
 
             groups[dateKey].data.push(item);
-
-            const value =
-                item.type === 'income'
-                    ? item.amount
-                    : item.type === 'expense'
-                        ? -item.amount
-                        : 0;
-
+            const value = item.type === 'income' ? item.amount : -item.amount;
             groups[dateKey].total += value;
         });
 
@@ -132,7 +177,7 @@ export function GalleryScreen() {
 
                 for (const transaction of dateGroup.data) {
                     if (transaction.img) {
-                        const filePath = `${FOLDER_PATH}/${transaction.img}`;
+                        const filePath = `${FOLDER_PATH}${transaction.img}`;
                         const fileInfo = await FileSystem.getInfoAsync(filePath);
                         if (fileInfo.exists) {
                             imagesForDate.push({
@@ -167,58 +212,22 @@ export function GalleryScreen() {
         }
     }, [groupedTransactions]);
 
-    // Gunakan useEffect untuk trigger loadImages saat groupedTransactions berubah
     useEffect(() => {
         loadImages();
     }, [loadImages]);
 
-    const openImageModal = (imageItem) => {
+    const openImageModal = useCallback((imageItem) => {
         setSelectedImage(imageItem);
         setModalVisible(true);
-    };
+    }, []);
 
-    const renderDateHeader = ({ item }) => (
-        <View style={styles.dateHeader}>
-            <Text style={styles.dateHeaderText}>{item.date}</Text>
-            <Text style={styles.dateHeaderCount}>{item.count} photos</Text>
-        </View>
-    );
+    const closeImageModal = useCallback(() => {
+        setModalVisible(false);
+    }, []);
 
-    const renderImageItem = ({ item }) => (
-        <View style={styles.imageContainer}>
-            <TouchableOpacity
-                style={styles.imageWrapper}
-                onPress={() => openImageModal(item)}
-            >
-                <Image source={{ uri: item.uri }} style={styles.image} />
-
-                {/* Transaction info overlay */}
-                <View style={styles.imageOverlay}>
-                    <Text style={styles.transactionTitle} numberOfLines={1}>
-                        {item.transactionTitle}
-                    </Text>
-                    <Text style={styles.transactionAmount}>
-                        {item.transactionType === 'expense' ? '-' : '+'}
-                        Rp {item.transactionAmount.toLocaleString('id-ID')}
-                    </Text>
-                </View>
-            </TouchableOpacity>
-        </View>
-    );
-
-    const renderDateSection = ({ item }) => (
-        <View style={styles.dateSection}>
-            {renderDateHeader({ item })}
-            <FlatList
-                data={item.images}
-                renderItem={renderImageItem}
-                keyExtractor={(imageItem) => imageItem.id}
-                numColumns={3}
-                scrollEnabled={false}
-                showsVerticalScrollIndicator={false}
-            />
-        </View>
-    );
+    const renderItem = useCallback(({ item }) => (
+        <DateSection item={item} onImagePress={openImageModal} />
+    ), [openImageModal]);
 
     if (groupedImages.length === 0) {
         return (
@@ -228,18 +237,7 @@ export function GalleryScreen() {
                     viewMode={viewMode}
                     onDateChange={setSelectedDate}
                 />
-                    {/* <Text style={styles.emptyText}>No images found</Text> */}
-
-                <View style={[styles.centerContainer,]}>
-                    <Ionicons name="images-outline" size={64} color="#ccc" />
-                    <Text style={styles.emptyText}>No images found</Text>
-                    <Text style={styles.emptySubText}>
-                        No transaction images found for the selected period
-                    </Text>
-                    <TouchableOpacity style={styles.refreshButton} onPress={loadImages}>
-                        <Text style={styles.refreshButtonText}>Refresh</Text>
-                    </TouchableOpacity>
-                </View>
+                <EmptyGallery onRefresh={loadImages} />
             </>
         );
     }
@@ -254,7 +252,7 @@ export function GalleryScreen() {
 
             <FlatList
                 data={groupedImages}
-                renderItem={renderDateSection}
+                renderItem={renderItem}
                 keyExtractor={(item, index) => `${item.date}-${index}`}
                 contentContainerStyle={styles.flatListContent}
                 showsVerticalScrollIndicator={false}
@@ -265,21 +263,21 @@ export function GalleryScreen() {
             <ImageModal
                 enableDelete={false}
                 visible={modalVisible}
-                onClose={() => setModalVisible(false)}
+                onClose={closeImageModal}
                 imageItem={selectedImage}
             />
         </>
     );
 }
 
-export default function Example() {
+export default memo(function GalleryContainer() {
     return (
         <View style={styles.container}>
             <SimpleHeader title="Gallery History" />
             <GalleryScreen />
         </View>
     )
-}
+});
 
 const styles = StyleSheet.create({
     container: {

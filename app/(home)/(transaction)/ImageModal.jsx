@@ -155,10 +155,8 @@ const ImageModal = ({
 
 const styles = StyleSheet.create({
     modalContainer: {
-        // position: "absolute",
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.9)',
-        // backgroundColor: "red"
     },
     fullScreenButton: {
         flex: 1,
@@ -178,8 +176,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalImage: {
-        width: width - 40,
-        height: width - 40,
+        width: width - 20,
+        height: width - 20,
     },
     modalInfo: {
         marginTop: 20,

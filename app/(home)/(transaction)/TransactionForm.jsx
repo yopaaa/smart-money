@@ -2,6 +2,7 @@ import ActionButton from '@/components/ActionButton';
 import CustomPicker from '@/components/CustomPicker';
 import SimpleHeader from '@/components/SimpleHeader';
 import SlideSelect from '@/components/SlideSelect';
+import { useTheme } from '@/hooks/ThemeContext';
 import { useTransactions } from '@/hooks/TransactionContext';
 import { formatCurrency, unformatCurrency } from '@/utils/number';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -10,9 +11,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Alert,
+  Dimensions,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -21,11 +22,20 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import AnimatedTabBar from '../(root)/AnimatedTabBar';
 import ChatInput from './ChatInput';
 import ImageModal from './ImageModal';
 import CameraComponent, { useFormPhoto } from './TakePhoto';
 
+const { width } = Dimensions.get('window');
+const TABS = [
+  { key: 'income', text: "income" },
+  { key: 'expense', text: "expense" },
+  { key: 'transfer', text: "transfer" }
+];
+
 const TransactionForm = () => {
+  const { theme } = useTheme();
   const router = useRouter();
   const { id: copyDataId } = useLocalSearchParams();
   const { refetchData,
@@ -204,6 +214,7 @@ const TransactionForm = () => {
         let matchedCategory = getCategoryById(tx.category)
         handleChange('category', matchedCategory)
         handleChange('accountId', accounts.find(acc => acc.id === tx.accountId) || accounts[0])
+        handleChange('targetAccountId', accounts.find(acc => acc.id === tx.targetAccountId) || accounts[1])
       } catch (error) {
         console.log(tx);
         console.info(error);
@@ -251,23 +262,23 @@ const TransactionForm = () => {
       {type == "keyboard" &&
         <>
           <View style={styles.tabContainer}>
-            {['income', 'expense', 'transfer'].map(type => (
-              <Pressable
-                key={type}
-                style={[styles.tab, formData.type === type && styles.activeTab]}
-                onPress={() => {
-                  handleChange('type', type)
-                  type === "income"
-                    ? handleChange('category', incomeCategories[0])
-                    : handleChange('category', expenseCategories[0])
-                }
-                }
-              >
-                <Text style={[styles.tabText, formData.type === type && styles.activeTabText]}>
-                  {type}
-                </Text>
-              </Pressable>
-            ))}
+            <AnimatedTabBar
+              tabs={TABS}
+              onPress={(type) => {
+                handleChange('type', type)
+                type === "income"
+                  ? handleChange('category', incomeCategories[0])
+                  : handleChange('category', expenseCategories[0])
+              }
+              }
+              style={{ height: 40, width: width - 30 }}
+              selectedColor={theme.colors.primary}
+              selected={1}
+              selectedStyle={{
+                borderWidth: 1,
+                borderColor: '#007AFF',
+              }}
+            />
           </View>
 
           <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -431,7 +442,7 @@ const TransactionForm = () => {
                   onPhotoSelected={handlePhotoSelected}
                   onPhotoRemoved={handlePhotoRemoved}
                   tempPhotoUri={tempPhotoUri}
-                  buttonStyle={{ height: 50, width: 50, margin: 10 }}
+                  buttonStyle={{ height: 50, width: 50 }}
                   onRenderPhotoPreviewPress={() => setModalVisible(true)}
                 />
 
@@ -456,7 +467,7 @@ const TransactionForm = () => {
                     onPhotoSelected={handlePhotoSelected}
                     onPhotoRemoved={handlePhotoRemoved}
                     tempPhotoUri={tempPhotoUri}
-                    buttonStyle={{ height: 50, width: 50, margin: 10 }}
+                    buttonStyle={{ height: 50, width: 50 }}
                   />
                 </View>}
             </View>
@@ -505,18 +516,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   tabContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 15
+    justifyContent: "center", alignItems: "center", paddingVertical: 10
   },
   tab: {
     paddingHorizontal: 30,
     paddingVertical: 10,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
     borderColor: '#e0e0e0',
+    backgroundColor: '#fff',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

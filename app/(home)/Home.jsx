@@ -25,8 +25,11 @@ const NavigationHeader = React.memo(({
     <View>
         <View style={styles.headercontainer}>
             <View>
-                <AnimatedTabBar tabs={TABS} onPress={onNavigate
-                } style={{ height: 40, width: 200 }} selectedColor={theme.colors.primary}/>
+                <AnimatedTabBar
+                    tabs={TABS}
+                    onPress={onNavigate}
+                    style={{ height: 40, width: 200 }}
+                    selectedColor={theme.colors.primary} />
             </View>
 
             <View style={styles.headerIcons}>
