@@ -18,7 +18,8 @@ export default function AnimatedTabBar({ tabs,
     textStyle,
     tabStyle,
     selectedStyle,
-    selected
+    selected,
+    isEnabled = true
 }) {
     const [activeIndex, setActiveIndex] = useState(0);
     const translateX = useSharedValue(0);
@@ -36,8 +37,8 @@ export default function AnimatedTabBar({ tabs,
     }));
 
     useEffect(() => {
-        if (selected) handlePress(selected)
-    }, [])
+        if (selected != null) handlePress(selected)
+    }, [selected])
 
     return (
         <View style={[styles.container, { width: SCREEN_WIDTH - 30 }, style]}>
@@ -45,6 +46,7 @@ export default function AnimatedTabBar({ tabs,
 
             {tabs.map((tab, index) => (
                 <TouchableOpacity
+                disabled={!isEnabled}
                     key={tab.key}
                     style={[styles.tab, { width: TAB_WIDTH }, tabStyle, activeIndex === index ? selectedStyle : null]}
                     onPress={() => {

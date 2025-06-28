@@ -5,11 +5,6 @@ import { useEffect, useState } from 'react';
 import { Alert, Button, Platform, SafeAreaView, StatusBar, Switch, Text, View } from 'react-native';
 
 import SimpleHeader from '../../components/SimpleHeader';
-import {
-    cancelReminders,
-    registerForPushNotificationsAsync,
-    scheduleDailyReminder,
-} from './NotificationService';
 
 function Reminder() {
     const [enabled, setEnabled] = useState(false);
@@ -34,13 +29,15 @@ function Reminder() {
         await AsyncStorage.setItem('reminder_enabled', String(newState));
 
         if (newState) {
-            const granted = await registerForPushNotificationsAsync();
+            // const granted = await registerForPushNotificationsAsync();
+            const granted = null;
+
             if (granted) {
-                await scheduleDailyReminder(time.getHours(), time.getMinutes());
+                // await scheduleDailyReminder(time.getHours(), time.getMinutes());
                 Alert.alert('Pengingat diaktifkan');
             }
         } else {
-            await cancelReminders();
+            // await cancelReminders();
             Alert.alert('Pengingat dimatikan');
         }
     };
@@ -56,7 +53,7 @@ function Reminder() {
         await AsyncStorage.setItem('reminder_time', selected.toString());
 
         if (enabled) {
-            await scheduleDailyReminder(selected.getHours(), selected.getMinutes());
+            // await scheduleDailyReminder(selected.getHours(), selected.getMinutes());
             Alert.alert('Waktu pengingat diperbarui');
         }
     };

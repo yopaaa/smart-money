@@ -10,9 +10,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
     Alert,
+    Dimensions,
     KeyboardAvoidingView,
     Platform,
-    Pressable,
     ScrollView,
     StatusBar,
     StyleSheet,
@@ -22,13 +22,20 @@ import {
     View
 } from 'react-native';
 // import { FOLDER_PATH } from '../TakePhoto';
+import { useTheme } from '@/hooks/ThemeContext';
 import * as FileSystem from 'expo-file-system';
+import AnimatedTabBar from '../../(root)/AnimatedTabBar';
+import { TABS } from '../TransactionForm';
 
+const { width } = Dimensions.get('window');
 export const FOLDER_NAME = 'SmartMoney';
 export const FOLDER_PATH = `${FileSystem.documentDirectory}${FOLDER_NAME}/`;
 
 const TransactionForm = () => {
     const { id } = useLocalSearchParams();
+    const { theme } = useTheme();
+
+
     const router = useRouter();
     const {
         accounts,
@@ -47,6 +54,8 @@ const TransactionForm = () => {
 
     const [incomeCategories, setIncomeCategories] = useState();
     const [expenseCategories, setExpenseCategories] = useState();
+
+    const [selectedTab, setselectedTab] = useState(1);
 
     const [formData, setFormData] = useState({
         id: "",
@@ -76,6 +85,12 @@ const TransactionForm = () => {
                 let matchedCategory = getCategoryById(tx.category)
 
                 setIsFormEditable(tx.category == "Biaya Admin" ? false : true)
+
+                if (tx.type == "income") {
+                    setselectedTab(0)
+                } else if (tx.type == "transfer") {
+                    setselectedTab(2)
+                }
 
                 setFormData({
                     id: tx.id,
@@ -171,6 +186,7 @@ const TransactionForm = () => {
         });
     }
 
+
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, paddingTop: StatusBar.currentHeight || 0 }}
@@ -179,17 +195,17 @@ const TransactionForm = () => {
             <SimpleHeader title={formData.type + " Details"} />
 
             <View style={styles.tabContainer}>
-                {['income', 'expense', 'transfer'].map(type => (
-                    <Pressable
-                        key={type}
-                        style={[styles.tab, formData.type === type && styles.activeTab]}
-                    // onPress={() => handleChange('type', type)}
-                    >
-                        <Text style={[styles.tabText, formData.type === type && styles.activeTabText]}>
-                            {type}
-                        </Text>
-                    </Pressable>
-                ))}
+                <AnimatedTabBar
+                    tabs={TABS}
+                    style={{ height: 40, width: width - 30 }}
+                    selectedColor={theme.colors.primary}
+                    selected={selectedTab}
+                    selectedStyle={{
+                        borderWidth: 1,
+                        borderColor: '#007AFF',
+                    }}
+                    isEnabled={false}
+                />
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContainer}>

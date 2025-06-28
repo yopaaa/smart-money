@@ -100,7 +100,7 @@ const ImageModal = ({
                             <Image
                                 source={{ uri: imageItem.uri }}
                                 style={styles.modalImage}
-                                contentFit="contain"
+                                contentFit="cover"
                             />
                             <View style={styles.modalInfo}>
                                 <Text style={styles.modalTitle}>{imageItem.name}</Text>

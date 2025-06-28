@@ -28,7 +28,7 @@ import ImageModal from './ImageModal';
 import CameraComponent, { useFormPhoto } from './TakePhoto';
 
 const { width } = Dimensions.get('window');
-const TABS = [
+export const TABS = [
   { key: 'income', text: "income" },
   { key: 'expense', text: "expense" },
   { key: 'transfer', text: "transfer" }
@@ -57,6 +57,7 @@ const TransactionForm = () => {
   const [type, setType] = useState('keyboard');
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedTab, setselectedTab] = useState(1);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -75,7 +76,13 @@ const TransactionForm = () => {
       const tx = getTransactionById(copyDataId);
       if (tx) {
         let matchedCategory = getCategoryById(tx.category)
-        console.log(matchedCategory);
+        // console.log(matchedCategory);
+        
+        if (tx.type == "income") {
+          setselectedTab(0)
+        } else if (tx.type == "transfer") {
+          setselectedTab(2)
+        }
 
         setFormData({
           title: tx.title,
@@ -273,7 +280,7 @@ const TransactionForm = () => {
               }
               style={{ height: 40, width: width - 30 }}
               selectedColor={theme.colors.primary}
-              selected={1}
+              selected={selectedTab}
               selectedStyle={{
                 borderWidth: 1,
                 borderColor: '#007AFF',
