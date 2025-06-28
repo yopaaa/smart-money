@@ -189,7 +189,7 @@ const TransactionForm = () => {
         fee: '0',
         img: ""
       });
-
+      handleCancel()
       setSelectedDate(new Date())
       setSelectedTime(new Date())
 
