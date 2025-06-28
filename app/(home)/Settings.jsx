@@ -217,7 +217,7 @@ export default function SettingsScreen() {
           <SettingItem
             title="Contact Us"
             subtitle="Send feedback or report issues"
-            onPress={() => router.push("(home)/(settings)/WebView")}
+            onPress={() => router.push("Report")}
           />
           <SettingItem
             title="Rate App"

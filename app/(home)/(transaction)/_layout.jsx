@@ -7,6 +7,7 @@ export default function SettingsLayout() {
     }}
     >
       <Stack.Screen name="TransactionForm" options={{ animation: "slide_from_bottom" }} />
+      <Stack.Screen name="TransactionDetails/index" options={{ animation: "slide_from_left" }} />
     </Stack>
   );
 }

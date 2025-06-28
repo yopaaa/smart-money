@@ -57,13 +57,9 @@ const NavigationHeader = React.memo(({
     </View>
 ));
 
-// ✅ GANTI atau TAMBAH ikon di sini
 const TABS = [
     { key: 'format-list-bulleted', icon: 'format-list-bulleted' },
-    { key: 'folder-image', icon: 'folder-image' },
-    // { key: 'layers', icon: 'layers-outline' },
-    // { key: 'cloud', icon: 'cloud-outline' },        // Tambahan
-    // { key: 'code-tags', icon: 'code-tags' },        // Tambahan
+    { key: 'folder-image', icon: 'folder-image' }
 ];
 
 export default function HomeScreen() {
