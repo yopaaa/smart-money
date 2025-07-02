@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     Dimensions,
@@ -25,6 +25,7 @@ import {
 import { useTheme } from '@/hooks/ThemeContext';
 import * as FileSystem from 'expo-file-system';
 import AnimatedTabBar from '../../(root)/AnimatedTabBar';
+import ImageModal from '../ImageModal';
 import { TABS } from '../TransactionForm';
 
 const { width } = Dimensions.get('window');
@@ -54,8 +55,9 @@ const TransactionForm = () => {
 
     const [incomeCategories, setIncomeCategories] = useState();
     const [expenseCategories, setExpenseCategories] = useState();
-
     const [selectedTab, setselectedTab] = useState(1);
+
+    const [modalVisible, setModalVisible] = useState(false);
 
     const [formData, setFormData] = useState({
         id: "",
@@ -112,6 +114,11 @@ const TransactionForm = () => {
             }
         }
     }, [id, accounts]);
+
+    const closeImageModal = useCallback(() => {
+        setModalVisible(false);
+    }, []);
+
 
     const handleChange = (name, value) => {
         setFormData(prev => ({
@@ -353,9 +360,20 @@ const TransactionForm = () => {
                     />
 
                     {formData.img &&
-                        <View style={{ justifyContent: "center", flex: 1, alignItems: "center", padding: 14 }}>
-                            <Image source={{ uri: FOLDER_PATH + formData.img }} style={{ height: 300, width: 300, borderRadius: 14 }} />
-                        </View>}
+                        <>
+                            <TouchableOpacity style={{ justifyContent: "center", flex: 1, alignItems: "center", padding: 14 }}
+                                onPress={() => setModalVisible(true)}>
+                                <Image source={{ uri: FOLDER_PATH + formData.img }} style={{ height: 300, width: 300, borderRadius: 14 }} />
+                            </TouchableOpacity>
+
+                            <ImageModal
+                                enableDelete={false}
+                                visible={modalVisible}
+                                onClose={closeImageModal}
+                                imageItem={FOLDER_PATH + formData.img}
+                            />
+                        </>
+                    }
 
                 </View>
             </ScrollView>

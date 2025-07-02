@@ -218,6 +218,8 @@ const styles = StyleSheet.create({
         marginTop: 4,
     },
     amount: {
+        flex: 1,
+        textAlign: "right",
         fontSize: 16,
         fontWeight: 'bold',
     },

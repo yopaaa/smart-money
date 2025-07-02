@@ -26,7 +26,8 @@ const SummaryCard = React.memo(({ title, value, isHideBalance }) => (
         <ThemedText style={styles.summaryLabel} type="description">{title}</ThemedText>
         <Text style={[
             styles.summaryValue,
-            value > 0 ? styles.assetBalance : styles.liabilityBalance
+            value > 0 ? styles.assetBalance : styles.liabilityBalance,
+            title == "Liabilities" ? styles.liabilityBalance : null
         ]}>
             {isHideBalance ? (formatCurrency(value) || "0") : "*****"}
         </Text>
@@ -235,6 +236,7 @@ export default function AccountsScreen() {
             </View>
 
             {/* Summary Cards */}
+            {/* <Text>{JSON.stringify(summary, " ", " ")}</Text> */}
             <View style={styles.summarySection}>
                 <View style={styles.summaryGrid}>
                     <SummaryCard title="Assets" value={summary.assets} isHideBalance={isHideBalance} />

@@ -178,6 +178,8 @@ const styles = StyleSheet.create({
     amount: {
         fontSize: 16,
         fontWeight: 'bold',
+        flex: 1,
+        textAlign: "right",
     },
     income: {
         color: '#2e7d32',
