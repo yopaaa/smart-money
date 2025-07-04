@@ -4,9 +4,47 @@ import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
+
+import { zip } from 'react-native-zip-archive';
+import { FOLDER_NAME, FOLDER_PATH } from '../(root)/GalleryScreen';
+import { getBackupPath } from '../../(backup)/_index';
+
+export const backupFolderToZip = async () => {
+    try {
+        const folderInfo = await FileSystem.getInfoAsync(FOLDER_PATH);
+        if (!folderInfo.exists) {
+            console.log('Folder tidak ditemukan:', FOLDER_PATH);
+            return null;
+        }
+
+        const dateStr = new Date().toISOString().split('T')[0];
+        const zipFileName = `${FOLDER_NAME}${dateStr}.zip`;
+        const zipOutputPath = `${FileSystem.documentDirectory}${zipFileName}`; // JANGAN di dalam FOLDER_PATH
+
+        const contents = await FileSystem.readDirectoryAsync(FOLDER_PATH);
+        console.log('Isi folder:', contents);
+
+        if (contents.length === 0) {
+            throw new Error('Folder kosong, tidak bisa di-zip');
+        }
+
+
+        const sourcePath = FOLDER_PATH.replace('file://', '');
+        const outputPath = zipOutputPath.replace('file://', '');
+
+        const zipResult = await zip(sourcePath, outputPath);
+
+        console.log('ZIP berhasil disimpan di:', zipResult);
+
+        return zipResult.startsWith('file://') ? zipResult : `file://${zipResult}`;
+    } catch (error) {
+        console.error('Gagal membuat ZIP:', error);
+        return null;
+    }
+};
 
 export async function generatePdf(transactions) {
     const html = `
@@ -72,6 +110,8 @@ const ExportScreen = () => {
 
             const content = csvHeader + csvRows;
             const fileUri = FileSystem.documentDirectory + 'exported_data.csv';
+            console.log(fileUri);
+
             await FileSystem.writeAsStringAsync(fileUri, content);
 
             await Sharing.shareAsync(fileUri, {
@@ -111,7 +151,9 @@ const ExportScreen = () => {
         setLoading('pdf');
         try {
             const uri = await generatePdf(getTransactions());
-            await Sharing.shareAsync(uri, {
+            console.log(uri);
+
+            await Sharing.shareAsync("file://" + uri, {
                 mimeType: 'application/pdf',
                 dialogTitle: 'Bagikan Laporan PDF',
             });
@@ -122,10 +164,46 @@ const ExportScreen = () => {
         }
     };
 
+    const exportZIP = async () => {
+        try {
+            const uri = await backupFolderToZip();
+
+            if (!uri) return null
+
+            const backupUrl = await getBackupPath();
+
+            const base64Content = await FileSystem.readAsStringAsync(uri, {
+                encoding: FileSystem.EncodingType.Base64,
+            });
+
+            const fileName = uri.split('/').pop() || 'backup.zip';
+            const newFileUri = await FileSystem.StorageAccessFramework.createFileAsync(
+                backupUrl,
+                fileName,
+                'application/zip'
+            );
+
+            await FileSystem.writeAsStringAsync(newFileUri, base64Content, {
+                encoding: FileSystem.EncodingType.Base64,
+            });
+
+            await Sharing.shareAsync(uri, {
+                mimeType: 'application/zip',
+                dialogTitle: 'Bagikan file ZIP',
+            });
+
+            await FileSystem.deleteAsync(uri);
+        } catch (e) {
+            Alert.alert('Gagal', `Gagal membuat ZIP: ${e.message}`);
+            console.error(e);
+        }
+    };
+
+
     return (
         <SafeAreaView style={{ ...styles.container, paddingTop: StatusBar.currentHeight || 0 }}>
             <SimpleHeader title="Export Data" />
-            <View style={styles.content}>
+            <ScrollView style={styles.content}>
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
                         <Ionicons name="download-outline" size={24} color="#27AE60" />
@@ -179,7 +257,27 @@ const ExportScreen = () => {
                         <Text style={styles.buttonText}>Export PDF</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Ionicons name="file-tray-full-outline" size={24} color="#fbc02d" />
+                        <Text style={styles.sectionTitle}>Backup Gambar (Image)</Text>
+                    </View>
+                    <Text style={styles.sectionDescription}>
+                        Ekspor semua gambar yang tersedia ke dalam file ZIP.
+                    </Text>
+                    <TouchableOpacity
+                        style={[styles.button, { backgroundColor: '#fbc02d' }]}
+                        onPress={exportZIP}
+                        disabled={loading !== ''}
+                    >
+                        {loading === 'pdf' ? <ActivityIndicator color="#fff" /> : <Ionicons name="print-outline" size={20} color="#fff" />}
+                        <Text style={styles.buttonText}>Export Zip</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={{marginBottom: 200}}/>
+            </ScrollView>
         </SafeAreaView>
     );
 };

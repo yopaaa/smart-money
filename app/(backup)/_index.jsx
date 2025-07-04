@@ -17,6 +17,23 @@ const DB_PATH = `${FileSystem.documentDirectory}SQLite/${DB_NAME}.db`;
 const BACKUP_FOLDER_URI_KEY = 'backup_folder_uri';
 const TITLE = "Backup & Restore"
 
+export async function getBackupPath() {
+    let targetFolderUri = await AsyncStorage.getItem(BACKUP_FOLDER_URI_KEY);
+
+    if (!targetFolderUri) {
+        const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync();
+        if (!permissions.granted) {
+            Alert.alert('Dibatalkan', 'Backup dibatalkan karena tidak ada folder yang dipilih.');
+            return;
+        }
+
+        targetFolderUri = permissions.directoryUri;
+        await AsyncStorage.setItem(BACKUP_FOLDER_URI_KEY, targetFolderUri);
+
+    }
+    return targetFolderUri
+}
+
 const BackupRestoreScreen = () => {
     const router = useRouter();
     const { resetTables, refetchData } = useTransactions();
@@ -76,18 +93,7 @@ const BackupRestoreScreen = () => {
             const isAvailable = await Sharing.isAvailableAsync();
 
             if (Platform.OS === 'android') {
-                let targetFolderUri = await AsyncStorage.getItem(BACKUP_FOLDER_URI_KEY);
-
-                if (!targetFolderUri) {
-                    const permissions = await StorageAccessFramework.requestDirectoryPermissionsAsync();
-                    if (!permissions.granted) {
-                        Alert.alert('Dibatalkan', 'Backup dibatalkan karena tidak ada folder yang dipilih.');
-                        return;
-                    }
-
-                    targetFolderUri = permissions.directoryUri;
-                    await AsyncStorage.setItem(BACKUP_FOLDER_URI_KEY, targetFolderUri);
-                }
+                let targetFolderUri = await getBackupPath();
 
                 const backupContent = await FileSystem.readAsStringAsync(backupPath, {
                     encoding: FileSystem.EncodingType.Base64

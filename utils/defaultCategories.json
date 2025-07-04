@@ -77,13 +77,6 @@
     "type": "expense"
   },
   {
-    "id": "29680517",
-    "name": "Lainnya",
-    "icon": "dots-horizontal",
-    "color": "#b0bec5",
-    "type": "expense"
-  },
-  {
     "id": "80317529",
     "name": "Gaji",
     "icon": "cash",
@@ -193,6 +186,12 @@
     "name": "Skincare",
     "icon": "face-woman",
     "color": "#f48fb1",
+    "type": "expense"
+  },{
+    "id": "29680517",
+    "name": "Lainnya",
+    "icon": "dots-horizontal",
+    "color": "#b0bec5",
     "type": "expense"
   }
 ]
