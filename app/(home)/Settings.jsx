@@ -171,6 +171,20 @@ export default function SettingsScreen() {
               router.push("(home)/(settings)/Currency");
             }}
           />
+
+          <SettingItem
+            title="Categorys"
+            subtitle={`set your income and expense categories`}
+            onPress={() => {
+              router.push({
+                pathname: "(home)/(settings)/Category/Categorys",
+                params: {
+                  title: "Categorys",
+                }
+              });
+            }}
+
+          />
         </SettingSection>
 
         {/* Data Section */}

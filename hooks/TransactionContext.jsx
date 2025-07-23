@@ -7,6 +7,8 @@ import {
     getAccounts
 } from '@/utils/fn/account';
 import {
+    addCategory,
+    deleteCategory,
     getAllCategories,
     getCategoriesByType,
     getCategoryById
@@ -169,7 +171,7 @@ export const TransactionProvider = ({ children }) => {
             try {
                 initDB();
                 await loadAccounts();
-                refetchData();                
+                refetchData();
             } catch (e) {
                 console.error("Initialization error:", e);
                 router.replace({
@@ -205,6 +207,8 @@ export const TransactionProvider = ({ children }) => {
             categories,
             getCategoryById,
             getCategoriesByType,
+            addCategory,
+            deleteCategory,
             saveSetting,
             getSetting
         }}>
