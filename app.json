@@ -3,7 +3,6 @@
     "name": "Smart Money",
     "slug": "smart-money",
     "version": "1.4.0",
-    "date": "July 4 2025",
     "orientation": "portrait",
     "icon": "./assets/images/adaptive-icon.png",
     "scheme": "smartmoney",
