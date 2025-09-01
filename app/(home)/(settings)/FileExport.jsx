@@ -6,9 +6,9 @@ import * as Sharing from 'expo-sharing';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
+// import RNHTMLtoPDF from 'react-native-html-to-pdf';
 
-import { zip } from 'react-native-zip-archive';
+// import { zip } from 'react-native-zip-archive';
 import { FOLDER_NAME, FOLDER_PATH } from '../(root)/GalleryScreen';
 import { getBackupPath } from '../../(backup)/_index';
 
@@ -35,7 +35,8 @@ export const backupFolderToZip = async () => {
         const sourcePath = FOLDER_PATH.replace('file://', '');
         const outputPath = zipOutputPath.replace('file://', '');
 
-        const zipResult = await zip(sourcePath, outputPath);
+        // const zipResult = await zip(sourcePath, outputPath);
+        const zipResult = "";
 
         console.log('ZIP berhasil disimpan di:', zipResult);
 
@@ -86,11 +87,17 @@ export async function generatePdf(transactions) {
     </html>
   `;
 
-    const file = await RNHTMLtoPDF.convert({
-        html,
+    // const file = await RNHTMLtoPDF.convert({
+    //     html,
+    //     fileName: 'laporan_keuangan',
+    //     directory: 'Documents',
+    // });
+
+    const file = {
+        html : "html code",
         fileName: 'laporan_keuangan',
         directory: 'Documents',
-    });
+    };
 
     return file.filePath;
 }
