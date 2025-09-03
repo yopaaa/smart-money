@@ -210,6 +210,13 @@ export default function SettingsScreen() {
             }}
           />
           <SettingItem
+            title="Export Image"
+            subtitle="Export your image to local folder."
+            onPress={() => {
+              router.push("/(home)/(settings)/ImageExport");
+            }}
+          />
+          <SettingItem
             title="Gallery"
             subtitle="Transactions image list"
             onPress={() => router.push("/(home)/(root)/GalleryScreen")}
